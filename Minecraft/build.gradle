@@ -1,0 +1,28 @@
+plugins {
+    id 'java'
+}
+
+group = 'cn.xiaozhou'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    implementation fileTree(
+            dir: 'runtime/libraries',
+            include: ['**/*.jar']
+    )
+    implementation files("runtime/versions/1.8.8/1.8.8.jar")
+
+    implementation files("../libraries/JuiceLoader.jar")
+    implementation project(":Loader")
+}
+
+test {
+    useJUnitPlatform()
+}

@@ -1,0 +1,9 @@
+server.properties
+options.txt
+servers.dat
+usercache.json
+
+logs/*
+saves/*
+crash-reports/*
+resourcepacks
