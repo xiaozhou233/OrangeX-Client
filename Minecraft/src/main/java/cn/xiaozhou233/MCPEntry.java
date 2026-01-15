@@ -14,15 +14,43 @@ public enum MCPEntry {
         System.out.println("[OrangeX Client] Stopping...");
     }
 
-    public void start() {
-        System.out.println("[OrangeX Client] Starting...");
+    public static String userDir = System.getProperty("user.home");
+    public static Thread clientThread;
+    public static ClassLoader minecraftClassLoader;
 
-        // JuiceLoader
+    public static void start() {
+        System.out.println("======== Loader START ========");
+
         System.load(new File("../../natives/libjuiceloader.dll").getAbsolutePath());
         JuiceLoader.init();
 
-        Loader.start();
-        System.out.println("[OrangeX Client] Done.");
+        // Find client thread
+        for (Thread t : Thread.getAllStackTraces().keySet()) {
+            if ("Client thread".equals(t.getName())) {
+                clientThread = t;
+                break;
+            }
+        }
+        if (clientThread == null) {
+            throw new IllegalStateException("Cannot find Minecraft client thread");
+        }
 
+        // Get Minecraft ClassLoader
+        minecraftClassLoader = clientThread.getContextClassLoader();
+        System.out.println("Minecraft ClassLoader: " + minecraftClassLoader);
+
+        // Load OrangeX
+        File injectionFile = new File(userDir + "/.orangex/OrangeX.jar");
+        System.out.println("OrangeX Injection: " + injectionFile.getAbsolutePath());
+        JuiceLoader.AddToClassLoader(injectionFile.getAbsolutePath(), minecraftClassLoader);
+
+        // Start OrangeX
+        try {
+            Class<?> orangeXClass = Class.forName("cn.xiaozhou233.orangex.OrangeX", true, minecraftClassLoader);
+            orangeXClass.getMethod("start").invoke(null);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println("======== Loader END ========");
     }
 }
