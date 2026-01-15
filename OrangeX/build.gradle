@@ -1,0 +1,34 @@
+plugins {
+    id 'java'
+    id "com.gradleup.shadow" version "8.3.9"
+}
+
+group = 'cn.xiaozhou.orangex'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    compileOnly(files("../libraries/minecraft-1.8.9.jar"))
+    compileOnly(files("../libraries/1.8.9-OptiFine.jar"))
+    compileOnly(files("../libraries/lwjgl-2.9.4-nightly-20150209.jar"))
+    // https://mvnrepository.com/artifact/org.projectlombok/lombok
+    compileOnly("org.projectlombok:lombok:1.18.42")
+    annotationProcessor "org.projectlombok:lombok:1.18.42"
+
+    implementation(files("../libraries/ymixin.jar"))
+    // https://mvnrepository.com/artifact/org.ow2.asm/asm-tree
+    implementation("org.ow2.asm:asm-tree:9.8")
+    // https://mvnrepository.com/artifact/org.ow2.asm/asm-tree
+    implementation("org.ow2.asm:asm:9.8")
+    // Source: https://mvnrepository.com/artifact/org.greenrobot/eventbus
+    implementation 'org.greenrobot:eventbus:3.1.1'
+}
+
+
+shadowJar {
+    relocate 'org.objectweb.asm', 'cn.xiaozhou233.asm9'
+}

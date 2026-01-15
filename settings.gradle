@@ -1,0 +1,6 @@
+rootProject.name = 'OrangeX-Client'
+include 'Minecraft'
+include 'OrangeX'
+include 'Loader'
+include 'Injector'
+

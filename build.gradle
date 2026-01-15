@@ -1,0 +1,64 @@
+tasks.register("buildInjection", Copy) {
+    group = 'build'
+    description = 'Build and collect all jars + resources into out/tmp'
+
+    dependsOn(
+            project(':OrangeX').tasks.named('build'),
+            project(':Loader').tasks.named('build')
+    )
+
+    into(layout.projectDirectory.dir('out/tmp'))
+
+    from(project(':OrangeX').tasks.named('shadowJar').map { it.archiveFile }) {
+        rename { 'OrangeX.jar' }
+    }
+    from(project(':Loader').tasks.named('shadowJar').map { it.archiveFile }) {
+        rename { 'Entry.jar' }
+    }
+
+    from(layout.projectDirectory.dir('natives'))
+    from(layout.projectDirectory.dir('resources'))
+    from(layout.projectDirectory.file('libraries/JuiceLoader.jar'))
+}
+
+tasks.register("packInjection", Zip) {
+    group = 'build'
+    description = 'Package all collected files into injection.zip'
+
+    dependsOn(tasks.named("buildInjection"))
+
+    destinationDirectory.set(layout.projectDirectory.dir("out"))
+    archiveFileName.set("injection.zip")
+
+    from(layout.projectDirectory.dir("out/tmp"))
+}
+
+tasks.register("buildInjector", Jar) {
+    group = 'build'
+    description = 'Build Injector.jar including injection.zip'
+
+    dependsOn(tasks.named("packInjection"))
+    dependsOn(project(':Injector').tasks.named('shadowJar'))
+
+    destinationDirectory.set(layout.projectDirectory.dir("out"))
+    archiveFileName.set("Injector.jar")
+
+    from(zipTree(project(':Injector').tasks.named('shadowJar').map { it.archiveFile })) {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+    from(layout.projectDirectory.file("out/injection.zip")) {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+
+    manifest {
+        attributes(
+                'Main-Class': 'cn.xiaozhou233.orangex.injector.Injector'
+        )
+    }
+
+    doLast {
+        delete('out/injection.zip')
+    }
+}
+
+
