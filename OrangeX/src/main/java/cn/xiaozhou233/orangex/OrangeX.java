@@ -7,7 +7,7 @@ import org.greenrobot.eventbus.EventBus;
 
 public class OrangeX {
     @Getter
-    public static final EventBus eventBus = EventBus.builder()
+    private static final EventBus eventBus = EventBus.builder()
             .logNoSubscriberMessages(false)
             .logSubscriberExceptions(false)
             .sendNoSubscriberEvent(false)
@@ -20,5 +20,9 @@ public class OrangeX {
         MixinManager.start();
 
         ModuleManager.registerAll();
+    }
+
+    public static void stop() {
+        System.out.println("OrangeX stopping...");
     }
 }
