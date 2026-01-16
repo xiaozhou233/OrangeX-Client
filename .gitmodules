@@ -1,0 +1,6 @@
+[submodule "JuiceAgent"]
+	path = JuiceAgent
+	url = https://github.com/xiaozhou233/JuiceAgent.git
+[submodule "JuiceLoader"]
+	path = JuiceLoader
+	url = https://github.com/xiaozhou233/JuiceLoader.git
