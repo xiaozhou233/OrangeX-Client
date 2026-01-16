@@ -5,6 +5,8 @@ import cn.xiaozhou233.orangex.module.ModuleManager;
 import lombok.Getter;
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.File;
+
 public class OrangeX {
     @Getter
     private static final EventBus eventBus = EventBus.builder()
@@ -13,13 +15,16 @@ public class OrangeX {
             .sendNoSubscriberEvent(false)
             .sendSubscriberExceptionEvent(false)
             .installDefaultEventBus();
+    @Getter
+    private static ModuleManager moduleManager = new ModuleManager();
+    @Getter
+    private static String orangexDir = new File(System.getProperty("user.dir") + "/.orangex/").getAbsolutePath();
 
     public static void start() {
         System.out.println("OrangeX loading...");
 
         MixinManager.start();
 
-        ModuleManager.registerAll();
     }
 
     public static void stop() {

@@ -1,102 +1,88 @@
 package cn.xiaozhou233.orangex.module.impl.render;
 
+import cn.xiaozhou233.orangex.OrangeX;
 import cn.xiaozhou233.orangex.event.impl.EventRender2D;
 import cn.xiaozhou233.orangex.module.Module;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
+import cn.xiaozhou233.orangex.module.ModuleCategory;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class HUD extends Module {
 
-    private Minecraft mc;
-    private FontRenderer fr;
-
-    private final ArrayList<String> modules = new ArrayList<>();
-
     private float rainbowTick = 0f;
 
+    // HUD 常量
+    private static final int MARGIN = 6;
+    private static final int PADDING = 2;
+    private static final int MODULE_SPACING = 4;
+    private static final int LOGO_COLOR = 0xFFA500;
+    private static final int BACKGROUND_ALPHA = 0x70; // 112
+    private static final float RAINBOW_CYCLE = 60f;
+
     public HUD() {
-        modules.add("Juice uwu");
-        modules.add("ExampleA");
-        modules.add("ExampleB");
-        modules.add("ExampleC");
-        modules.add("114514");
+        super("HUD", ModuleCategory.RENDER);
+
+        // TODO: Release 时移除
+        keyBind = 41;
+        setEnabled(true);
     }
 
     @Subscribe
     public void onRender2D(EventRender2D event) {
-
-        // Lazy init, safe in MC thread
-        if (mc == null) {
-            mc = Minecraft.getMinecraft();
-            if (mc == null || mc.fontRendererObj == null) return;
-            fr = mc.fontRendererObj;
-        }
-
         ScaledResolution sr = new ScaledResolution(mc);
-        float partialTicks = event.getPartialTicks();
-
-        rainbowTick += partialTicks;
+        rainbowTick += event.getPartialTicks();
 
         renderLogo();
-        renderModuleList(sr, rainbowTick);
+        renderModuleList(sr);
     }
 
     private void renderLogo() {
-        fr.drawStringWithShadow(
-                "OrangeX Client",
-                10,
-                10,
-                0xFFA500
-        );
+        fr.drawStringWithShadow("OrangeX Client", MARGIN, MARGIN, LOGO_COLOR);
     }
 
-    private void renderModuleList(ScaledResolution sr, float baseTick) {
-        int margin = 6;
-        int y = margin;
-        int index = 0;
+    private void renderModuleList(ScaledResolution sr) {
+        List<Module> enabledModules = OrangeX.getModuleManager()
+                .getAllModules()
+                .stream()
+                .filter(Module::isEnabled)
+                .sorted(Comparator.comparingInt((Module m) -> fr.getStringWidth(m.getName())).reversed())
+                .collect(Collectors.toList());
 
-        modules.sort(
-                Comparator.comparingInt(fr::getStringWidth).reversed()
-        );
+        int y = MARGIN;
+        int screenWidth = sr.getScaledWidth();
 
-        for (String module : modules) {
-            int textWidth = fr.getStringWidth(module);
-            int x = sr.getScaledWidth() - textWidth - margin;
+        for (int i = 0; i < enabledModules.size(); i++) {
+            Module module = enabledModules.get(i);
+            int textWidth = fr.getStringWidth(module.getName());
+            int x = screenWidth - textWidth - MARGIN;
 
-            int color = getRainbowColor(baseTick + index * 6f);
+            int color = getRainbowColor(rainbowTick + i * 6f);
+            drawHudString(module.getName(), x, y, color);
 
-            drawHudString(module, x, y, color);
-
-            y += fr.FONT_HEIGHT + 4;
-            index++;
+            y += fr.FONT_HEIGHT + MODULE_SPACING;
         }
     }
 
     private void drawHudString(String text, int x, int y, int color) {
-        int padding = 2;
-
+        int textWidth = fr.getStringWidth(text);
         Gui.drawRect(
-                x - padding,
-                y - padding,
-                x + fr.getStringWidth(text) + padding,
-                y + fr.FONT_HEIGHT + padding,
-                0x70000000
+                x - PADDING,
+                y - PADDING,
+                x + textWidth + PADDING,
+                y + fr.FONT_HEIGHT + PADDING,
+                (BACKGROUND_ALPHA << 24) | 0x000000
         );
-
         fr.drawStringWithShadow(text, x, y, color);
     }
 
     private int getRainbowColor(float tick) {
-        float cycle = 60f;
-        float hue = (tick % cycle) / cycle;
+        float hue = (tick % RAINBOW_CYCLE) / RAINBOW_CYCLE;
         return Color.HSBtoRGB(hue, 0.9f, 1.0f);
     }
 }
-
