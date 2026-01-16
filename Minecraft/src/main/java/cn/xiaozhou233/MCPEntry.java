@@ -40,7 +40,7 @@ public enum MCPEntry {
         System.out.println("Minecraft ClassLoader: " + minecraftClassLoader);
 
         // Load OrangeX
-        File injectionFile = new File(userDir + "/.orangex/OrangeX.jar");
+        File injectionFile = new File("../../out/tmp/OrangeX.jar");
         System.out.println("OrangeX Injection: " + injectionFile.getAbsolutePath());
         JuiceLoader.AddToClassLoader(injectionFile.getAbsolutePath(), minecraftClassLoader);
 
