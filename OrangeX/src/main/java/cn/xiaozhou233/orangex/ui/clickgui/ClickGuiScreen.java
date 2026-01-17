@@ -18,7 +18,7 @@ public class ClickGuiScreen extends GuiScreen {
     public void initGui() {
         panel = new PanelUI(10, 10, 120, 180, "Combat");
 
-        for (Module module : OrangeX.getModuleManager().getAllModules()) {
+        for (Module module : OrangeX.getInstance().getModuleManager().getAllModules()) {
             panel.addComponent(new ModuleButton(module, 120));
         }
     }

@@ -16,17 +16,17 @@ public class MixinMinecraft {
 
     @Inject(method = "runGameLoop", desc = "()V", target = @Target("HEAD"))
     private void onLoop() {
-        OrangeX.getEventBus().post(new EventLoop());
+        OrangeX.getInstance().getEventBus().post(new EventLoop());
     }
 
     @Inject(method = "runTick", desc = "()V", target = @Target("HEAD"))
     public void onTick() {
-        OrangeX.getEventBus().post(new EventTick());
+        OrangeX.getInstance().getEventBus().post(new EventTick());
     }
 
     @Inject(method = "shutdownMinecraftApplet", desc = "()V", target = @Target("HEAD"))
     public void onShutdown() {
-        OrangeX.stop();
+        OrangeX.getInstance().stop();
     }
 
     @Inject(
@@ -39,11 +39,11 @@ public class MixinMinecraft {
     )
     public void onKey(@Local(source = "key", index = 1) int key) {
         if (Minecraft.getMinecraft().currentScreen == null && Keyboard.getEventKeyState())
-            OrangeX.getEventBus().post(new EventKey(key));
+            OrangeX.getInstance().getEventBus().post(new EventKey(key));
     }
 
     @Inject(method = "loadWorld", desc = "(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", target = @Target("HEAD"))
     public void onLoadWorld() {
-        OrangeX.getEventBus().post(new EventWorldLoad());
+        OrangeX.getInstance().getEventBus().post(new EventWorldLoad());
     }
 }

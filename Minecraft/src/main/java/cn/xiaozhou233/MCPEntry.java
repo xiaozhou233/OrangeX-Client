@@ -44,10 +44,10 @@ public enum MCPEntry {
         System.out.println("OrangeX Injection: " + injectionFile.getAbsolutePath());
         JuiceLoader.AddToClassLoader(injectionFile.getAbsolutePath(), minecraftClassLoader);
 
-        // Start OrangeX
         try {
             Class<?> orangeXClass = Class.forName("cn.xiaozhou233.orangex.OrangeX", true, minecraftClassLoader);
-            orangeXClass.getMethod("start").invoke(null);
+            Object instance = orangeXClass.getMethod("getInstance").invoke(null);
+            orangeXClass.getMethod("start").invoke(instance);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

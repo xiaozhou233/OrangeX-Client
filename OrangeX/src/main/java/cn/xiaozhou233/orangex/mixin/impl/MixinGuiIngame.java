@@ -33,7 +33,7 @@ public class MixinGuiIngame {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         mc.entityRenderer.setupOverlayRendering();
 
-        OrangeX.getEventBus().post(new EventRender2D(partialTicks));
+        OrangeX.getInstance().getEventBus().post(new EventRender2D(partialTicks));
 
         GlStateManager.enableDepth();
         GlStateManager.disableBlend();

@@ -47,7 +47,7 @@ public class HUD extends Module {
     }
 
     private void renderModuleList(ScaledResolution sr) {
-        List<Module> enabledModules = OrangeX.getModuleManager()
+        List<Module> enabledModules = OrangeX.getInstance().getModuleManager()
                 .getAllModules()
                 .stream()
                 .filter(Module::isEnabled)

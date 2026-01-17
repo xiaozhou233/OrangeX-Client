@@ -11,11 +11,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 public class ModuleManager {
-    // 使用线程安全列表
     private static final List<Module> modules = new CopyOnWriteArrayList<>();
 
     public ModuleManager() {
-        OrangeX.getEventBus().register(this);
+
+    }
+
+    public void init() {
+        OrangeX.getInstance().getEventBus().register(this);
         registerAll();
     }
 
