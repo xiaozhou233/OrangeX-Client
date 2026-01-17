@@ -20,14 +20,20 @@ public class OrangeX {
     private static ModuleManager moduleManager = new ModuleManager();
     @Getter
     private static String orangexDir = new File(System.getProperty("user.dir") + "/.orangex/").getAbsolutePath();
-    @Getter
-    private static FontManager fontManager = new FontManager();
+    private static FontManager fontManager;
 
     public static void start() {
         System.out.println("OrangeX loading...");
 
         MixinManager.start();
 
+    }
+
+    public static FontManager getFontManager() {
+        if (fontManager == null) {
+            fontManager = new FontManager();
+        }
+        return fontManager;
     }
 
     public static void stop() {
