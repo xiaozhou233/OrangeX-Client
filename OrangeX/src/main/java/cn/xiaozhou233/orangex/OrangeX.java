@@ -1,5 +1,6 @@
 package cn.xiaozhou233.orangex;
 
+import cn.xiaozhou233.orangex.font.FontManager;
 import cn.xiaozhou233.orangex.mixin.MixinManager;
 import cn.xiaozhou233.orangex.module.ModuleManager;
 import lombok.Getter;
@@ -19,6 +20,8 @@ public class OrangeX {
     private static ModuleManager moduleManager = new ModuleManager();
     @Getter
     private static String orangexDir = new File(System.getProperty("user.dir") + "/.orangex/").getAbsolutePath();
+    @Getter
+    private static FontManager fontManager = new FontManager();
 
     public static void start() {
         System.out.println("OrangeX loading...");
