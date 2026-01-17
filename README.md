@@ -46,3 +46,6 @@
 * 使用 `./gradlew buildInjector` 构建项目
 * 构建完成后，`out/` 目录下会生成 `Injector.jar`
 * 使用 `java -jar Injector.jar` 启动注入器
+
+# 致谢
+* [FontRenderer](https://github.com/Godwhitelight/FontRenderer) - 字体渲染
