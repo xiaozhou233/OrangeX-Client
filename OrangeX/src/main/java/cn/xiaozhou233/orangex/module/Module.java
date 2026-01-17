@@ -41,14 +41,14 @@ public abstract class Module {
         this.enabled = setEnabled;
 
         if (this.enabled) {
-            if (OrangeX.getEventBus().isRegistered(this))
+            if (OrangeX.getInstance().getEventBus().isRegistered(this))
                 return;
-            try { OrangeX.getEventBus().register(this); } catch (Exception ignored) {}
+            try { OrangeX.getInstance().getEventBus().register(this); } catch (Exception ignored) {}
             onEnable();
         } else {
-            if (!OrangeX.getEventBus().isRegistered(this))
+            if (!OrangeX.getInstance().getEventBus().isRegistered(this))
                 return;
-            try { OrangeX.getEventBus().unregister(this); } catch (Exception ignored) {}
+            try { OrangeX.getInstance().getEventBus().unregister(this); } catch (Exception ignored) {}
             onDisable();
         }
     }

@@ -10,23 +10,34 @@ import java.io.File;
 
 public class OrangeX {
     @Getter
-    private static final EventBus eventBus = EventBus.builder()
-            .logNoSubscriberMessages(false)
-            .logSubscriberExceptions(false)
-            .sendNoSubscriberEvent(false)
-            .sendSubscriberExceptionEvent(false)
-            .installDefaultEventBus();
+    private static final OrangeX Instance = new OrangeX();
     @Getter
-    private static ModuleManager moduleManager = new ModuleManager();
+    private final EventBus eventBus;
     @Getter
-    private static String orangexDir = new File(System.getProperty("user.dir") + "/.orangex/").getAbsolutePath();
+    private final ModuleManager moduleManager;
     private static FontManager fontManager;
 
-    public static void start() {
-        System.out.println("OrangeX loading...");
+    public OrangeX() {
+        // EventBus
+        this.eventBus = EventBus.builder()
+                .logNoSubscriberMessages(false)
+                .logSubscriberExceptions(false)
+                .sendNoSubscriberEvent(false)
+                .sendSubscriberExceptionEvent(false)
+                .installDefaultEventBus();
 
+        // Module Manager
+        this.moduleManager = new ModuleManager();
+    }
+
+    public void start() {
+        System.out.println("OrangeX start!");
         MixinManager.start();
+        moduleManager.init();
+    }
 
+    public void stop() {
+        System.out.println("OrangeX stopping...");
     }
 
     public static FontManager getFontManager() {
@@ -34,9 +45,5 @@ public class OrangeX {
             fontManager = new FontManager();
         }
         return fontManager;
-    }
-
-    public static void stop() {
-        System.out.println("OrangeX stopping...");
     }
 }
