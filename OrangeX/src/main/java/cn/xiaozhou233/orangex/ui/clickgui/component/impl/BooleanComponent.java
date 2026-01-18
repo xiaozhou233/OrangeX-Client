@@ -19,18 +19,14 @@ public class BooleanComponent extends ValueComponent {
         double ax = getAbsoluteX();
         double ay = getAbsoluteY();
 
+        int bgColor = value.getValue() ? 0xFF2E8B57 : 0xFF444444;
+        if (isHovered(mouseX, mouseY)) {
+            bgColor = GuiRenderUtils.blendColor(bgColor, 0xFFFFFFFF, 0.12f);
+        }
+
         GuiRenderUtils.enableBlend();
-
-        // background
-        GuiRenderUtils.drawRect(ax, ay, width, height, 0x80000000);
-
-        // name text
-        GuiRenderUtils.drawString(value.getName(), ax + 4, ay + 3, 0xFFFFFFFF);
-
-        // toggle indicator
-        int color = value.getValue() ? 0xFF00FF00 : 0xFFAAAAAA;
-        GuiRenderUtils.drawRect(ax + width - 14, ay + 3, 10, 8, color);
-
+        GuiRenderUtils.drawRect(ax, ay, width, height, bgColor);
+        GuiRenderUtils.drawString(value.getName(), ax + 6, ay + 4, 0xFFFFFFFF);
         GuiRenderUtils.disableBlend();
     }
 
@@ -39,11 +35,12 @@ public class BooleanComponent extends ValueComponent {
         if (!isHovered(mouseX, mouseY)) return;
         if (button == 0) {
             value.setValue(!value.getValue());
+            applyValue();
         }
     }
 
     @Override
     public void applyValue() {
-        // optional
+        // no-op: value 已经直接设置
     }
 }

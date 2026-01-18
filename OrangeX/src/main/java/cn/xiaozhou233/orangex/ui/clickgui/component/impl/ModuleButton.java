@@ -38,15 +38,12 @@ public class ModuleButton extends Component {
             bgColor = GuiRenderUtils.blendColor(bgColor, 0xFFFFFFFF, 0.15f);
         }
 
-        // draw background
         GuiRenderUtils.enableBlend();
         GuiRenderUtils.drawRect(ax, ay, width, baseHeight, bgColor);
 
-        // draw status bar (left)
         int statusColor = module.isEnabled() ? 0xFF00FF00 : 0xFF888888;
         GuiRenderUtils.drawRect(ax, ay, 2, baseHeight, statusColor);
 
-        // draw module name
         GuiRenderUtils.drawString(module.getName(), ax + 6, ay + 5, 0xFFFFFFFF);
         GuiRenderUtils.disableBlend();
 
@@ -58,7 +55,7 @@ public class ModuleButton extends Component {
         double offsetY = baseHeight;
         for (Component component : components) {
             component.setY(offsetY);
-            component.setWidth(width);  // ensure same width
+            component.setWidth(width);
             component.render(mouseX, mouseY, partialTicks);
             offsetY += component.getHeight();
         }
@@ -76,6 +73,18 @@ public class ModuleButton extends Component {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
+
+        // 先让子组件处理点击（优先级更高）
+        if (expanded) {
+            for (Component component : components) {
+                if (component.isHovered(mouseX, mouseY)) {
+                    component.mouseClicked(mouseX, mouseY, button);
+                    return;  // 子组件处理后，不再继续处理 module 的开关
+                }
+            }
+        }
+
+        // 只有点击到 ModuleButton 自己时才处理开关/展开
         if (!isHovered(mouseX, mouseY)) return;
 
         if (button == 0) {
