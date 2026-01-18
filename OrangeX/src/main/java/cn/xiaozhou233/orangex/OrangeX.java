@@ -9,8 +9,7 @@ import org.greenrobot.eventbus.EventBus;
 import java.io.File;
 
 public class OrangeX {
-    @Getter
-    private static final OrangeX Instance = new OrangeX();
+    private static OrangeX instance;
     @Getter
     private final EventBus eventBus;
     @Getter
@@ -45,5 +44,12 @@ public class OrangeX {
             fontManager = new FontManager();
         }
         return fontManager;
+    }
+
+    public static OrangeX getInstance() {
+        if (instance == null) {
+            instance = new OrangeX();
+        }
+        return instance;
     }
 }
