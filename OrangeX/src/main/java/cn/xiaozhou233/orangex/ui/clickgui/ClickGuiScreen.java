@@ -10,8 +10,10 @@ import cn.xiaozhou233.orangex.ui.clickgui.component.impl.BooleanComponent;
 import cn.xiaozhou233.orangex.ui.clickgui.component.impl.NumberComponent;
 import cn.xiaozhou233.orangex.ui.clickgui.component.impl.ModeComponent;
 import cn.xiaozhou233.orangex.ui.clickgui.component.impl.KeybindComponent;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +24,6 @@ public class ClickGuiScreen extends GuiScreen {
 
     @Override
     public void initGui() {
-        System.out.println("ClickGui init");
         panels.clear();
 
         // build panels for each category
@@ -57,18 +58,18 @@ public class ClickGuiScreen extends GuiScreen {
             panels.add(panel);
             startX += panelWidth + gap;
         }
-
-        System.out.println("Panels count: " + panels.size());
-        for (Panel p : panels) {
-            System.out.println("Panel " + p.getTitle() + " components: " + p.getComponents().size());
-        }
-
     }
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         // background
-        drawDefaultBackground();
+        Gui.drawRect(
+                0,
+                0,
+                width,
+                height,
+                new Color(50, 50, 50, 100).getRGB()
+        );
 
         // update and render panels
         for (Panel panel : panels) {

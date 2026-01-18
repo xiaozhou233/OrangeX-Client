@@ -4,6 +4,7 @@ import cn.xiaozhou233.orangex.ui.clickgui.component.Component;
 import cn.xiaozhou233.orangex.ui.clickgui.render.GuiRenderUtils;
 import lombok.Getter;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,10 +37,10 @@ public class Panel extends Component {
 
         // draw header background
         GuiRenderUtils.enableBlend();
-        GuiRenderUtils.drawRect(ax, ay, width, headerHeight, 0x80000000);
+        GuiRenderUtils.drawRect(ax, ay, width, headerHeight, new Color(32, 32, 32, 255).getRGB());
 
         // draw title
-        GuiRenderUtils.drawString(title, ax + 4, ay + 4, 0xFFFFFFFF);
+        GuiRenderUtils.drawCenteredString(title, ax + width / 2, ay + 5, new Color(255, 255, 255, 255).getRGB());
         GuiRenderUtils.disableBlend();
 
         if (!open) return;

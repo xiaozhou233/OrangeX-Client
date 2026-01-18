@@ -1,5 +1,6 @@
 package cn.xiaozhou233.orangex.ui.clickgui.render;
 
+import cn.xiaozhou233.orangex.OrangeX;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
@@ -14,8 +15,13 @@ public class GuiRenderUtils {
     }
 
     public static void drawString(String text, double x, double y, int color) {
-        FontRenderer fr = mc.fontRendererObj;
-        fr.drawString(text, (int) x, (int) y, color);
+        OrangeX.getFontManager().MontserratRegular18
+                .drawString(text, (float) x, (float) y, color);
+    }
+
+    public static void drawCenteredString(String text, double x, double y, int color) {
+        OrangeX.getFontManager().MontserratRegular18
+                .drawString(text, (float) x - (float) OrangeX.getFontManager().MontserratLight18.getStringWidth(text) / 2, (float) y, color);
     }
 
     public static void enableBlend() {
