@@ -4,12 +4,8 @@ import cn.xiaozhou233.orangex.module.value.ModeValue;
 import cn.xiaozhou233.orangex.ui.clickgui.component.Component;
 import cn.xiaozhou233.orangex.ui.clickgui.component.ValueComponent;
 import cn.xiaozhou233.orangex.ui.clickgui.render.GuiRenderUtils;
-import net.minecraft.client.Minecraft;
-
-import java.util.List;
 
 public class ModeComponent extends ValueComponent {
-    private final Minecraft mc = Minecraft.getMinecraft();
 
     private final ModeValue value;
 
@@ -23,33 +19,31 @@ public class ModeComponent extends ValueComponent {
         double ax = getAbsoluteX();
         double ay = getAbsoluteY();
 
+        int bgColor = 0xFF333333;
+        if (isHovered(mouseX, mouseY)) {
+            bgColor = GuiRenderUtils.blendColor(bgColor, 0xFFFFFFFF, 0.12f);
+        }
+
         GuiRenderUtils.enableBlend();
+        GuiRenderUtils.drawRect(ax, ay, width, height, bgColor);
 
-        // background
-        GuiRenderUtils.drawRect(ax, ay, width, height, 0x80000000);
-
-        // name text
-        GuiRenderUtils.drawString(value.getName(), ax + 4, ay + 3, 0xFFFFFFFF);
-
-        // mode text
-        String mode = value.getValue();
-        GuiRenderUtils.drawString(mode, ax + width - 4 - mc.fontRendererObj.getStringWidth(mode), ay + 3, 0xFFFFFFFF);
-
+        String text = value.getName() + ": " + value.getValue();
+        GuiRenderUtils.drawString(text, ax + 6, ay + 4, 0xFFFFFFFF);
         GuiRenderUtils.disableBlend();
     }
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
         if (!isHovered(mouseX, mouseY)) return;
-        if (button == 0) {
-            List<String> modes = value.getModes();
-            int idx = (value.getIndex() + 1) % modes.size();
-            value.setIndex(idx);
-        }
+
+        if (button == 0) value.next();
+        else if (button == 1) value.previous();
+
+        applyValue();
     }
 
     @Override
     public void applyValue() {
-        // optional
+        // no-op
     }
 }

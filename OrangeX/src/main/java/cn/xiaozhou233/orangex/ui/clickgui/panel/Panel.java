@@ -28,18 +28,13 @@ public class Panel extends Component {
         this.height = headerHeight;
     }
 
-    /* ================= 渲染 ================= */
-
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
         double ax = getAbsoluteX();
         double ay = getAbsoluteY();
 
-        // draw header background
         GuiRenderUtils.enableBlend();
         GuiRenderUtils.drawRect(ax, ay, width, headerHeight, new Color(32, 32, 32, 255).getRGB());
-
-        // draw title
         GuiRenderUtils.drawCenteredString(title, ax + width / 2, ay + 5, new Color(255, 255, 255, 255).getRGB());
         GuiRenderUtils.disableBlend();
 
@@ -58,9 +53,6 @@ public class Panel extends Component {
         this.height = offsetY;
     }
 
-
-    /* ================= 更新 ================= */
-
     @Override
     public void update(int mouseX, int mouseY) {
         if (dragging) {
@@ -74,8 +66,6 @@ public class Panel extends Component {
             component.update(mouseX, mouseY);
         }
     }
-
-    /* ================= 鼠标 ================= */
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
@@ -110,13 +100,18 @@ public class Panel extends Component {
         }
     }
 
-    /* ================= 工具 ================= */
-
-    private boolean isHeaderHovered(int mouseX, int mouseY) {
+    public boolean isHeaderHovered(int mouseX, int mouseY) {
         double px = getAbsoluteX();
         double py = getAbsoluteY();
         return mouseX >= px && mouseX <= px + width
                 && mouseY >= py && mouseY <= py + headerHeight;
+    }
+
+    public boolean isHovered(int mouseX, int mouseY) {
+        double px = getAbsoluteX();
+        double py = getAbsoluteY();
+        return mouseX >= px && mouseX <= px + width
+                && mouseY >= py && mouseY <= py + height;
     }
 
     public void addComponent(Component component) {
