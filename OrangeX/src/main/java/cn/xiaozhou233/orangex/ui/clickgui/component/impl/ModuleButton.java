@@ -28,25 +28,42 @@ public class ModuleButton extends Component {
         double ax = getAbsoluteX();
         double ay = getAbsoluteY();
 
+        int bgColor = 0x80000000;
+
+        if (module.isEnabled()) {
+            bgColor = 0xFF2E8B57;
+        }
+
+        if (isHovered(mouseX, mouseY)) {
+            bgColor = GuiRenderUtils.blendColor(bgColor, 0xFFFFFFFF, 0.15f);
+        }
+
         // draw background
         GuiRenderUtils.enableBlend();
-        GuiRenderUtils.drawRect(ax, ay, width, baseHeight, 0x80000000);
+        GuiRenderUtils.drawRect(ax, ay, width, baseHeight, bgColor);
+
+        // draw status bar (left)
+        int statusColor = module.isEnabled() ? 0xFF00FF00 : 0xFF888888;
+        GuiRenderUtils.drawRect(ax, ay, 2, baseHeight, statusColor);
 
         // draw module name
-        GuiRenderUtils.drawString(module.getName(), ax + 4, ay + 3, 0xFFFFFFFF);
+        GuiRenderUtils.drawString(module.getName(), ax + 6, ay + 3, 0xFFFFFFFF);
         GuiRenderUtils.disableBlend();
 
-        if (!expanded) return;
+        if (!expanded) {
+            this.height = baseHeight;
+            return;
+        }
 
         double offsetY = baseHeight;
         for (Component component : components) {
             component.setY(offsetY);
+            component.setWidth(width);  // ensure same width
             component.render(mouseX, mouseY, partialTicks);
             offsetY += component.getHeight();
         }
         this.height = offsetY;
     }
-
 
     @Override
     public void update(int mouseX, int mouseY) {
