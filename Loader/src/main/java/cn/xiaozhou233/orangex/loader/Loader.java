@@ -36,8 +36,9 @@ public class Loader {
         // Start OrangeX
         try {
             Class<?> orangeXClass = Class.forName("cn.xiaozhou233.orangex.OrangeX", true, minecraftClassLoader);
-            Object orangeXInstance = orangeXClass.getDeclaredConstructor().newInstance();
+            Object orangeXInstance = orangeXClass.getMethod("getInstance").invoke(null);
             orangeXClass.getMethod("start").invoke(orangeXInstance);
+
 
         } catch (Exception e) {
             throw new RuntimeException(e);
