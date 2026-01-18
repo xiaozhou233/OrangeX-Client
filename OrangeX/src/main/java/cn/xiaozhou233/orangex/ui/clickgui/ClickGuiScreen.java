@@ -22,11 +22,13 @@ public class ClickGuiScreen extends GuiScreen {
 
     private final List<Panel> panels = new ArrayList<>();
 
+    // 当前正在拖拽的面板
+    private Panel draggingPanel = null;
+
     @Override
     public void initGui() {
         panels.clear();
 
-        // build panels for each category
         double startX = 20;
         double startY = 20;
         double panelWidth = 120;
@@ -35,11 +37,9 @@ public class ClickGuiScreen extends GuiScreen {
         for (ModuleCategory category : ModuleCategory.values()) {
             Panel panel = new Panel(category.name(), startX, startY, panelWidth);
 
-            // add module buttons
             for (Module module : OrangeX.getInstance().getModuleManager().getModulesByCategory(category)) {
                 ModuleButton button = new ModuleButton(0, 0, panelWidth, module, panel);
 
-                // add all values
                 for (Value<?> value : module.getValues()) {
                     if (value instanceof BooleanValue) {
                         button.addComponent(new BooleanComponent(0, 0, panelWidth, (BooleanValue) value, button));
@@ -62,16 +62,8 @@ public class ClickGuiScreen extends GuiScreen {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        // background
-        Gui.drawRect(
-                0,
-                0,
-                width,
-                height,
-                new Color(50, 50, 50, 100).getRGB()
-        );
+        Gui.drawRect(0, 0, width, height, new Color(50, 50, 50, 100).getRGB());
 
-        // update and render panels
         for (Panel panel : panels) {
             panel.update(mouseX, mouseY);
             panel.render(mouseX, mouseY, partialTicks);
@@ -82,17 +74,36 @@ public class ClickGuiScreen extends GuiScreen {
 
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-        for (Panel panel : panels) {
-            panel.mouseClicked(mouseX, mouseY, mouseButton);
+        // 从后往前，优先处理最上层面板
+        for (int i = panels.size() - 1; i >= 0; i--) {
+            Panel panel = panels.get(i);
+
+            if (panel.isHovered(mouseX, mouseY) || panel.isHeaderHovered(mouseX, mouseY)) {
+                // 置顶：把点击的面板放到列表末尾（最后渲染）
+                panels.remove(panel);
+                panels.add(panel);
+
+                panel.mouseClicked(mouseX, mouseY, mouseButton);
+
+                // 记录拖拽面板
+                if (mouseButton == 0 && panel.isHeaderHovered(mouseX, mouseY)) {
+                    draggingPanel = panel;
+                }
+
+                return; // 阻止下面面板响应
+            }
         }
+
         super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override
     protected void mouseReleased(int mouseX, int mouseY, int state) {
-        for (Panel panel : panels) {
-            panel.mouseReleased(mouseX, mouseY, state);
+        if (draggingPanel != null) {
+            draggingPanel.mouseReleased(mouseX, mouseY, state);
+            draggingPanel = null;
         }
+
         super.mouseReleased(mouseX, mouseY, state);
     }
 
@@ -102,7 +113,6 @@ public class ClickGuiScreen extends GuiScreen {
             panel.keyTyped(typedChar, keyCode);
         }
 
-        // close GUI on ESC
         if (keyCode == 1) {
             mc.displayGuiScreen(null);
         }

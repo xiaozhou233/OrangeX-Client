@@ -5,14 +5,11 @@ import cn.xiaozhou233.orangex.ui.clickgui.component.Component;
 import cn.xiaozhou233.orangex.ui.clickgui.component.ValueComponent;
 import cn.xiaozhou233.orangex.ui.clickgui.render.GuiRenderUtils;
 import net.minecraft.client.Minecraft;
-import org.lwjgl.input.Keyboard;
 
 public class KeybindComponent extends ValueComponent {
 
     private final KeybindValue value;
-    private boolean listening;
-
-    private final Minecraft mc = Minecraft.getMinecraft();
+    private boolean listening = false;
 
     public KeybindComponent(double x, double y, double width, KeybindValue value, Component parent) {
         super(x, y, width, 14, parent);
@@ -24,24 +21,23 @@ public class KeybindComponent extends ValueComponent {
         double ax = getAbsoluteX();
         double ay = getAbsoluteY();
 
+        int bgColor = 0xFF333333;
+        if (isHovered(mouseX, mouseY)) {
+            bgColor = GuiRenderUtils.blendColor(bgColor, 0xFFFFFFFF, 0.12f);
+        }
+
         GuiRenderUtils.enableBlend();
+        GuiRenderUtils.drawRect(ax, ay, width, height, bgColor);
 
-        // background
-        GuiRenderUtils.drawRect(ax, ay, width, height, 0x80000000);
-
-        // name
-        GuiRenderUtils.drawString(value.getName(), ax + 4, ay + 3, 0xFFFFFFFF);
-
-        // key text
-        String keyText = listening ? "Press..." : Keyboard.getKeyName(value.getValue());
-        GuiRenderUtils.drawString(keyText, ax + width - 4 - mc.fontRendererObj.getStringWidth(keyText), ay + 3, 0xFFFFFFFF);
-
+        String keyName = listening ? "Press a key..." : Minecraft.getMinecraft().gameSettings.getKeyDisplayString(value.getValue());
+        GuiRenderUtils.drawString(value.getName() + ": " + keyName, ax + 6, ay + 4, 0xFFFFFFFF);
         GuiRenderUtils.disableBlend();
     }
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
         if (!isHovered(mouseX, mouseY)) return;
+
         if (button == 0) {
             listening = true;
         }
@@ -51,12 +47,18 @@ public class KeybindComponent extends ValueComponent {
     public void keyTyped(char typedChar, int keyCode) {
         if (!listening) return;
 
+        if (keyCode == 1) {
+            listening = false;
+            return;
+        }
+
         value.setKey(keyCode);
         listening = false;
+        applyValue();
     }
 
     @Override
     public void applyValue() {
-        // optional
+        // no-op
     }
 }

@@ -23,4 +23,28 @@ public class ModeValue extends Value<String> {
         if (index < 0 || index >= modes.size()) return;
         setValue(modes.get(index));
     }
+
+    public void next() {
+        int index = getIndex();
+        if (index < 0) index = 0;
+        index++;
+        if (index >= modes.size()) index = 0;
+        setIndex(index);
+    }
+
+    public void previous() {
+        int index = getIndex();
+        if (index < 0) index = 0;
+        index--;
+        if (index < 0) index = modes.size() - 1;
+        setIndex(index);
+    }
+
+    public String getCurrentMode() {
+        return getValue();
+    }
+
+    public boolean isValidMode(String mode) {
+        return modes.contains(mode);
+    }
 }
