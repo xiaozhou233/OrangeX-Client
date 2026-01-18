@@ -3,21 +3,20 @@ package cn.xiaozhou233.orangex.module.impl.combat;
 import cn.xiaozhou233.orangex.event.impl.EventTick;
 import cn.xiaozhou233.orangex.module.Module;
 import cn.xiaozhou233.orangex.module.ModuleCategory;
+import cn.xiaozhou233.orangex.module.value.NumberValue;
 import net.minecraft.client.settings.KeyBinding;
 import org.greenrobot.eventbus.Subscribe;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 public class AutoClicker extends Module {
+    private final NumberValue cps = new NumberValue("CPS", "Clicks per second", 12.0, 1, 30, 1);
 
-    // Fixed CPS
-    private final double cps = 10.0;
-
-    // Last click timestamp
     private long lastClickTime = 0L;
 
     public AutoClicker() {
         super("AutoClicker", ModuleCategory.COMBAT, Keyboard.KEY_F);
+        addValue(cps);
     }
 
     @Subscribe
@@ -39,7 +38,7 @@ public class AutoClicker extends Module {
         }
 
         long now = System.currentTimeMillis();
-        long delay = (long) (1000.0 / cps);
+        long delay = (long) (1000.0 / cps.getValue());
 
         if (now - lastClickTime >= delay) {
             // Simulate one left click
