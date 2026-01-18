@@ -47,7 +47,7 @@ public class ModuleButton extends Component {
         GuiRenderUtils.drawRect(ax, ay, 2, baseHeight, statusColor);
 
         // draw module name
-        GuiRenderUtils.drawString(module.getName(), ax + 6, ay + 3, 0xFFFFFFFF);
+        GuiRenderUtils.drawString(module.getName(), ax + 6, ay + 5, 0xFFFFFFFF);
         GuiRenderUtils.disableBlend();
 
         if (!expanded) {
