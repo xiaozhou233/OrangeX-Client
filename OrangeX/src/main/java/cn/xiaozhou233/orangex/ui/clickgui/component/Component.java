@@ -7,7 +7,7 @@ public abstract class Component {
 
     @Setter
     protected double x, y;
-    @Getter
+    @Getter @Setter
     protected double width, height;
 
     protected Component parent;
