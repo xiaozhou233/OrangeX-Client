@@ -1,6 +1,7 @@
 package cn.xiaozhou233.orangex.module;
 
 import cn.xiaozhou233.orangex.OrangeX;
+import cn.xiaozhou233.orangex.module.value.KeybindValue;
 import cn.xiaozhou233.orangex.module.value.Value;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +18,7 @@ public abstract class Module {
 
     protected final String name;
     @Setter
-    protected int keyBind = -1;
+    protected KeybindValue keyBind = new KeybindValue("Bind", "KeyBinding", 0);
     protected final ModuleCategory category;
     protected boolean enabled = false;
     @Getter
@@ -30,7 +31,7 @@ public abstract class Module {
 
     public Module(String name, ModuleCategory category, int defaultKey) {
         this(name, category);
-        this.keyBind = defaultKey;
+        this.keyBind.setKey(defaultKey);
     }
 
     protected void onEnable() {

@@ -28,9 +28,10 @@ public class HUD extends Module {
     public HUD() {
         super("HUD", ModuleCategory.RENDER);
 
-        // TODO: Release 时移除
-        keyBind = 41;
+        // TODO: Remove this when config is implemented
         setEnabled(true);
+
+        addValue(keyBind);
     }
 
     @Subscribe
