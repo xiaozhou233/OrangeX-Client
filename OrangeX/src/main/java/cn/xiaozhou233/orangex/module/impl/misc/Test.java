@@ -14,8 +14,9 @@ public class Test extends Module{
 
     public Test() {
         super("Test", ModuleCategory.MISC);
-        setEnabled(true);
 
+        addValue(new BooleanValue("Example Boolean1", "Example", true));
+        addValue(new BooleanValue("Example Boolean2", "Example", false));
     }
 
     @Subscribe
