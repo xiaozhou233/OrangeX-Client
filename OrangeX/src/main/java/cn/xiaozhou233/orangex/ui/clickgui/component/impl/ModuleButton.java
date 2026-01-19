@@ -28,11 +28,7 @@ public class ModuleButton extends Component {
         double ax = getAbsoluteX();
         double ay = getAbsoluteY();
 
-        int bgColor = 0x80000000;
-
-        if (module.isEnabled()) {
-            bgColor = 0xFF2E8B57;
-        }
+        int bgColor = module.isEnabled() ? 0xFF2E8B57 : 0x80000000;
 
         if (isHovered(mouseX, mouseY)) {
             bgColor = GuiRenderUtils.blendColor(bgColor, 0xFFFFFFFF, 0.15f);
@@ -74,17 +70,15 @@ public class ModuleButton extends Component {
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
 
-        // 先让子组件处理点击（优先级更高）
         if (expanded) {
             for (Component component : components) {
                 if (component.isHovered(mouseX, mouseY)) {
                     component.mouseClicked(mouseX, mouseY, button);
-                    return;  // 子组件处理后，不再继续处理 module 的开关
+                    return;
                 }
             }
         }
 
-        // 只有点击到 ModuleButton 自己时才处理开关/展开
         if (!isHovered(mouseX, mouseY)) return;
 
         if (button == 0) {
@@ -96,8 +90,7 @@ public class ModuleButton extends Component {
 
     @Override
     public void mouseReleased(int mouseX, int mouseY, int button) {
-        if (!expanded) return;
-
+        // IMPORTANT: always propagate release to children
         for (Component component : components) {
             component.mouseReleased(mouseX, mouseY, button);
         }
@@ -106,5 +99,4 @@ public class ModuleButton extends Component {
     public void addComponent(Component component) {
         components.add(component);
     }
-
 }
