@@ -117,4 +117,9 @@ public class ClickGuiScreen extends GuiScreen {
 
         super.keyTyped(typedChar, keyCode);
     }
+
+    @Override
+    public boolean doesGuiPauseGame() {
+        return false;
+    }
 }
