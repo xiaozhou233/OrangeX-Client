@@ -20,9 +20,10 @@ import java.util.List;
 
 public class ClickGuiScreen extends GuiScreen {
 
+    // Category
     private final List<Panel> panels = new ArrayList<>();
 
-    // 当前正在拖拽的面板
+    // Dragging
     private Panel draggingPanel = null;
 
     @Override
@@ -74,23 +75,20 @@ public class ClickGuiScreen extends GuiScreen {
 
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-        // 从后往前，优先处理最上层面板
         for (int i = panels.size() - 1; i >= 0; i--) {
             Panel panel = panels.get(i);
 
             if (panel.isHovered(mouseX, mouseY) || panel.isHeaderHovered(mouseX, mouseY)) {
-                // 置顶：把点击的面板放到列表末尾（最后渲染）
                 panels.remove(panel);
                 panels.add(panel);
 
                 panel.mouseClicked(mouseX, mouseY, mouseButton);
 
-                // 记录拖拽面板
                 if (mouseButton == 0 && panel.isHeaderHovered(mouseX, mouseY)) {
                     draggingPanel = panel;
                 }
 
-                return; // 阻止下面面板响应
+                return;
             }
         }
 

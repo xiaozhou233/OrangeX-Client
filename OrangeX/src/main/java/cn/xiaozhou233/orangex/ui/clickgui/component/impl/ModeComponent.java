@@ -10,7 +10,7 @@ public class ModeComponent extends ValueComponent {
     private final ModeValue value;
 
     public ModeComponent(double x, double y, double width, ModeValue value, Component parent) {
-        super(x, y, width, 14, parent);
+        super(x, y, width, 16, parent);
         this.value = value;
     }
 

@@ -15,4 +15,5 @@ public class FontManager {
     public FontRenderer MontserratBold32 = new FontRenderer("Montserrat-Bold.ttf", 32, Font.PLAIN, true, true);
 
     public FontRenderer JelloMedium32 = new FontRenderer("JelloMedium.ttf", 32, Font.PLAIN, true, true);
+    public FontRenderer JelloRegular16 = new FontRenderer("JelloRegular.ttf", 16, Font.PLAIN, true, true);
 }
