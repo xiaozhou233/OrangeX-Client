@@ -41,6 +41,8 @@ public class ClickGuiScreen extends GuiScreen {
             for (Module module : OrangeX.getInstance().getModuleManager().getModulesByCategory(category)) {
                 ModuleButton button = new ModuleButton(0, 0, panelWidth, module, panel);
 
+                KeybindValue toggleKeybinding = null;
+
                 for (Value<?> value : module.getValues()) {
                     if (value instanceof BooleanValue) {
                         button.addComponent(new BooleanComponent(0, 0, panelWidth, (BooleanValue) value, button));
@@ -49,9 +51,15 @@ public class ClickGuiScreen extends GuiScreen {
                     } else if (value instanceof ModeValue) {
                         button.addComponent(new ModeComponent(0, 0, panelWidth, (ModeValue) value, button));
                     } else if (value instanceof KeybindValue) {
-                        button.addComponent(new KeybindComponent(0, 0, panelWidth, (KeybindValue) value, button));
+                        if (value.getName().equals("Bind")) {
+                            toggleKeybinding = (KeybindValue) value;
+                        } else {
+                            button.addComponent(new KeybindComponent(0, 0, panelWidth, (KeybindValue) value, button));
+                        }
                     }
                 }
+                if (toggleKeybinding != null)
+                    button.addComponent(new KeybindComponent(0, 0, panelWidth, toggleKeybinding, button));
 
                 panel.addComponent(button);
             }
