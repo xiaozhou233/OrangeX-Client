@@ -19,14 +19,21 @@ public class BooleanComponent extends ValueComponent {
         double ax = getAbsoluteX();
         double ay = getAbsoluteY();
 
-        int bgColor = value.getValue() ? 0xFF2E8B57 : 0xFF444444;
+        double boxSize = 8;
+        double boxX = ax + 4;
+        double boxY = ay + (height - boxSize) / 2;
+
+        int boxColor = value.getValue() ? 0xFF2E8B57 : 0xFF444444;
         if (isHovered(mouseX, mouseY)) {
-            bgColor = GuiRenderUtils.blendColor(bgColor, 0xFFFFFFFF, 0.12f);
+            boxColor = GuiRenderUtils.blendColor(boxColor, 0xFFFFFFFF, 0.12f);
         }
 
         GuiRenderUtils.enableBlend();
-        GuiRenderUtils.drawRect(ax, ay, width, height, bgColor);
-        GuiRenderUtils.drawString(value.getName(), ax + 6, ay + 4, 0xFFFFFFFF);
+
+        GuiRenderUtils.drawRect(boxX, boxY, boxSize, boxSize, boxColor);
+
+        GuiRenderUtils.drawString(value.getName(), ax + 4 + boxSize + 6, ay + 4, 0xFFFFFFFF);
+
         GuiRenderUtils.disableBlend();
     }
 
@@ -41,6 +48,5 @@ public class BooleanComponent extends ValueComponent {
 
     @Override
     public void applyValue() {
-        // no-op: value 已经直接设置
     }
 }
