@@ -40,7 +40,7 @@ public class ModuleButton extends Component {
         int statusColor = module.isEnabled() ? 0xFF00FF00 : 0xFF888888;
         GuiRenderUtils.drawRect(ax, ay, 2, baseHeight, statusColor);
 
-        GuiRenderUtils.drawString(module.getName(), ax + 6, ay + 5, 0xFFFFFFFF);
+        GuiRenderUtils.drawString(module.getName(), ax + 6, ay + 6, 0xFFFFFFFF);
         GuiRenderUtils.disableBlend();
 
         if (!expanded) {
@@ -90,7 +90,6 @@ public class ModuleButton extends Component {
 
     @Override
     public void mouseReleased(int mouseX, int mouseY, int button) {
-        // IMPORTANT: always propagate release to children
         for (Component component : components) {
             component.mouseReleased(mouseX, mouseY, button);
         }

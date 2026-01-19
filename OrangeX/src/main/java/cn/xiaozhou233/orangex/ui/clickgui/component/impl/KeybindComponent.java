@@ -12,7 +12,7 @@ public class KeybindComponent extends ValueComponent {
     private boolean listening = false;
 
     public KeybindComponent(double x, double y, double width, KeybindValue value, Component parent) {
-        super(x, y, width, 14, parent);
+        super(x, y, width, 16, parent);
         this.value = value;
     }
 

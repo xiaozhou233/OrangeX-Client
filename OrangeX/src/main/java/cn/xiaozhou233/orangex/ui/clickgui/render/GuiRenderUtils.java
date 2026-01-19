@@ -15,7 +15,7 @@ public class GuiRenderUtils {
     }
 
     public static void drawString(String text, double x, double y, int color) {
-        OrangeX.getFontManager().MontserratRegular18
+        OrangeX.getFontManager().JelloRegular16
                 .drawString(text, (float) x, (float) y, color);
     }
 
