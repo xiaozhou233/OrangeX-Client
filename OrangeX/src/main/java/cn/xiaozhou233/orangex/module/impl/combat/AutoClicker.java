@@ -36,8 +36,6 @@ public class AutoClicker extends Module {
         addValue(cps);
         addValue(jitter);
         addValue(ignoreBlock);
-
-        addValue(keyBind);
     }
 
     @Subscribe

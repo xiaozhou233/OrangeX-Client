@@ -27,6 +27,8 @@ public abstract class Module {
     public Module(String name, ModuleCategory category) {
         this.name = name;
         this.category = category;
+
+        addValue(keyBind);
     }
 
     public Module(String name, ModuleCategory category, int defaultKey) {

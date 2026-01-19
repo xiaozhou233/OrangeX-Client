@@ -31,7 +31,6 @@ public class HUD extends Module {
         // TODO: Remove this when config is implemented
         setEnabled(true);
 
-        addValue(keyBind);
     }
 
     @Subscribe
