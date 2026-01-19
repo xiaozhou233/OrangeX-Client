@@ -124,7 +124,17 @@ public class Panel extends Component {
     }
 
     public void addComponent(Component component) {
+        component.setParent(this);
         components.add(component);
+    }
+
+
+    @Override
+    public void keyTyped(char typedChar, int keyCode) {
+        super.keyTyped(typedChar, keyCode);
+        for (Component c : components) {
+            c.keyTyped(typedChar, keyCode);
+        }
     }
 
 }

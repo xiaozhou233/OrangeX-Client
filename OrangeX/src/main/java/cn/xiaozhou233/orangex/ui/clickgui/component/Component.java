@@ -1,5 +1,7 @@
 package cn.xiaozhou233.orangex.ui.clickgui.component;
 
+import cn.xiaozhou233.orangex.ui.clickgui.component.impl.ModuleButton;
+import cn.xiaozhou233.orangex.ui.clickgui.panel.Panel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -56,4 +58,11 @@ public abstract class Component {
         return parent == null ? y : parent.getAbsoluteY() + y;
     }
 
+    protected void setParent(Panel panel) {
+        this.parent = parent;
+    }
+
+    public void setParent(Component parent) {
+        this.parent = parent;
+    }
 }
