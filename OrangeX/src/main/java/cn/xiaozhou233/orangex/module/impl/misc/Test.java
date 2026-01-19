@@ -32,6 +32,8 @@ public class Test extends Module{
 
         // Number Examples
         addValue(new NumberValue("Example Number", "Example", 0.0, 0, 100, 0.1));
+
+        addValue(keyBind);
     }
 
     @Subscribe

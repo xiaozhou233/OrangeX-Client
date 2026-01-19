@@ -9,7 +9,9 @@ public class ClickGUI extends Module {
 
     public ClickGUI() {
         super("ClickGUI", ModuleCategory.RENDER);
-        setKeyBind(Keyboard.KEY_RSHIFT);
+        keyBind.setKey(Keyboard.KEY_RSHIFT);
+
+        addValue(keyBind);
     }
 
     @Override

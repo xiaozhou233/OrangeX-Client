@@ -4,6 +4,7 @@ import cn.xiaozhou233.orangex.event.impl.EventTick;
 import cn.xiaozhou233.orangex.module.Module;
 import cn.xiaozhou233.orangex.module.ModuleCategory;
 import cn.xiaozhou233.orangex.module.value.BooleanValue;
+import cn.xiaozhou233.orangex.module.value.KeybindValue;
 import cn.xiaozhou233.orangex.module.value.NumberValue;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.MovingObjectPosition;
@@ -31,10 +32,12 @@ public class AutoClicker extends Module {
     private double currentTicksPerClick = 0.0;
 
     public AutoClicker() {
-        super("AutoClicker", ModuleCategory.COMBAT, Keyboard.KEY_F);
+        super("AutoClicker", ModuleCategory.COMBAT);
         addValue(cps);
         addValue(jitter);
         addValue(ignoreBlock);
+
+        addValue(keyBind);
     }
 
     @Subscribe
@@ -45,15 +48,13 @@ public class AutoClicker extends Module {
             return;
         }
 
-        // Determine what we're looking at
         MovingObjectPosition target = mc.objectMouseOver;
 
+        // Target is a block
         if (target != null && target.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-            // Auto mine: keep holding left click
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindAttack.getKeyCode(), true);
             KeyBinding.onTick(mc.gameSettings.keyBindAttack.getKeyCode());
 
-            // Reset click logic so it doesn't click once then stop
             tickCounter = 0;
             clicking = false;
             currentTicksPerClick = 0;
@@ -67,7 +68,6 @@ public class AutoClicker extends Module {
             return;
         }
 
-        // Normal auto clicker behavior (entities / air)
         if (currentTicksPerClick <= 0) {
             recalcDelay();
         }

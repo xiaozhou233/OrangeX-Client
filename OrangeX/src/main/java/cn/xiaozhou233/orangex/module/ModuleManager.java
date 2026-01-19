@@ -35,7 +35,7 @@ public class ModuleManager {
     @Subscribe
     public void onKey(EventKey event) {
         for (Module module : modules) {
-            if (module.getKeyBind() == event.getKey()) {
+            if (module.getKeyBind().getValue() == event.getKey()) {
                 module.toggle();
                 System.out.println("[ModuleManager] Toggled module: " + module.getName());
             }

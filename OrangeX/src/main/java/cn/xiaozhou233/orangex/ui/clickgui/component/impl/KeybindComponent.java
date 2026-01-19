@@ -6,6 +6,7 @@ import cn.xiaozhou233.orangex.ui.clickgui.component.ValueComponent;
 import cn.xiaozhou233.orangex.ui.clickgui.render.GuiRenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.GameSettings;
+import org.lwjgl.input.Keyboard;
 
 public class KeybindComponent extends ValueComponent {
 
@@ -31,6 +32,8 @@ public class KeybindComponent extends ValueComponent {
         GuiRenderUtils.drawRect(ax, ay, width, height, bgColor);
 
         String keyName = listening ? "Press a key..." : GameSettings.getKeyDisplayString(value.getValue());
+        if (keyName==GameSettings.getKeyDisplayString(Keyboard.KEY_DELETE))
+            keyName = "None";
         GuiRenderUtils.drawString(value.getName() + ": " + keyName, ax + 6, ay + 4, 0xFFFFFFFF);
         GuiRenderUtils.disableBlend();
     }
@@ -48,10 +51,17 @@ public class KeybindComponent extends ValueComponent {
     public void keyTyped(char typedChar, int keyCode) {
         if (!listening) return;
 
-        System.out.println("KeyTyped triggered: " + keyCode); // 用来测试
-
+        // ESC
         if (keyCode == 1) {
             listening = false;
+            return;
+        }
+
+        // DELETE
+        if (keyCode == Keyboard.KEY_DELETE) {
+            value.setValue(Keyboard.KEY_NONE);
+            listening = false;
+            applyValue();
             return;
         }
 
@@ -59,7 +69,6 @@ public class KeybindComponent extends ValueComponent {
         listening = false;
         applyValue();
     }
-
 
     @Override
     public void applyValue() {
