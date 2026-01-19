@@ -69,7 +69,6 @@ public class ModuleButton extends Component {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
-
         if (expanded) {
             for (Component component : components) {
                 if (component.isHovered(mouseX, mouseY)) {
@@ -95,7 +94,17 @@ public class ModuleButton extends Component {
         }
     }
 
+    @Override
+    public void keyTyped(char typedChar, int keyCode) {
+        if (!expanded) return;
+
+        for (Component component : components) {
+            component.keyTyped(typedChar, keyCode);
+        }
+    }
+
     public void addComponent(Component component) {
+        component.setParent(this);
         components.add(component);
     }
 }
