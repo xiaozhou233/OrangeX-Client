@@ -1,7 +1,10 @@
 package cn.xiaozhou233.orangex.module.value;
 
+import lombok.Getter;
+
 import java.util.List;
 
+@Getter
 public class ModeValue extends Value<String> {
 
     private final List<String> modes;
@@ -9,10 +12,6 @@ public class ModeValue extends Value<String> {
     public ModeValue(String name, String description, String defaultValue, List<String> modes) {
         super(name, description, defaultValue);
         this.modes = modes;
-    }
-
-    public List<String> getModes() {
-        return modes;
     }
 
     public int getIndex() {
