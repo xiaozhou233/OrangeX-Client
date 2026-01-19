@@ -34,11 +34,17 @@ public class Panel extends Component {
         double ay = getAbsoluteY();
 
         GuiRenderUtils.enableBlend();
+
+        // header
         GuiRenderUtils.drawRect(ax, ay, width, headerHeight, new Color(32, 32, 32, 255).getRGB());
         GuiRenderUtils.drawCenteredString(title, ax + width / 2, ay + 5, new Color(255, 255, 255, 255).getRGB());
-        GuiRenderUtils.disableBlend();
 
-        if (!open) return;
+        if (!open) {
+            GuiRenderUtils.disableBlend();
+            return;
+        }
+
+        GuiRenderUtils.drawRect(ax, ay + headerHeight, width, height - headerHeight, new Color(22, 22, 22, 230).getRGB());
 
         double offsetY = headerHeight;
 
@@ -51,7 +57,10 @@ public class Panel extends Component {
         }
 
         this.height = offsetY;
+
+        GuiRenderUtils.disableBlend();
     }
+
 
     @Override
     public void update(int mouseX, int mouseY) {
