@@ -2,13 +2,12 @@ package cn.xiaozhou233.orangex.ui.clickgui.component.impl;
 
 import cn.xiaozhou233.orangex.module.value.NumberValue;
 import cn.xiaozhou233.orangex.ui.clickgui.component.Component;
-import cn.xiaozhou233.orangex.ui.clickgui.component.ValueComponent;
+import cn.xiaozhou233.orangex.ui.clickgui.component.DragComponent;
 import cn.xiaozhou233.orangex.ui.clickgui.render.GuiRenderUtils;
 
-public class NumberComponent extends ValueComponent {
+public class NumberComponent extends DragComponent {
 
     private final NumberValue value;
-    private boolean dragging = false;
 
     public NumberComponent(double x, double y, double width, NumberValue value, Component parent) {
         super(x, y, width, 14, parent);
@@ -25,12 +24,14 @@ public class NumberComponent extends ValueComponent {
         double cur = value.getValue();
 
         double ratio = (cur - min) / (max - min);
+        ratio = Math.max(0, Math.min(1, ratio));
+
         double fillWidth = ratio * (width - 10);
 
         int bgColor = 0xFF333333;
         int fillColor = 0xFF2E8B57;
 
-        if (isHovered(mouseX, mouseY)) {
+        if (isHovered(mouseX, mouseY) || dragging) {
             bgColor = GuiRenderUtils.blendColor(bgColor, 0xFFFFFFFF, 0.12f);
         }
 
@@ -44,9 +45,7 @@ public class NumberComponent extends ValueComponent {
     }
 
     @Override
-    public void update(int mouseX, int mouseY) {
-        if (!dragging) return;
-
+    protected void onDrag(int mouseX, int mouseY) {
         double ax = getAbsoluteX();
         double rel = mouseX - ax - 5;
         double ratio = rel / (width - 10);
@@ -58,18 +57,7 @@ public class NumberComponent extends ValueComponent {
     }
 
     @Override
-    public void mouseClicked(int mouseX, int mouseY, int button) {
-        if (!isHovered(mouseX, mouseY)) return;
-        if (button == 0) dragging = true;
-    }
-
-    @Override
-    public void mouseReleased(int mouseX, int mouseY, int button) {
-        dragging = false;
-    }
-
-    @Override
     public void applyValue() {
-        // no-op
+        // hook point
     }
 }
