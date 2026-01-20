@@ -2,7 +2,6 @@ package cn.xiaozhou233.orangex.module;
 
 import cn.xiaozhou233.orangex.OrangeX;
 import cn.xiaozhou233.orangex.event.impl.EventKey;
-import cn.xiaozhou233.orangex.module.impl.combat.AutoClicker;
 import cn.xiaozhou233.orangex.module.impl.misc.Test;
 import cn.xiaozhou233.orangex.module.impl.render.*;
 import org.greenrobot.eventbus.Subscribe;
@@ -29,7 +28,6 @@ public class ModuleManager {
 
         register(new Test());
 
-        register(new AutoClicker());
     }
 
     @Subscribe
