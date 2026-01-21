@@ -3,10 +3,11 @@ package cn.xiaozhou233.orangex;
 import cn.xiaozhou233.orangex.font.FontManager;
 import cn.xiaozhou233.orangex.mixin.MixinManager;
 import cn.xiaozhou233.orangex.module.ModuleManager;
+import cn.xiaozhou233.orangex.ui.notice.NoticeManager;
 import lombok.Getter;
 import org.greenrobot.eventbus.EventBus;
 
-import java.io.File;
+import java.awt.*;
 
 public class OrangeX {
     private static OrangeX instance;
@@ -15,24 +16,29 @@ public class OrangeX {
     @Getter
     private final ModuleManager moduleManager;
     private static FontManager fontManager;
+    @Getter
+    private final NoticeManager noticeManager;
 
     public OrangeX() {
-        // EventBus
         this.eventBus = EventBus.builder()
                 .logNoSubscriberMessages(false)
                 .logSubscriberExceptions(false)
                 .sendNoSubscriberEvent(false)
                 .sendSubscriberExceptionEvent(false)
-                .installDefaultEventBus();
+                .build();
 
         // Module Manager
         this.moduleManager = new ModuleManager();
+
+        // Notice Manager
+        this.noticeManager = new NoticeManager(this.eventBus);
     }
 
     public void start() {
         System.out.println("OrangeX start!");
         MixinManager.start();
         moduleManager.init();
+        noticeManager.addNotice("Welcome!", "OrangeX Started!", 5000, Color.GREEN.getRGB());
     }
 
     public void stop() {

@@ -8,6 +8,7 @@ import lombok.Setter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,6 +65,7 @@ public abstract class Module {
 
     public void toggle() {
         setEnabled(!this.enabled);
+        OrangeX.getInstance().getNoticeManager().addNotice(getName(), "Toggled", 1000, Color.BLUE.getRGB());
     }
 
     protected void addValue(Value<?> value) {
