@@ -1,5 +1,6 @@
 package cn.xiaozhou233.orangex;
 
+import cn.xiaozhou233.orangex.alts.AltManager;
 import cn.xiaozhou233.orangex.font.FontManager;
 import cn.xiaozhou233.orangex.mixin.MixinManager;
 import cn.xiaozhou233.orangex.module.ModuleManager;
@@ -8,8 +9,11 @@ import lombok.Getter;
 import org.greenrobot.eventbus.EventBus;
 
 import java.awt.*;
+import java.io.File;
 
 public class OrangeX {
+    @Getter
+    private static File orangeXDir = new File(System.getProperty("user.home") + "/.orangex");
     private static OrangeX instance;
     @Getter
     private final EventBus eventBus;
@@ -18,6 +22,8 @@ public class OrangeX {
     private static FontManager fontManager;
     @Getter
     private final NoticeManager noticeManager;
+    @Getter
+    private final AltManager altManager;
 
     public OrangeX() {
         this.eventBus = EventBus.builder()
@@ -32,6 +38,11 @@ public class OrangeX {
 
         // Notice Manager
         this.noticeManager = new NoticeManager(this.eventBus);
+
+        // Alt Manager
+        this.altManager = new AltManager();
+
+        eventBus.register(altManager);
     }
 
     public void start() {
