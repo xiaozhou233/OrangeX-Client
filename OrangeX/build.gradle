@@ -26,9 +26,21 @@ dependencies {
     implementation("org.ow2.asm:asm:9.8")
     // Source: https://mvnrepository.com/artifact/org.greenrobot/eventbus
     implementation 'org.greenrobot:eventbus:3.1.1'
+    // Source: https://mvnrepository.com/artifact/com.google.code.gson/gson
+    implementation 'com.google.code.gson:gson:2.13.2'
+
+    // for Alt
+    // Source: https://mvnrepository.com/artifact/net.raphimc/MinecraftAuth
+    implementation 'net.raphimc:MinecraftAuth:5.0.0'
+    // Source: https://mvnrepository.com/artifact/net.lenni0451.commons/gson
+    implementation 'net.lenni0451.commons:gson:1.9.2'
+    // Source: https://mvnrepository.com/artifact/net.lenni0451.commons/httpclient
+    implementation 'net.lenni0451.commons:httpclient:1.9.2'
+
 }
 
 
 shadowJar {
     relocate 'org.objectweb.asm', 'cn.xiaozhou233.asm9'
+    relocate 'com.google.gson', "cn.xiaozhou233.gson"
 }
