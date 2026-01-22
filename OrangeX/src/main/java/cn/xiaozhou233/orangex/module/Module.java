@@ -65,7 +65,6 @@ public abstract class Module {
 
     public void toggle() {
         setEnabled(!this.enabled);
-        OrangeX.getInstance().getNoticeManager().addNotice(getName(), "Toggled", 1000, Color.BLUE.getRGB());
     }
 
     protected void addValue(Value<?> value) {
