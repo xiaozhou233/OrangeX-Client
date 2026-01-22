@@ -4,7 +4,6 @@ import cn.xiaozhou233.orangex.alts.AltManager;
 import cn.xiaozhou233.orangex.font.FontManager;
 import cn.xiaozhou233.orangex.mixin.MixinManager;
 import cn.xiaozhou233.orangex.module.ModuleManager;
-import cn.xiaozhou233.orangex.ui.notice.NoticeManager;
 import lombok.Getter;
 import org.greenrobot.eventbus.EventBus;
 
@@ -21,8 +20,6 @@ public class OrangeX {
     private final ModuleManager moduleManager;
     private static FontManager fontManager;
     @Getter
-    private final NoticeManager noticeManager;
-    @Getter
     private final AltManager altManager;
 
     public OrangeX() {
@@ -36,9 +33,6 @@ public class OrangeX {
         // Module Manager
         this.moduleManager = new ModuleManager();
 
-        // Notice Manager
-        this.noticeManager = new NoticeManager(this.eventBus);
-
         // Alt Manager
         this.altManager = new AltManager();
 
@@ -49,7 +43,6 @@ public class OrangeX {
         System.out.println("OrangeX start!");
         MixinManager.start();
         moduleManager.init();
-        noticeManager.addNotice("Welcome!", "OrangeX Started!", 5000, Color.GREEN.getRGB());
     }
 
     public void stop() {
