@@ -7,59 +7,41 @@ import cn.xiaozhou233.orangex.module.ModuleManager;
 import lombok.Getter;
 import org.greenrobot.eventbus.EventBus;
 
-import java.awt.*;
 import java.io.File;
 
+@Getter
 public class OrangeX {
     @Getter
-    private static File orangeXDir = new File(System.getProperty("user.home") + "/.orangex");
-    private static OrangeX instance;
-    @Getter
-    private final EventBus eventBus;
-    @Getter
-    private final ModuleManager moduleManager;
-    private static FontManager fontManager;
-    @Getter
-    private final AltManager altManager;
+    private static OrangeX instance = new OrangeX();
+
+    private final File orangeXDir = new File(System.getProperty("user.home") + "/.orangex");
+    private final EventBus eventBus = EventBus.builder()
+            .logNoSubscriberMessages(false)
+            .logSubscriberExceptions(false)
+            .sendNoSubscriberEvent(false)
+            .sendSubscriberExceptionEvent(false)
+            .build();
+    private final MixinManager mixinManager = new MixinManager();
+    private final ModuleManager moduleManager = new ModuleManager();
+    private final FontManager fontManager = new FontManager();
+    private final AltManager altManager = new AltManager();
 
     public OrangeX() {
-        this.eventBus = EventBus.builder()
-                .logNoSubscriberMessages(false)
-                .logSubscriberExceptions(false)
-                .sendNoSubscriberEvent(false)
-                .sendSubscriberExceptionEvent(false)
-                .build();
-
-        // Module Manager
-        this.moduleManager = new ModuleManager();
-
-        // Alt Manager
-        this.altManager = new AltManager();
-
-        eventBus.register(altManager);
     }
 
+    // Invoke by Loader/MCPEntry
+    // See Loader -> cn.xiaozhou233.orangex.loader.Loader
+    // See Minecraft -> cn.xiaozhou233.MCPEntry
     public void start() {
-        System.out.println("OrangeX start!");
-        MixinManager.start();
         moduleManager.init();
+        altManager.init();
+        mixinManager.start();
     }
 
+    // Invoke by Minecraft
+    // See Mixin cn.xiaozhou233.orangex.mixin.impl.MixinMinecraft.onShutdown()
     public void stop() {
         System.out.println("OrangeX stopping...");
     }
 
-    public static FontManager getFontManager() {
-        if (fontManager == null) {
-            fontManager = new FontManager();
-        }
-        return fontManager;
-    }
-
-    public static OrangeX getInstance() {
-        if (instance == null) {
-            instance = new OrangeX();
-        }
-        return instance;
-    }
 }

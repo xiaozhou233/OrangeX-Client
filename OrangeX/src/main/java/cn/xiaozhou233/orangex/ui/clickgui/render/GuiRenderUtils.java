@@ -15,13 +15,13 @@ public class GuiRenderUtils {
     }
 
     public static void drawString(String text, double x, double y, int color) {
-        OrangeX.getFontManager().JelloRegular16
+        OrangeX.getInstance().getFontManager().JelloRegular16
                 .drawString(text, (float) x, (float) y, color);
     }
 
     public static void drawCenteredString(String text, double x, double y, int color) {
-        OrangeX.getFontManager().MontserratRegular18
-                .drawString(text, (float) x - (float) OrangeX.getFontManager().MontserratLight18.getStringWidth(text) / 2, (float) y, color);
+        OrangeX.getInstance().getFontManager().MontserratRegular18
+                .drawString(text, (float) x - (float) OrangeX.getInstance().getFontManager().MontserratLight18.getStringWidth(text) / 2, (float) y, color);
     }
 
     public static void enableBlend() {
