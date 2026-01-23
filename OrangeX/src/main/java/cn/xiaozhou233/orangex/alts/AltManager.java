@@ -27,7 +27,12 @@ public class AltManager {
     private List<Alt> alts = new ArrayList<>();
     private File file;
     public AltManager() {
-        file = new File(OrangeX.getOrangeXDir(), "alts.json");
+    }
+
+    public void init() {
+        // register event
+        OrangeX.getInstance().getEventBus().register(this);
+        file = new File(OrangeX.getInstance().getOrangeXDir(), "alts.json");
         load();
     }
 

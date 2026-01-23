@@ -9,9 +9,7 @@ import cn.yapeteam.ymixin.YMixin;
 
 public final class MixinManager {
 
-    private MixinManager() {}
-
-    public static void start() {
+    public void start() {
 
         ClassLoader cl = MixinManager.class.getClassLoader();
 

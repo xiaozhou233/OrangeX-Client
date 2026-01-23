@@ -43,7 +43,7 @@ public class HUD extends Module {
     }
 
     private void renderLogo() {
-        OrangeX.getFontManager().JelloMedium32.drawStringWithShadow("OrangeX", 5, 5, LOGO_COLOR);
+        OrangeX.getInstance().getFontManager().JelloMedium32.drawStringWithShadow("OrangeX", 5, 5, LOGO_COLOR);
     }
 
     private void renderModuleList(ScaledResolution sr) {
@@ -52,7 +52,7 @@ public class HUD extends Module {
                 .stream()
                 .filter(Module::isEnabled)
                 .sorted(Comparator.comparingInt((Module m) ->
-                        OrangeX.getFontManager().MontserratMedium18.getStringWidth(m.getName())).reversed())
+                        OrangeX.getInstance().getFontManager().MontserratMedium18.getStringWidth(m.getName())).reversed())
                 .collect(Collectors.toList());
 
         int y = MARGIN;
@@ -60,18 +60,18 @@ public class HUD extends Module {
 
         for (int i = 0; i < enabledModules.size(); i++) {
             Module module = enabledModules.get(i);
-            int textWidth = OrangeX.getFontManager().MontserratMedium18.getStringWidth(module.getName());
+            int textWidth = OrangeX.getInstance().getFontManager().MontserratMedium18.getStringWidth(module.getName());
             int x = screenWidth - textWidth - MARGIN;
 
             int color = getRainbowColor(rainbowTick + i * 6f);
             drawHudString(module.getName(), x, y, color);
 
-            y += OrangeX.getFontManager().MontserratMedium18.getStringHeight(module.getName()) + MODULE_SPACING;
+            y += OrangeX.getInstance().getFontManager().MontserratMedium18.getStringHeight(module.getName()) + MODULE_SPACING;
         }
     }
 
     private void drawHudString(String text, int x, int y, int color) {
-        FontRenderer font = OrangeX.getFontManager().MontserratMedium18;
+        FontRenderer font = OrangeX.getInstance().getFontManager().MontserratMedium18;
         int textWidth = font.getStringWidth(text);
 
         Gui.drawRect(
