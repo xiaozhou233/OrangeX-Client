@@ -1,6 +1,7 @@
 package cn.xiaozhou233.orangex;
 
 import cn.xiaozhou233.orangex.alts.AltManager;
+import cn.xiaozhou233.orangex.config.ConfigManager;
 import cn.xiaozhou233.orangex.font.FontManager;
 import cn.xiaozhou233.orangex.manager.ResourceManager;
 import cn.xiaozhou233.orangex.mixin.MixinManager;
@@ -22,6 +23,7 @@ public class OrangeX {
             .sendSubscriberExceptionEvent(false)
             .build();
     private final ResourceManager resourceManager = new ResourceManager();
+    private final ConfigManager configManager = new ConfigManager();
     private final MixinManager mixinManager = new MixinManager();
     private final ModuleManager moduleManager = new ModuleManager();
     private final FontManager fontManager = new FontManager();
@@ -34,6 +36,7 @@ public class OrangeX {
     // See Loader -> cn.xiaozhou233.orangex.loader.Loader
     // See Minecraft -> cn.xiaozhou233.MCPEntry
     public void start() {
+        configManager.loadConfig();
         moduleManager.init();
         altManager.init();
         mixinManager.start();

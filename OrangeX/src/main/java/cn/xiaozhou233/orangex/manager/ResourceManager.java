@@ -10,4 +10,7 @@ public class ResourceManager {
 
     // Alt
     private File altConfig = new File(orangeXDir, "alts.json");
+
+    // Panel Config
+    private File panelConfig = new File(orangeXDir, "panel.json");
 }

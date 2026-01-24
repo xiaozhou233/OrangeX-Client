@@ -1,6 +1,8 @@
 package cn.xiaozhou233.orangex.ui.clickgui;
 
 import cn.xiaozhou233.orangex.OrangeX;
+import cn.xiaozhou233.orangex.config.ConfigManager;
+import cn.xiaozhou233.orangex.config.PanelPosition;
 import cn.xiaozhou233.orangex.module.Module;
 import cn.xiaozhou233.orangex.module.ModuleCategory;
 import cn.xiaozhou233.orangex.module.value.*;
@@ -36,7 +38,15 @@ public class ClickGuiScreen extends GuiScreen {
         double gap = 10;
 
         for (ModuleCategory category : ModuleCategory.values()) {
-            Panel panel = new Panel(category.name(), startX, startY, panelWidth);
+
+            // Load Position from panel.json
+            PanelPosition position = OrangeX.getInstance().getConfigManager().getPanelPosition(category.name());
+            Panel panel;
+            if (position == null) {
+                panel = new Panel(category.name(), startX, startY, panelWidth);
+            } else {
+                panel = new Panel(category.name(), position.getX(), position.getY(), panelWidth);
+            }
 
             for (Module module : OrangeX.getInstance().getModuleManager().getModulesByCategory(category)) {
                 ModuleButton button = new ModuleButton(0, 0, panelWidth, module, panel);
@@ -107,6 +117,12 @@ public class ClickGuiScreen extends GuiScreen {
     protected void mouseReleased(int mouseX, int mouseY, int state) {
         if (draggingPanel != null) {
             draggingPanel.mouseReleased(mouseX, mouseY, state);
+
+            // Save Position to HashMap
+            ConfigManager configManager = OrangeX.getInstance().getConfigManager();
+            configManager.setPanelPosition(draggingPanel.getTitle(),
+                    new PanelPosition(draggingPanel.getAbsoluteX(), draggingPanel.getAbsoluteY()));
+
             draggingPanel = null;
         }
 
@@ -129,5 +145,12 @@ public class ClickGuiScreen extends GuiScreen {
     @Override
     public boolean doesGuiPauseGame() {
         return false;
+    }
+
+    @Override
+    public void onGuiClosed() {
+        super.onGuiClosed();
+        // Save position to panel.json
+        OrangeX.getInstance().getConfigManager().saveConfig();
     }
 }
