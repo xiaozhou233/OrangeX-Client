@@ -26,7 +26,7 @@ public class OrangeX {
     private final ConfigManager configManager = new ConfigManager();
     private final MixinManager mixinManager = new MixinManager();
     private final ModuleManager moduleManager = new ModuleManager();
-    private final FontManager fontManager = new FontManager();
+    private FontManager fontManager;
     private final AltManager altManager = new AltManager();
 
     public OrangeX() {
@@ -48,4 +48,10 @@ public class OrangeX {
         System.out.println("OrangeX stopping...");
     }
 
+    public FontManager getFontManager() {
+        if (fontManager == null) {
+            fontManager = new FontManager();
+        }
+        return fontManager;
+    }
 }
