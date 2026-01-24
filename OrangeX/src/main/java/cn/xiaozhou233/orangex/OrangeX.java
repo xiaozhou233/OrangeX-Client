@@ -2,6 +2,7 @@ package cn.xiaozhou233.orangex;
 
 import cn.xiaozhou233.orangex.alts.AltManager;
 import cn.xiaozhou233.orangex.font.FontManager;
+import cn.xiaozhou233.orangex.manager.ResourceManager;
 import cn.xiaozhou233.orangex.mixin.MixinManager;
 import cn.xiaozhou233.orangex.module.ModuleManager;
 import lombok.Getter;
@@ -14,13 +15,13 @@ public class OrangeX {
     @Getter
     private static OrangeX instance = new OrangeX();
 
-    private final File orangeXDir = new File(System.getProperty("user.home") + "/.orangex");
     private final EventBus eventBus = EventBus.builder()
             .logNoSubscriberMessages(false)
             .logSubscriberExceptions(false)
             .sendNoSubscriberEvent(false)
             .sendSubscriberExceptionEvent(false)
             .build();
+    private final ResourceManager resourceManager = new ResourceManager();
     private final MixinManager mixinManager = new MixinManager();
     private final ModuleManager moduleManager = new ModuleManager();
     private final FontManager fontManager = new FontManager();

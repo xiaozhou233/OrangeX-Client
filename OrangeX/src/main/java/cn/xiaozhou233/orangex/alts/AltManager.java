@@ -32,7 +32,7 @@ public class AltManager {
     public void init() {
         // register event
         OrangeX.getInstance().getEventBus().register(this);
-        file = new File(OrangeX.getInstance().getOrangeXDir(), "alts.json");
+        file = OrangeX.getInstance().getResourceManager().getAltConfig();
         load();
     }
 
