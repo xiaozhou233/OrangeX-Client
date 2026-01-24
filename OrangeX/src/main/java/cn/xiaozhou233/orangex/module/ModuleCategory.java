@@ -5,5 +5,6 @@ public enum ModuleCategory {
     COMBAT,
     MISC,
     MOVEMENT,
-    PLAYER
+    PLAYER,
+    FUN
 }
