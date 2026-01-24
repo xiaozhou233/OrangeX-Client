@@ -3,6 +3,7 @@ package cn.xiaozhou233.orangex.mixin;
 import cn.xiaozhou233.orangex.mixin.impl.MixinEntityRenderer;
 import cn.xiaozhou233.orangex.mixin.impl.MixinGuiIngame;
 import cn.xiaozhou233.orangex.mixin.impl.MixinMinecraft;
+import cn.xiaozhou233.orangex.mixin.impl.MixinNetHandlerPlayClient;
 import cn.xiaozhou233.orangex.utils.JuiceLoaderFacade;
 import cn.yapeteam.ymixin.Transformer;
 import cn.yapeteam.ymixin.YMixin;
@@ -44,6 +45,7 @@ public final class MixinManager {
             transformer.addMixin(MixinGuiIngame.class);
             transformer.addMixin(MixinMinecraft.class);
             transformer.addMixin(MixinEntityRenderer.class);
+            transformer.addMixin(MixinNetHandlerPlayClient.class);
         } catch (Throwable e) {
             throw new RuntimeException("Failed to add mixin", e);
         }
