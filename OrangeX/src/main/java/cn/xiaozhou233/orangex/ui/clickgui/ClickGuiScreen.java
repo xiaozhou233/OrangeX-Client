@@ -14,6 +14,7 @@ import cn.xiaozhou233.orangex.ui.clickgui.component.impl.ModeComponent;
 import cn.xiaozhou233.orangex.ui.clickgui.component.impl.KeybindComponent;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.ScaledResolution;
 
 import java.awt.*;
 import java.io.IOException;
@@ -32,21 +33,42 @@ public class ClickGuiScreen extends GuiScreen {
     public void initGui() {
         panels.clear();
 
-        double startX = 20;
-        double startY = 20;
+        ScaledResolution sr = new ScaledResolution(mc);
+        double screenWidth = sr.getScaledWidth_double();
+        double screenHeight = sr.getScaledHeight_double();
+
+        double margin = 20;
+        double startX = margin;
+        double startY = margin;
+
         double panelWidth = 120;
+        double panelHeaderHeight = 20;
         double gap = 10;
 
         for (ModuleCategory category : ModuleCategory.values()) {
-
-            // Load Position from panel.json
-            PanelPosition position = OrangeX.getInstance().getConfigManager().getPanelPosition(category.name());
-            Panel panel;
-            if (position == null) {
-                panel = new Panel(category.name(), startX, startY, panelWidth);
-            } else {
-                panel = new Panel(category.name(), position.getX(), position.getY(), panelWidth);
+            if (startX + panelWidth > screenWidth - margin) {
+                startX = margin;
+                startY += panelHeaderHeight + gap;
             }
+
+            PanelPosition position =
+                    OrangeX.getInstance().getConfigManager().getPanelPosition(category.name());
+
+            double x = startX;
+            double y = startY;
+
+            if (position != null) {
+                x = Math.max(
+                        0,
+                        Math.min(position.getX(), screenWidth - panelWidth)
+                );
+                y = Math.max(
+                        0,
+                        Math.min(position.getY(), screenHeight - panelHeaderHeight)
+                );
+            }
+
+            Panel panel = new Panel(category.name(), x, y, panelWidth);
 
             for (Module module : OrangeX.getInstance().getModuleManager().getModulesByCategory(category)) {
                 ModuleButton button = new ModuleButton(0, 0, panelWidth, module, panel);
