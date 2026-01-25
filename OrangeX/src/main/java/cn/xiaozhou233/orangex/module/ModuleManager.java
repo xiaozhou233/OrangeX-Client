@@ -2,6 +2,7 @@ package cn.xiaozhou233.orangex.module;
 
 import cn.xiaozhou233.orangex.OrangeX;
 import cn.xiaozhou233.orangex.event.impl.EventKey;
+import cn.xiaozhou233.orangex.module.impl.combat.AutoClicker;
 import cn.xiaozhou233.orangex.module.impl.fun.Derp;
 import cn.xiaozhou233.orangex.module.impl.misc.Test;
 import cn.xiaozhou233.orangex.module.impl.movement.NoJumpDelay;
@@ -34,6 +35,8 @@ public class ModuleManager {
         register(new Derp());
 
         register(new NoJumpDelay());
+
+        register(new AutoClicker());
     }
 
     @Subscribe
