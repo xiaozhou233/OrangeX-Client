@@ -8,6 +8,7 @@ import cn.xiaozhou233.orangex.module.value.ModeValue;
 import cn.xiaozhou233.orangex.module.value.NumberValue;
 import cn.xiaozhou233.orangex.module.value.Value;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
@@ -96,38 +97,38 @@ public class ConfigManager {
         moduleConfigMap.clear();
 
         for (Module module : OrangeX.getInstance().getModuleManager().getAllModules()) {
-            ModuleConfig mc = new ModuleConfig();
-            mc.enabled = module.isEnabled();
-            mc.keybind = module.getKeyBind().getValue();
+            ModuleConfig moduleConfig = new ModuleConfig();
+            moduleConfig.setEnabled(module.isEnabled());
+            moduleConfig.setKeybind(module.getKeyBind().getValue());
 
             for (Value<?> v : module.getValues()) {
-                mc.values.put(v.getName(), v.getValue());
+                moduleConfig.getValues().put(
+                        v.getName(),
+                        gson.toJsonTree(v.getValue())
+                );
             }
 
-            moduleConfigMap.put(module.getName(), mc);
+            moduleConfigMap.put(module.getName(), moduleConfig);
         }
     }
 
-    @SuppressWarnings("unchecked")
     private void applyModuleConfig() {
         for (Module module : OrangeX.getInstance().getModuleManager().getAllModules()) {
             ModuleConfig mc = moduleConfigMap.get(module.getName());
             if (mc == null) continue;
 
-            module.setEnabled(mc.enabled);
-            module.getKeyBind().setValue(mc.keybind);
+            module.setEnabled(mc.isEnabled());
+            module.getKeyBind().setValue(mc.getKeybind());
 
-            for (Value<?> v : module.getValues()) {
-                Object raw = mc.values.get(v.getName());
-                if (raw == null) continue;
+            for (Value<?> value : module.getValues()) {
+                JsonElement element = mc.getValues().get(value.getName());
+                if (element == null) continue;
 
-                Object converted = convertValue(raw, v);
-                if (converted != null) {
-                    ((Value<Object>) v).setValue(converted);
-                }
+                value.fromJson(element);
             }
         }
     }
+
 
     private Object convertValue(Object raw, Value<?> targetValue) {
         if (raw == null) return null;
