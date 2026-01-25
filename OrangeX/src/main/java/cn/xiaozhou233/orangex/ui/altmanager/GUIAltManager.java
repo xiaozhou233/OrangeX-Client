@@ -50,6 +50,8 @@ public class GUIAltManager extends GuiScreen {
 
     @Override
     protected void actionPerformed(GuiButton button) throws IOException {
+        List<Alt> alts = OrangeX.getInstance().getAltManager().getAlts();
+
         switch (button.id) {
             case 1:
                 mc.displayGuiScreen(new GUIAddCracked());
@@ -64,15 +66,15 @@ public class GUIAltManager extends GuiScreen {
                 break;
 
             case 4:
-                if (selectedIndex >= 0) {
-                    Alt alt = OrangeX.getInstance().getAltManager().getAlts().get(selectedIndex);
+                if (selectedIndex >= 0 && selectedIndex < alts.size()) {
+                    Alt alt = alts.get(selectedIndex);
                     OrangeX.getInstance().getAltManager().login(alt);
                 }
                 break;
 
             case 5:
-                if (selectedIndex >= 0) {
-                    Alt alt = OrangeX.getInstance().getAltManager().getAlts().get(selectedIndex);
+                if (selectedIndex >= 0 && selectedIndex < alts.size()) {
+                    Alt alt = alts.get(selectedIndex);
                     OrangeX.getInstance().getAltManager().removeAlt(alt);
                     selectedIndex = -1;
                     lastClickIndex = -1;
@@ -80,6 +82,7 @@ public class GUIAltManager extends GuiScreen {
                 break;
         }
     }
+
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
