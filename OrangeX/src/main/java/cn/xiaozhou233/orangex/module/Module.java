@@ -15,8 +15,8 @@ import java.util.Optional;
 
 @Getter
 public abstract class Module {
-    protected static final Minecraft mc = Minecraft.getMinecraft();
-    protected static final FontRenderer fr = mc.fontRendererObj;
+    protected final Minecraft mc = Minecraft.getMinecraft();
+    protected final FontRenderer fr = mc.fontRendererObj;
 
     protected final String name;
     @Getter
