@@ -13,4 +13,6 @@ public class ResourceManager {
 
     // Panel Config
     private File panelConfig = new File(orangeXDir, "panel.json");
+    // Modules Config
+    private File modulesConfig = new File(orangeXDir, "modules.json");
 }
