@@ -18,6 +18,7 @@ public abstract class Module {
     protected static final FontRenderer fr = mc.fontRendererObj;
 
     protected final String name;
+    @Getter
     @Setter
     protected KeybindValue keyBind = new KeybindValue("Bind", "KeyBinding", 0);
     protected final ModuleCategory category;
@@ -80,4 +81,5 @@ public abstract class Module {
         }
         return null;
     }
+
 }
