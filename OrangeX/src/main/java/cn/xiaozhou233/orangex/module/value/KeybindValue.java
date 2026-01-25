@@ -9,4 +9,9 @@ public class KeybindValue extends Value<Integer> {
     public void setKey(int key) {
         setValue(key);
     }
+
+    @Override
+    public Class<Integer> getValueClass() {
+        return Integer.class;
+    }
 }
