@@ -13,6 +13,7 @@ import com.google.gson.reflect.TypeToken;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 
@@ -30,27 +31,34 @@ public class ConfigManager {
             File panelConfig = OrangeX.getInstance().getResourceManager().getPanelConfig();
             if (!panelConfig.exists()) panelConfig.createNewFile();
             if (panelConfig.length() != 0) {
-                Type type = new TypeToken<HashMap<String, PanelPosition>>() {}.getType();
-                FileReader reader = new FileReader(panelConfig);
-                HashMap<String, PanelPosition> map = gson.fromJson(reader, type);
-                reader.close();
-                if (map != null) this.panelConfigMap = map;
+                Type type = new TypeToken<HashMap<String, PanelPosition>>() {
+                }.getType();
+                try (FileReader reader = new FileReader(panelConfig)) {
+                    HashMap<String, PanelPosition> map = gson.fromJson(reader, type);
+                    if (map != null) this.panelConfigMap = map;
+                }
             }
+        } catch (Exception e) {
+            System.out.println("Failed to load panel config!");
+            throw new RuntimeException(e);
+        }
 
+        try {
             // Load Module Config
             File moduleConfig = OrangeX.getInstance().getResourceManager().getModulesConfig();
             if (!moduleConfig.exists()) moduleConfig.createNewFile();
             if (moduleConfig.length() != 0) {
                 Type type = new TypeToken<HashMap<String, ModuleConfig>>() {}.getType();
-                FileReader reader = new FileReader(moduleConfig);
-                HashMap<String, ModuleConfig> map = gson.fromJson(reader, type);
-                reader.close();
-                if (map != null) this.moduleConfigMap = map;
+                try (FileReader reader = new FileReader(moduleConfig)) {
+                    HashMap<String, ModuleConfig> map = gson.fromJson(reader, type);
+                    if (map != null) this.moduleConfigMap = map;
+                }
             }
 
             applyModuleConfig();
 
         } catch (Exception e) {
+            System.out.println("Failed to load module config!");
             throw new RuntimeException(e);
         }
     }
@@ -64,17 +72,22 @@ public class ConfigManager {
     }
 
     public void saveConfig() {
-        try {
-            FileWriter writer = new FileWriter(OrangeX.getInstance().getResourceManager().getPanelConfig());
+        // Save panel config
+        try(FileWriter writer = new FileWriter(
+                OrangeX.getInstance().getResourceManager().getPanelConfig())) {
             writer.write(gson.toJson(this.panelConfigMap));
-            writer.close();
+        } catch (IOException e) {
+            System.out.println("Failed to save panel config");
+            throw new RuntimeException(e);
+        }
 
-            generateModuleConfig();
-            FileWriter moduleWriter = new FileWriter(OrangeX.getInstance().getResourceManager().getModulesConfig());
-            moduleWriter.write(gson.toJson(this.moduleConfigMap));
-            moduleWriter.close();
-
-        } catch (Exception e) {
+        // Save module config
+        generateModuleConfig();
+        try (FileWriter writer = new FileWriter(
+                OrangeX.getInstance().getResourceManager().getModulesConfig())) {
+            writer.write(gson.toJson(this.moduleConfigMap));
+        } catch (IOException e) {
+            System.out.println("Failed to save module config");
             throw new RuntimeException(e);
         }
     }
