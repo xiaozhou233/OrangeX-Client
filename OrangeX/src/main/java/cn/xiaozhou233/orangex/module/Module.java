@@ -11,13 +11,15 @@ import net.minecraft.client.gui.FontRenderer;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 public abstract class Module {
-    protected static final Minecraft mc = Minecraft.getMinecraft();
-    protected static final FontRenderer fr = mc.fontRendererObj;
+    protected final Minecraft mc = Minecraft.getMinecraft();
+    protected final FontRenderer fr = mc.fontRendererObj;
 
     protected final String name;
+    @Getter
     @Setter
     protected KeybindValue keyBind = new KeybindValue("Bind", "KeyBinding", 0);
     protected final ModuleCategory category;
@@ -72,12 +74,13 @@ public abstract class Module {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> Value<T> getValue(String name) {
+    public <T> Optional<Value<T>> getValue(String name, Class<T> type) {
         for (Value<?> v : values) {
-            if (v.getName().equalsIgnoreCase(name)) {
-                return (Value<T>) v;
+            if (v.getName().equalsIgnoreCase(name) && type.isInstance(v.getValue())) {
+                return Optional.of((Value<T>) v);
             }
         }
-        return null;
+        return Optional.empty();
     }
+
 }

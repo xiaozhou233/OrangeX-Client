@@ -46,4 +46,10 @@ public class ModeValue extends Value<String> {
     public boolean isValidMode(String mode) {
         return modes.contains(mode);
     }
+
+
+    @Override
+    public Class<String> getValueClass() {
+        return String.class;
+    }
 }
