@@ -74,9 +74,9 @@ public abstract class Module {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> Optional<Value<T>> getValue(String name) {
+    public <T> Optional<Value<T>> getValue(String name, Class<T> type) {
         for (Value<?> v : values) {
-            if (v.getName().equalsIgnoreCase(name)) {
+            if (v.getName().equalsIgnoreCase(name) && type.isInstance(v.getValue())) {
                 return Optional.of((Value<T>) v);
             }
         }
