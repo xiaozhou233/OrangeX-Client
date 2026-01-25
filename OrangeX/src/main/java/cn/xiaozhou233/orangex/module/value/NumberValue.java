@@ -16,4 +16,8 @@ public class NumberValue extends Value<Double> {
         this.increment = increment;
     }
 
+    @Override
+    public Class<Double> getValueClass() {
+        return Double.class;
+    }
 }

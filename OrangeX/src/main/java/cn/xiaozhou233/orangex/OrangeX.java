@@ -36,8 +36,8 @@ public class OrangeX {
     // See Loader -> cn.xiaozhou233.orangex.loader.Loader
     // See Minecraft -> cn.xiaozhou233.MCPEntry
     public void start() {
-        configManager.loadConfig();
         moduleManager.init();
+        configManager.loadConfig();
         altManager.init();
         mixinManager.start();
     }
