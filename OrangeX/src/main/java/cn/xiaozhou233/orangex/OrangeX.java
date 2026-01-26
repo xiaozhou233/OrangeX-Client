@@ -4,6 +4,7 @@ import cn.xiaozhou233.orangex.alts.AltManager;
 import cn.xiaozhou233.orangex.config.ConfigManager;
 import cn.xiaozhou233.orangex.font.FontManager;
 import cn.xiaozhou233.orangex.manager.ResourceManager;
+import cn.xiaozhou233.orangex.manager.ThreadManager;
 import cn.xiaozhou233.orangex.mixin.MixinManager;
 import cn.xiaozhou233.orangex.module.ModuleManager;
 import lombok.Getter;
@@ -28,6 +29,7 @@ public class OrangeX {
     private final ModuleManager moduleManager = new ModuleManager();
     private FontManager fontManager;
     private final AltManager altManager = new AltManager();
+    private final ThreadManager threadManager = new ThreadManager();
 
     public OrangeX() {
     }
@@ -39,6 +41,7 @@ public class OrangeX {
         moduleManager.init();
         configManager.loadConfig();
         altManager.init();
+        threadManager.init();
         mixinManager.start();
     }
 
