@@ -1,21 +1,27 @@
 package cn.xiaozhou233.orangex.utils;
 
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class MathUtil {
 
-    private static final Random random = new Random();
+    private static final int MAX_ATTEMPTS = 8;
 
     public static double generateNoise(double min, double max) {
-        double mean = (max + min) / 2;
-        double stdDev = Math.max(1.0, (max - min) / 3); // stdDev >= 1
+        double mean = (min + max) / 2.0;
+        double range = max - min;
+        double stdDev = Math.max(1.0, range / 3.0);
 
-        double value;
-        do {
-            value = random.nextGaussian() * stdDev + mean;
-        } while (value < min || value > max);
+        ThreadLocalRandom random = ThreadLocalRandom.current();
 
-        return value;
+        for (int i = 0; i < MAX_ATTEMPTS; i++) {
+            double value = random.nextGaussian() * stdDev + mean;
+            if (value >= min && value <= max) {
+                return value;
+            }
+        }
+
+        // fallback: clamp gaussian
+        return clamp(random.nextGaussian() * stdDev + mean, min, max);
     }
 
     public static double clamp(double value, double min, double max) {

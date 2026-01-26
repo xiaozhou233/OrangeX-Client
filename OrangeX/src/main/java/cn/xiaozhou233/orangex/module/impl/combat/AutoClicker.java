@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 public class AutoClicker extends Module {
 
-    private static final ScheduledExecutorService CLICK_EXECUTOR =
+    private final ScheduledExecutorService CLICK_EXECUTOR =
             Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, "OrangeX-ClickThread"));
 
     private final Random random = new Random();
@@ -109,5 +109,10 @@ public class AutoClicker extends Module {
 
         lastClickTime = now;
         delayMs = generateDelayMs();
+    }
+
+    @Override
+    protected void onDisable() {
+        CLICK_EXECUTOR.shutdownNow();
     }
 }
