@@ -7,6 +7,7 @@ import cn.xiaozhou233.orangex.module.impl.fun.Derp;
 import cn.xiaozhou233.orangex.module.impl.misc.Test;
 import cn.xiaozhou233.orangex.module.impl.movement.NoJumpDelay;
 import cn.xiaozhou233.orangex.module.impl.render.*;
+import cn.xiaozhou233.orangex.module.impl.world.FastPlace;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.awt.*;
@@ -37,6 +38,8 @@ public class ModuleManager {
         register(new NoJumpDelay());
 
         register(new AutoClicker());
+
+        register(new FastPlace());
     }
 
     @Subscribe
