@@ -1,14 +1,17 @@
 # OrangeX Client
+![Banner1](./doc/banner1.png)
+![Banner2](./doc/banner2.png)
+
+## Language: [中文](./README.md) | [English](./README_EN.md)
 
 ## 支持注入的客户端
+目前仅支持注入无混淆的客户端，已测试的客户端如下
 
-| 客户端          | 说明             |
-| ------------ | -------------- |
-| MCP 1.8.8    | 基于 MCP 的本地开发环境 |
-| Lunar Client | 已适配的第三方客户端     |
-
+| 客户端                | 说明             |
+|--------------------| -------------- |
+| MCP 1.8.8          | 基于 MCP 的本地开发环境 |
+| Lunar Client 1.8.9 | 已适配的第三方客户端     |
 ---
-
 ## 如何构建
 
 ### 方式一：直接构建
@@ -47,5 +50,13 @@
 * 构建完成后，`out/` 目录下会生成 `Injector.jar`
 * 使用 `java -jar Injector.jar` 启动注入器
 
+## 开发
+* 安装 IntelliJ IDEA
+* 使用IntelliJ IDEA打开项目
+* 编写代码
+* 右上角启动开发环境客户端
+  ![devlaunch](./doc/devlaunch.png)
+
 # 致谢
 * [FontRenderer](https://github.com/Godwhitelight/FontRenderer) - 字体渲染
+* [YMixin](https://github.com/yapeteam/YMixin) - 字节码插桩工具 动态生成可替换的字节码
