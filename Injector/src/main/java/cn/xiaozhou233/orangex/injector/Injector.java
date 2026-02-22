@@ -8,7 +8,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
-import java.util.stream.Stream;
+
 
 public class Injector {
     public static String orangexPath = System.getProperty("user.home") + "/.orangex";
@@ -35,11 +35,11 @@ public class Injector {
         InjectorNative injectorNative = new InjectorNative();
 
         // Find Minecraft
-        StringBuilder stringBuilder = new StringBuilder();
+        ArrayList<Integer> pids = new ArrayList<>();
+        ArrayList<String> windowTitles = new ArrayList<>();
         try {
             String[] titles = {"Minecraft", "minecraft", "1.8.9", "Badlion", "Lunar"};
             String[] ignoreTitles = {"Badlion Client", "Badlion Chat", "Home - Lunar Client"};
-            ArrayList<Integer> pids = new ArrayList<>();
             for (String title : titles) {
                 InjectorNative.WindowInfo[] list = InjectorNative.findWindowsByTitle(title);
                 if (list == null || list.length == 0) {
@@ -50,7 +50,7 @@ public class Injector {
                         if (Arrays.stream(ignoreTitles).anyMatch(w.title::contains))
                             continue;
                         pids.add(w.pid);
-                        stringBuilder.append(String.format("[ %s ] %s%n", w.pid, w.title));
+                        windowTitles.add(w.title);
                     }
                 }
             }
@@ -63,18 +63,31 @@ public class Injector {
 
         // Print the result
         System.out.println("=======================");
-        System.out.println(stringBuilder);
+        for (int i = 0; i < pids.size(); i++) {
+            System.out.printf("[ %d ] %s (PID: %d)%n", i + 1, windowTitles.get(i), pids.get(i));
+        }
         System.out.println("=======================");
 
-        // Input the process ID
-        try (Scanner scanner = new Scanner(System.in)) {
-            System.out.print("[INPUT] PID: ");
-            pid = scanner.nextInt();
-        } catch (Exception e) {
-            throw new RuntimeException("Invalid PID input", e);
+        if (pids.isEmpty()) {
+            System.out.println("[ERROR] No Minecraft process found!");
+            return;
         }
 
-        // Inject!
+        // Input the sequence number
+        try (Scanner scanner = new Scanner(System.in)) {
+            System.out.printf("[INPUT] Select (1-%d): ", pids.size());
+            int index = scanner.nextInt();
+            if (index < 1 || index > pids.size()) {
+                throw new RuntimeException("Invalid selection: " + index);
+            }
+            pid = pids.get(index - 1);
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid input", e);
+        }
+
+        // Inject
         String agentPath = orangexPath + "/libagent.dll";
         String configDir = orangexPath;
         injectorNative.inject(pid, agentPath, configDir);
