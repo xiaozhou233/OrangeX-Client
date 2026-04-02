@@ -1,7 +1,7 @@
 package cn.xiaozhou233.orangex.loader;
 
 
-import cn.xiaozhou233.juiceloader.JuiceLoader;
+import cn.xiaozhou233.juiceagent.api.JuiceAgent;
 
 import java.io.File;
 
@@ -31,7 +31,7 @@ public class Loader {
         // Load OrangeX
         File injectionFile = new File(userDir + "/.orangex/OrangeX.jar");
         System.out.println("OrangeX Injection: " + injectionFile.getAbsolutePath());
-        JuiceLoader.AddToClassLoader(injectionFile.getAbsolutePath(), minecraftClassLoader);
+        JuiceAgent.addToClassLoader(injectionFile.getAbsolutePath(), minecraftClassLoader);
 
         // Start OrangeX
         try {

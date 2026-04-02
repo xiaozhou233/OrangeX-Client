@@ -2,7 +2,7 @@ package cn.xiaozhou233.orangex.utils;
 
 import java.lang.reflect.Method;
 
-public final class JuiceLoaderFacade {
+public final class JuiceAgentFacade {
 
     private static final Class<?> JL;
     private static final Method INIT;
@@ -13,7 +13,7 @@ public final class JuiceLoaderFacade {
     static {
         try {
             JL = Class.forName(
-                    "cn.xiaozhou233.juiceloader.JuiceLoader",
+                    "cn.xiaozhou233.juiceagent.api.JuiceAgent",
                     true,
                     ClassLoader.getSystemClassLoader()
             );
@@ -33,7 +33,7 @@ public final class JuiceLoaderFacade {
         }
     }
 
-    private JuiceLoaderFacade() {}
+    private JuiceAgentFacade() {}
 
     public static byte[] getClassBytes(Class<?> clazz) {
         try {

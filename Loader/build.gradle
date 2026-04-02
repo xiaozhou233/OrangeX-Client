@@ -11,5 +11,5 @@ repositories {
 }
 
 dependencies {
-    compileOnly(files("../libraries/JuiceLoader.jar"))
+    compileOnly(files("../libraries/JuiceAgent-API-1.4.0+build.1.jar"))
 }

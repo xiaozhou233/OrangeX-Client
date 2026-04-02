@@ -4,7 +4,7 @@ import cn.xiaozhou233.orangex.mixin.impl.MixinEntityRenderer;
 import cn.xiaozhou233.orangex.mixin.impl.MixinGuiIngame;
 import cn.xiaozhou233.orangex.mixin.impl.MixinMinecraft;
 import cn.xiaozhou233.orangex.mixin.impl.MixinNetHandlerPlayClient;
-import cn.xiaozhou233.orangex.utils.JuiceLoaderFacade;
+import cn.xiaozhou233.orangex.utils.JuiceAgentFacade;
 import cn.yapeteam.ymixin.Transformer;
 import cn.yapeteam.ymixin.YMixin;
 
@@ -27,7 +27,7 @@ public final class MixinManager {
                     }
                 },
                 clazz -> {
-                    byte[] classBytes = JuiceLoaderFacade.getClassBytes(clazz);
+                    byte[] classBytes = JuiceAgentFacade.getClassBytes(clazz);
                     if (classBytes == null) {
                         throw new RuntimeException(
                                 "ClassBytes null: " + clazz.getName()
@@ -53,7 +53,7 @@ public final class MixinManager {
         transformer.transform().forEach((name, bytes) -> {
             try {
                 Class<?> targetClass = Class.forName(name, false, cl);
-                boolean ok = JuiceLoaderFacade.redefineClass(targetClass, bytes);
+                boolean ok = JuiceAgentFacade.redefineClass(targetClass, bytes);
                 if (!ok) {
                     throw new RuntimeException("Redefine failed: " + name);
                 }
