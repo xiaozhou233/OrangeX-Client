@@ -1,7 +1,11 @@
-JuiceLoaderJarPath = ""
-JuiceLoaderLibraryPath = ""
-InjectionDir = ""
+[JuiceAgent]
+JuiceAgentAPIJarPath = ""
+JuiceAgentNativePath = ""
 
+[Entry]
 EntryJarPath = ""
 EntryClass = "cn.xiaozhou233.orangex.loader.Loader"
 EntryMethod = "start"
+
+[Runtime]
+InjectionDir = ""

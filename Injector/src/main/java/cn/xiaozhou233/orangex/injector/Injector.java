@@ -88,7 +88,7 @@ public class Injector {
         }
 
         // Inject
-        String agentPath = orangexPath + "/libagent.dll";
+        String agentPath = orangexPath + "/libloader.dll";
         String configDir = orangexPath;
         injectorNative.inject(pid, agentPath, configDir);
     }
