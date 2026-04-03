@@ -3,6 +3,7 @@ package cn.xiaozhou233.orangex.injector;
 import cn.xiaozhou233.juiceagent.injector.InjectorNative;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -17,13 +18,16 @@ public class Injector {
 
         int pid = -1;
 
-        // Unzip injection.zip to ~/.orangex
         System.out.println("Unzip injection.zip to " + orangexPath);
-        try (InputStream zipStream = ClassLoader.getSystemResourceAsStream("injection.zip")) {
-            if (zipStream == null) {
-                System.err.println("ZIP resource not found!");
-                return;
-            }
+
+        File zipFile = new File("injection.zip");
+
+        if (!zipFile.exists()) {
+            System.err.println("injection.zip not found in runtime directory!");
+            return;
+        }
+
+        try (InputStream zipStream = new FileInputStream(zipFile)) {
             FileUtils.unzip(zipStream, new File(orangexPath));
             System.out.println("Done!");
         } catch (IOException e) {

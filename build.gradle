@@ -1,64 +1,156 @@
+//   ░██████                                                        ░██    ░██
+// ░██   ░██                                                        ░██  ░██
+//░██     ░██ ░██░████  ░██████   ░████████   ░████████  ░███████    ░██░██
+//░██     ░██ ░███           ░██  ░██    ░██ ░██    ░██ ░██    ░██    ░███
+//░██     ░██ ░██       ░███████  ░██    ░██ ░██    ░██ ░█████████   ░██░██
+// ░██   ░██  ░██      ░██   ░██  ░██    ░██ ░██   ░███ ░██         ░██  ░██
+//  ░██████   ░██       ░█████░██ ░██    ░██  ░█████░██  ░███████  ░██    ░██
+//                                                  ░██
+//                                            ░███████
+//
+
+plugins {
+    id 'lifecycle-base'
+}
+
+// ============================
+// Variables
+// ============================
+def JuiceAgentJar = "libraries/JuiceAgent-API-1.4.0+build.1.jar"
+def outDir = layout.projectDirectory.dir("out")
+def tmpDir = layout.projectDirectory.dir("out/tmp")
+def runBatFile = layout.projectDirectory.file("out/run.bat")
+
+// ============================
+// Clean output directory
+// ============================
+tasks.register('cleanOut', Delete) {
+    delete("$outDir/Injector.jar", "$outDir/injection.zip", runBatFile)
+}
+
+// ============================
+// Build injection
+// ============================
 tasks.register("buildInjection", Copy) {
     group = 'build'
-    description = 'Build and collect all jars + resources into out/tmp'
+    description = 'Build injection and copy all required files to tmp directory'
+
+    // Incremental build: only copy changed files
+    outputs.upToDateWhen { false } // optional: force always check, can remove for caching
 
     dependsOn(
-            project(':OrangeX').tasks.named('build'),
-            project(':Loader').tasks.named('build')
+            project(':OrangeX').tasks.named('shadowJar'),
+            project(':Loader').tasks.named('shadowJar')
     )
 
-    into(layout.projectDirectory.dir('out/tmp'))
+    into(tmpDir)
 
     from(project(':OrangeX').tasks.named('shadowJar').map { it.archiveFile }) {
         rename { 'OrangeX.jar' }
     }
+
     from(project(':Loader').tasks.named('shadowJar').map { it.archiveFile }) {
         rename { 'Entry.jar' }
     }
 
     from(layout.projectDirectory.dir('natives'))
     from(layout.projectDirectory.dir('resources'))
-    from(layout.projectDirectory.file('libraries/JuiceLoader.jar'))
+
+    from(layout.projectDirectory.file(JuiceAgentJar)) {
+        rename { 'JuiceAgent.jar' }
+    }
 }
 
+// ============================
+// Package injection into injection.zip
+// ============================
 tasks.register("packInjection", Zip) {
     group = 'build'
-    description = 'Package all collected files into injection.zip'
+    description = 'Package all files from tmp into injection.zip'
 
     dependsOn(tasks.named("buildInjection"))
 
-    destinationDirectory.set(layout.projectDirectory.dir("out"))
+    destinationDirectory.set(outDir)
     archiveFileName.set("injection.zip")
 
-    from(layout.projectDirectory.dir("out/tmp"))
+    from(tmpDir)
 }
 
+// ============================
+// Build Injector.jar
+// ============================
 tasks.register("buildInjector", Jar) {
     group = 'build'
-    description = 'Build Injector.jar including injection.zip'
+    description = 'Build Injector.jar including injection.zip and subproject jar'
 
-    dependsOn(tasks.named("packInjection"))
-    dependsOn(project(':Injector').tasks.named('shadowJar'))
+    dependsOn(
+            tasks.named("packInjection"),
+            project(':Injector').tasks.named('shadowJar')
+    )
 
-    destinationDirectory.set(layout.projectDirectory.dir("out"))
+    destinationDirectory.set(outDir)
     archiveFileName.set("Injector.jar")
 
     from(zipTree(project(':Injector').tasks.named('shadowJar').map { it.archiveFile })) {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
-    from(layout.projectDirectory.file("out/injection.zip")) {
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    }
 
     manifest {
-        attributes(
-                'Main-Class': 'cn.xiaozhou233.orangex.injector.Injector'
-        )
-    }
-
-    doLast {
-        delete('out/injection.zip')
+        attributes('Main-Class': 'cn.xiaozhou233.orangex.injector.Injector')
     }
 }
 
+// ============================
+// Generate run.bat
+// ============================
+tasks.register("generateRunBat") {
+    group = 'build'
+    description = 'Generate run.bat to run Injector.jar'
 
+    dependsOn(tasks.named("buildInjector"))
+
+    outputs.file(runBatFile)
+
+    doLast {
+        runBatFile.asFile.text =
+"""@echo off
+java -jar Injector.jar
+pause
+"""
+        println("run.bat generated in 'out/' folder")
+    }
+}
+
+// ============================
+// Main build task
+// ============================
+tasks.register("buildAll") {
+    dependsOn(tasks.named("generateRunBat"))
+
+    doFirst {
+        println("Building OrangeX-Client...")
+    }
+
+    doLast {
+        println("Build finished! Injector.jar, injection.zip, and run.bat are in 'out/' folder.")
+    }
+}
+
+// ============================
+// Task execution order chain
+// ============================
+tasks.named("buildInjection") {
+    dependsOn(tasks.named("cleanOut"))
+}
+
+tasks.named("packInjection") {
+    dependsOn(tasks.named("buildInjection"))
+}
+
+tasks.named("buildInjector") {
+    dependsOn(tasks.named("packInjection"))
+}
+
+tasks.named("generateRunBat") {
+    dependsOn(tasks.named("buildInjector"))
+}
