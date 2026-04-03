@@ -46,7 +46,7 @@
 
 #### 第三步：构建 OrangeX
 
-* 使用 `./gradlew buildInjector` 构建项目
+* 使用 `./gradlew buildAll` 构建项目
 * 构建完成后，`out/` 目录下会生成 `Injector.jar`
 * 使用 `java -jar Injector.jar` 启动注入器
 
