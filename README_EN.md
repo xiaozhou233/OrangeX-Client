@@ -1,5 +1,7 @@
 # OrangeX Client
 
+# Note: This project is either discontinued or undergoing refactoring. For the original code, please refer to the legacy branch: [legacy](https://github.com/xiaozhou233/OrangeX-Client/tree/legacy)
+
 ![Banner1](./doc/banner1.png)
 ![Banner2](./doc/banner2.png)
 

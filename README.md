@@ -1,4 +1,7 @@
 # OrangeX Client
+
+# 该项目不再更新或者重构中，原始代码请查看 [legacy](https://github.com/xiaozhou233/OrangeX-Client/tree/legacy)
+
 ![Banner1](./doc/banner1.png)
 ![Banner2](./doc/banner2.png)
 
