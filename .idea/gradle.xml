@@ -10,9 +10,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/Injector" />
-            <option value="$PROJECT_DIR$/Loader" />
             <option value="$PROJECT_DIR$/Minecraft" />
-            <option value="$PROJECT_DIR$/OrangeX" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="true" />
