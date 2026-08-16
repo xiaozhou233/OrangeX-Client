@@ -2,6 +2,10 @@
 
 # 该项目不再更新或者重构中，原始代码请查看 [legacy](https://github.com/xiaozhou233/OrangeX-Client/tree/legacy)
 
+# 欢迎加入我们的Discord/QQ群组
+ - [JuiceDev](https://discord.gg/AQTnUyWNNJ)
+ - QQ: 1103504356
+
 ![Banner1](./doc/banner1.png)
 ![Banner2](./doc/banner2.png)
 
