@@ -8,6 +8,7 @@
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Minecraft-1.8.8-runtime" />
     <method v="2">
       <option name="Make" enabled="true" />
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="OrangeX-Client [buildAll]" run_configuration_type="GradleRunConfiguration" />
     </method>
   </configuration>
 </component>

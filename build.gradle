@@ -1,3 +1,23 @@
 plugins {
     id 'lifecycle-base'
 }
+
+tasks.register("buildInjection", Copy) {
+    outputs.upToDateWhen { false }
+
+    dependsOn(
+            project(':OrangeX').tasks.named('shadowJar')
+    )
+}
+
+tasks.register("buildAll") {
+    dependsOn(tasks.named("buildInjection"))
+
+    doFirst {
+        println("Building OrangeX-Client...")
+    }
+
+    doLast {
+        println("Build finished!")
+    }
+}

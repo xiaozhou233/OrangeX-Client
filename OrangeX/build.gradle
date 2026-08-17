@@ -1,0 +1,21 @@
+plugins {
+    id 'java'
+    id "com.gradleup.shadow" version "8.3.9"
+}
+
+group = 'cn.xiaozhou233.orangex'
+version = 'unspecified'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly("org.projectlombok:lombok:1.18.46")
+    annotationProcessor("org.projectlombok:lombok:1.18.46")
+}
+
+shadowJar {
+    archiveFileName = 'OrangeX.jar'
+    destinationDirectory = rootProject.layout.projectDirectory.dir('out/temp')
+}

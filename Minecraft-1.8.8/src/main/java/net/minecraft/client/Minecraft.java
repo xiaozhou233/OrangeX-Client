@@ -1,5 +1,6 @@
 package net.minecraft.client;
 
+import cn.xiaozhou233.orangex.loader.MCPLoader;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -589,6 +590,10 @@ public class Minecraft implements IThreadListener, IPlayerUsage
         }
 
         this.renderGlobal.makeEntityOutlineShader();
+
+        // OrangeX MCP Loader Inject Point //
+        MCPLoader.INSTANCE.start();
+        // OrangeX MCP Loader Inject Point //
     }
 
     private void registerMetadataSerializers()
@@ -1030,6 +1035,10 @@ public class Minecraft implements IThreadListener, IPlayerUsage
         {
             this.stream.shutdownStream();
             logger.info("Stopping!");
+
+            // OrangeX MCP Loader Inject Point //
+            MCPLoader.INSTANCE.stop();
+            // OrangeX MCP Loader Inject Point //
 
             try
             {
