@@ -2,16 +2,45 @@ plugins {
     id 'lifecycle-base'
 }
 
+// ============================
+// Variables
+// ============================
+def outDir = layout.projectDirectory.dir("out")
+def tmpDir = layout.projectDirectory.dir("out/tmp")
+
+tasks.register("cleanTmp", Delete) {
+    delete tmpDir
+}
+
 tasks.register("buildInjection", Copy) {
     outputs.upToDateWhen { false }
 
     dependsOn(
-            project(':OrangeX').tasks.named('shadowJar')
+            tasks.named("cleanTmp"),
+            project(':OrangeX').tasks.named('shadowJar'),
+            project(':Injector').tasks.named('shadowJar')
     )
+
+    from(rootProject.layout.projectDirectory.dir('natives'))
+    from(rootProject.layout.projectDirectory.dir('resources'))
+    into(tmpDir)
+}
+
+tasks.register("packInjection", Zip) {
+    group = 'build'
+    description = 'Package all files from tmp into injection.zip'
+
+    dependsOn(tasks.named("buildInjection"))
+
+    destinationDirectory.set(outDir)
+    archiveFileName.set("injection.zip")
+
+    from(tmpDir)
 }
 
 tasks.register("buildAll") {
     dependsOn(tasks.named("buildInjection"))
+    dependsOn(tasks.named("packInjection"))
 
     doFirst {
         println("Building OrangeX-Client...")

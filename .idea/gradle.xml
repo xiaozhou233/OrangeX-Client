@@ -9,6 +9,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/Injector" />
             <option value="$PROJECT_DIR$/Minecraft-1.8.8" />
             <option value="$PROJECT_DIR$/OrangeX" />
           </set>

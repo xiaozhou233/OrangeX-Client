@@ -17,5 +17,5 @@ dependencies {
 
 shadowJar {
     archiveFileName = 'OrangeX.jar'
-    destinationDirectory = rootProject.layout.projectDirectory.dir('out/temp')
+    destinationDirectory = rootProject.layout.projectDirectory.dir('out/tmp')
 }
