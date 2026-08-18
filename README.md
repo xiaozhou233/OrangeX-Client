@@ -5,10 +5,6 @@
 ## - Discord：[JuiceDev](https://discord.gg/AQTnUyWNNJ)
 ## - QQ 群：1103504356
 
-# 欢迎加入我们的Discord/QQ群组
- - [JuiceDev](https://discord.gg/AQTnUyWNNJ)
- - QQ: 1103504356
-
 ![Banner1](./doc/banner1.png)
 ![Banner2](./doc/banner2.png)
 
