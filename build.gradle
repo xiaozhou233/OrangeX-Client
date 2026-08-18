@@ -22,6 +22,8 @@ tasks.register("buildInjection", Copy) {
             project(':Loader').tasks.named('shadowJar')
     )
 
+    from(project(':OrangeX').tasks.named('shadowJar').flatMap { it.archiveFile })
+    from(project(':Loader').tasks.named('shadowJar').flatMap { it.archiveFile })
     from(rootProject.layout.projectDirectory.dir('natives'))
     from(rootProject.layout.projectDirectory.dir('resources'))
     into(tmpDir)

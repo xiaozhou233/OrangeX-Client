@@ -16,5 +16,4 @@ dependencies {
 
 shadowJar {
     archiveFileName = 'Loader.jar'
-    destinationDirectory = rootProject.layout.projectDirectory.dir('out/tmp')
 }
