@@ -18,7 +18,8 @@ tasks.register("buildInjection", Copy) {
     dependsOn(
             tasks.named("cleanTmp"),
             project(':OrangeX').tasks.named('shadowJar'),
-            project(':Injector').tasks.named('shadowJar')
+            project(':Injector').tasks.named('shadowJar'),
+            project(':Loader').tasks.named('shadowJar')
     )
 
     from(rootProject.layout.projectDirectory.dir('natives'))
