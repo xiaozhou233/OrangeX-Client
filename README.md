@@ -1,6 +1,9 @@
 # OrangeX Client
 
-# 该项目不再更新或者重构中，原始代码请查看 [legacy](https://github.com/xiaozhou233/OrangeX-Client/tree/legacy)
+# 该项目正在重构中，原始代码请查看 [legacy](https://github.com/xiaozhou233/OrangeX-Client/tree/legacy)
+# 欢迎加入我们的 QQ / Discord 群组获取更多信息和支持：
+## - Discord：[JuiceDev](https://discord.gg/AQTnUyWNNJ)
+## - QQ 群：1103504356
 
 # 欢迎加入我们的Discord/QQ群组
  - [JuiceDev](https://discord.gg/AQTnUyWNNJ)
