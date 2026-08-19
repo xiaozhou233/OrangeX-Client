@@ -1,6 +1,7 @@
 package cn.xiaozhou233.orangex.mixin.impl;
 
 import cn.xiaozhou233.orangex.OrangeX;
+import cn.xiaozhou233.orangex.event.impl.EventRender2D;
 import cn.yapeteam.ymixin.annotations.Inject;
 import cn.yapeteam.ymixin.annotations.Local;
 import cn.yapeteam.ymixin.annotations.Mixin;
@@ -32,7 +33,7 @@ public class MixinGuiIngame {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         mc.entityRenderer.setupOverlayRendering();
 
-        OrangeX.getInstance().getFontManager().JelloMedium32.drawString("OrangeX", 5, 5, 0xFFA500);
+        OrangeX.getInstance().getEventBus().post(new EventRender2D(partialTicks));
 
         GlStateManager.enableDepth();
         GlStateManager.disableBlend();
