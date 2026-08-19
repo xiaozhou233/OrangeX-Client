@@ -32,17 +32,20 @@ public class Loader {
         // Check Obfuscation
         // Only Check MCP or Vanilla Obfuscation
         try {
-            Class.forName("net.minecraft.client.Minecraft");
-        } catch (ClassNotFoundException e) {
+            Class.forName("ave");
             System.out.println("Obfuscation detected");
-
             // Load JuiceRemapper Native
             System.load(new File(userDir, "/.orangex/libremapper.dll").getAbsolutePath());
 
             JuiceRemapper.init();
             JuiceRemapper.addInclude("cn/xiaozhou233/orangex/");
             JuiceRemapper.addExclude("cn/xiaozhou233/orangex/mixin");
+        } catch (ClassNotFoundException e) {
+            System.out.println("Obfuscation not detected");
         }
+
+
+
 
 
 
