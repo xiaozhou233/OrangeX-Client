@@ -2,6 +2,7 @@ package cn.xiaozhou233.orangex.loader;
 
 
 import cn.xiaozhou233.juiceagent.api.JuiceAgent;
+import cn.xiaozhou233.juiceremapper.JuiceRemapper;
 
 import java.io.File;
 
@@ -28,6 +29,23 @@ public class Loader {
         minecraftClassLoader = clientThread.getContextClassLoader();
         System.out.println("Minecraft ClassLoader: " + minecraftClassLoader);
 
+        // Check Obfuscation
+        // Only Check MCP or Vanilla Obfuscation
+        try {
+            Class.forName("net.minecraft.client.Minecraft");
+        } catch (ClassNotFoundException e) {
+            System.out.println("Obfuscation detected");
+
+            // Load JuiceRemapper Native
+            System.load(new File(userDir, "/.orangex/libremapper.dll").getAbsolutePath());
+
+            JuiceRemapper.init();
+            JuiceRemapper.addInclude("cn/xiaozhou233/orangex/");
+            JuiceRemapper.addExclude("cn/xiaozhou233/orangex/mixin");
+        }
+
+
+
         // Load OrangeX
         File injectionFile = new File(userDir + "/.orangex/OrangeX.jar");
         System.out.println("OrangeX Injection: " + injectionFile.getAbsolutePath());
@@ -38,8 +56,6 @@ public class Loader {
             Class<?> orangeXClass = Class.forName("cn.xiaozhou233.orangex.OrangeX", true, minecraftClassLoader);
             Object orangeXInstance = orangeXClass.getMethod("getInstance").invoke(null);
             orangeXClass.getMethod("start").invoke(orangeXInstance);
-
-
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

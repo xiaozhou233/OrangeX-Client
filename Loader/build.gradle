@@ -12,6 +12,7 @@ repositories {
 
 dependencies {
     compileOnly files("../libraries/JuiceAgent-API-1.4.1+build.1.jar")
+    implementation files("../libraries/JuiceRemapper-1.0-SNAPSHOT-all.jar")
 }
 
 shadowJar {

@@ -13,8 +13,18 @@ repositories {
 dependencies {
     compileOnly("org.projectlombok:lombok:1.18.46")
     annotationProcessor("org.projectlombok:lombok:1.18.46")
+
+    compileOnly fileTree(dir: "../libraries", include: ["**/*.jar"])
+
+    implementation files("../libraries/ymixin.jar")
+    // https://mvnrepository.com/artifact/org.ow2.asm/asm-tree
+    implementation("org.ow2.asm:asm-tree:9.8")
+    // https://mvnrepository.com/artifact/org.ow2.asm/asm-tree
+    implementation("org.ow2.asm:asm:9.8")
 }
 
 shadowJar {
     archiveFileName = 'OrangeX.jar'
+    relocate 'org.objectweb.asm', 'cn.xiaozhou233.asm9'
+    relocate 'com.google.gson', "cn.xiaozhou233.gson"
 }
