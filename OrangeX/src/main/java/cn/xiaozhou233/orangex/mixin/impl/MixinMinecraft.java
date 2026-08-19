@@ -14,7 +14,7 @@ public class MixinMinecraft {
 
     @Inject(method = "runGameLoop", desc = "()V", target = @Target("HEAD"))
     private void onLoop() {
-        System.out.println("LOOP!");
+
     }
 
     @Inject(method = "runTick", desc = "()V", target = @Target("HEAD"))
