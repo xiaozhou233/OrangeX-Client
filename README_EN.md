@@ -1,6 +1,9 @@
 # OrangeX Client
 
-# Note: This project is either discontinued or undergoing refactoring. For the original code, please refer to the legacy branch: [legacy](https://github.com/xiaozhou233/OrangeX-Client/tree/legacy)
+# Note: This project is undergoing refactoring. For the original code, please refer to the legacy branch: [legacy](https://github.com/xiaozhou233/OrangeX-Client/tree/legacy)
+# Welcome to join our QQ / Discord groups for more information and support:
+## - Discord: [JuiceDev](https://discord.gg/AQTnUyWNNJ)
+## - QQ Group: 1103504356
 
 ![Banner1](./doc/banner1.png)
 ![Banner2](./doc/banner2.png)
@@ -75,3 +78,7 @@ Currently, only non-obfuscated clients are supported. The following clients have
 
 * [FontRenderer](https://github.com/Godwhitelight/FontRenderer) - Font rendering
 * [YMixin](https://github.com/yapeteam/YMixin) - Bytecode instrumentation tool for dynamically generating replaceable bytecode
+* [OpenVape](https://github.com/OpenVapeCN/VapeV4.21) - Vape Crack??? (Part of font rendering code comes from this project)
+* [OpenYolbo](https://github.com/yapeteam/OpenYolBi) - Hot injection client (Mixin approach and some ideas from this project)
+* [JuiceAgent](https://github.com/xiaozhou233/JuiceAgent) - JVMTI-based injection framework - Underlying implementation for client hot injection
+* [JuiceRemapper](https://github.com/xiaozhou233/JuiceRemapper) - Runtime automatic remapping tool
