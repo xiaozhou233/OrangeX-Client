@@ -49,4 +49,8 @@ public class Detector {
 
         return DetectorType.UNKNOWN;
     }
+
+    public static boolean isLaunchWrapper() {
+        return classExists("net.minecraft.launchwrapper.Launch");
+    }
 }

@@ -27,6 +27,7 @@ public class OrangeX {
     }
 
     public void stop() {
+        System.out.println("OrangeX stopping...");
         System.out.println("OrangeX stopped.");
     }
 

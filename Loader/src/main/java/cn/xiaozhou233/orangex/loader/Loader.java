@@ -26,6 +26,11 @@ public class Loader {
             throw new IllegalStateException("Cannot find Minecraft client thread");
         }
 
+        // Check if LaunchWrapper exists
+        if (Detector.isLaunchWrapper()){
+            System.out.println("LaunchWrapper detected");
+        }
+
         // Get Minecraft ClassLoader
         minecraftClassLoader = clientThread.getContextClassLoader();
         System.out.println("Minecraft ClassLoader: " + minecraftClassLoader);
