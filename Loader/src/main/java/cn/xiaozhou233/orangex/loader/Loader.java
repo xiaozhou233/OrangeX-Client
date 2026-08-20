@@ -4,6 +4,7 @@ package cn.xiaozhou233.orangex.loader;
 import cn.xiaozhou233.juiceagent.api.JuiceAgent;
 import cn.xiaozhou233.juiceremapper.JuiceRemapper;
 
+import javax.swing.*;
 import java.io.File;
 
 public class Loader {
@@ -31,17 +32,34 @@ public class Loader {
 
         // Check Obfuscation
         // Only Check MCP or Vanilla Obfuscation
-        try {
-            Class.forName("ave");
-            System.out.println("Obfuscation detected");
-            // Load JuiceRemapper Native
-            System.load(new File(userDir, "/.orangex/libremapper.dll").getAbsolutePath());
+        switch (Detector.detect()) {
+            case MCP:
+                break;
+            case VANILLA:
+                System.load(new File(userDir, "/.orangex/libremapper.dll").getAbsolutePath());
 
-            JuiceRemapper.init();
-            JuiceRemapper.addInclude("cn/xiaozhou233/orangex/");
-            JuiceRemapper.addExclude("cn/xiaozhou233/orangex/mixin");
-        } catch (ClassNotFoundException e) {
-            System.out.println("Obfuscation not detected");
+                JuiceRemapper.init();
+                JuiceRemapper.addInclude("cn/xiaozhou233/orangex/");
+                JuiceRemapper.addExclude("cn/xiaozhou233/orangex/mixin/");
+                break;
+            case LUNAR:
+                break;
+            case BADLION:
+                System.load(new File(userDir, "/.orangex/libremapper.dll").getAbsolutePath());
+
+                JuiceRemapper.init();
+                JuiceRemapper.addInclude("cn/xiaozhou233/orangex/");
+                JuiceRemapper.addExclude("cn/xiaozhou233/orangex/mixin/");
+                break;
+            case UNKNOWN:
+                JOptionPane.showMessageDialog(
+                        null,
+                        "Inject Failed! Cause: Unknown Obfuscation",
+                        "Unknown Obfuscation",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                throw new IllegalStateException("Unknown Obfuscation");
+
         }
 
 

@@ -8,6 +8,7 @@ public final class JuiceAgentFacade {
     private static final Method GET_CLASS_BYTES;
     private static final Method REDEFINE_CLASS;
     private static final Method GET_LOADED_CLASSES;
+    private static final Method RETRANSFORM_CLASS;
 
     static {
         try {
@@ -25,6 +26,7 @@ public final class JuiceAgentFacade {
                     int.class
             );
             GET_LOADED_CLASSES = JL.getMethod("getLoadedClasses");
+            RETRANSFORM_CLASS = JL.getMethod("retransformClass", Class.class, byte[].class, int.class);
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to init JuiceFacade", e);
@@ -52,6 +54,14 @@ public final class JuiceAgentFacade {
     public static Class<?>[] getLoadedClasses() {
         try {
             return (Class<?>[]) GET_LOADED_CLASSES.invoke(null);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static boolean retransformClass(Class<?> clazz, byte[] bytes) {
+        try {
+            return (boolean) RETRANSFORM_CLASS.invoke(null, clazz, bytes, bytes.length);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

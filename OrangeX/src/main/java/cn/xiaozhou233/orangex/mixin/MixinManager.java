@@ -1,6 +1,6 @@
 package cn.xiaozhou233.orangex.mixin;
 
-import cn.xiaozhou233.juiceremapper.utils.IOUtils;
+import cn.xiaozhou233.orangex.utils.IOUtils;
 import cn.xiaozhou233.orangex.mixin.impl.*;
 import cn.xiaozhou233.orangex.utils.JuiceAgentFacade;
 import cn.yapeteam.ymixin.Transformer;
@@ -71,7 +71,7 @@ public final class MixinManager {
         transformer.transform().forEach((name, bytes) -> {
             try {
                 Class<?> targetClass = Class.forName(name, false, cl);
-                boolean ok = JuiceAgentFacade.redefineClass(targetClass, bytes);
+                boolean ok = JuiceAgentFacade.retransformClass(targetClass, bytes);
                 if (!ok) {
                     throw new RuntimeException("Redefine failed: " + name);
                 }

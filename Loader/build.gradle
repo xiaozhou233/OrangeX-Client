@@ -17,4 +17,5 @@ dependencies {
 
 shadowJar {
     archiveFileName = 'Loader.jar'
+    relocate 'org.objectweb.asm', 'cn.xiaozhou233.asm9'
 }
