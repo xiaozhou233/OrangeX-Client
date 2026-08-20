@@ -1,6 +1,7 @@
 package cn.xiaozhou233.orangex;
 
 import cn.xiaozhou233.orangex.font.FontManager;
+import cn.xiaozhou233.orangex.font.StbFontManager;
 import cn.xiaozhou233.orangex.mixin.MixinManager;
 import lombok.Getter;
 import org.greenrobot.eventbus.EventBus;
@@ -10,6 +11,7 @@ public class OrangeX {
     public static final OrangeX INSTANCE = new OrangeX();
     public MixinManager mixinManager = new MixinManager();
     FontManager fontManager = new FontManager();
+    StbFontManager stbFontManager = new StbFontManager();
     private final EventBus eventBus = EventBus.builder()
             .logNoSubscriberMessages(false)
             .logSubscriberExceptions(false)
@@ -21,6 +23,7 @@ public class OrangeX {
     public void start() {
         System.out.println("OrangeX starting...");
 
+        stbFontManager.loadFonts();
         mixinManager.start();
 
         System.out.println("OrangeX started.");

@@ -2,6 +2,7 @@ package cn.xiaozhou233.orangex.mixin.impl;
 
 import cn.xiaozhou233.orangex.OrangeX;
 import cn.xiaozhou233.orangex.event.impl.EventRender2D;
+import cn.xiaozhou233.orangex.font.SmoothFontRenderer;
 import cn.yapeteam.ymixin.annotations.Inject;
 import cn.yapeteam.ymixin.annotations.Local;
 import cn.yapeteam.ymixin.annotations.Mixin;
@@ -34,7 +35,9 @@ public class MixinGuiIngame {
         mc.entityRenderer.setupOverlayRendering();
 
         OrangeX.getInstance().getEventBus().post(new EventRender2D(partialTicks));
-        OrangeX.getInstance().getFontManager().JelloMedium32.drawString("OrangeX", 10, 10, 0xFFA500);
+        SmoothFontRenderer font = OrangeX.getInstance().getStbFontManager().getProxima(18);
+        font.drawString("Hello World!", 50, 50, 0xFFFFFFFF);
+
 
         GlStateManager.enableDepth();
         GlStateManager.disableBlend();
