@@ -30,8 +30,6 @@ public class Loader {
         minecraftClassLoader = clientThread.getContextClassLoader();
         System.out.println("Minecraft ClassLoader: " + minecraftClassLoader);
 
-        // Check Obfuscation
-        // Only Check MCP or Vanilla Obfuscation
         switch (Detector.detect()) {
             case MCP:
                 break;
@@ -61,11 +59,6 @@ public class Loader {
                 throw new IllegalStateException("Unknown Obfuscation");
 
         }
-
-
-
-
-
 
         // Load OrangeX
         File injectionFile = new File(userDir + "/.orangex/OrangeX.jar");
