@@ -67,6 +67,6 @@
 * [FontRenderer](https://github.com/Godwhitelight/FontRenderer) - 字体渲染
 * [YMixin](https://github.com/yapeteam/YMixin) - 字节码插桩工具 动态生成可替换的字节码
 * [OpenVape](https://github.com/OpenVapeCN/VapeV4.21) - Vape Crack??? (部分字体渲染代码来自该项目)
-* [OpenYolbo](https://github.com/yapeteam/OpenYolBi) - 热注入客户端 (mixin写法、部分思路来自该项目)
+* [OpenYolbi](https://github.com/yapeteam/OpenYolBi) - 热注入客户端 (mixin写法、部分思路来自该项目)
 * [JuiceAgent](https://github.com/xiaozhou233/JuiceAgent) - 基于 JVMTI 的注入框架 - 客户端热注入底层实现 
 * [JuiceRemapper](https://github.com/xiaozhou233/JuiceRemapper) - 运行时自动映射工具

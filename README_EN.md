@@ -79,6 +79,6 @@ Currently, only non-obfuscated clients are supported. The following clients have
 * [FontRenderer](https://github.com/Godwhitelight/FontRenderer) - Font rendering
 * [YMixin](https://github.com/yapeteam/YMixin) - Bytecode instrumentation tool for dynamically generating replaceable bytecode
 * [OpenVape](https://github.com/OpenVapeCN/VapeV4.21) - Vape Crack??? (Part of font rendering code comes from this project)
-* [OpenYolbo](https://github.com/yapeteam/OpenYolBi) - Hot injection client (Mixin approach and some ideas from this project)
+* [OpenYolbi](https://github.com/yapeteam/OpenYolBi) - Hot injection client (Mixin approach and some ideas from this project)
 * [JuiceAgent](https://github.com/xiaozhou233/JuiceAgent) - JVMTI-based injection framework - Underlying implementation for client hot injection
 * [JuiceRemapper](https://github.com/xiaozhou233/JuiceRemapper) - Runtime automatic remapping tool
