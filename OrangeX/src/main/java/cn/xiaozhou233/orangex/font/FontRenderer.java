@@ -1,7 +1,6 @@
 package cn.xiaozhou233.orangex.font;
 
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.util.ResourceLocation;
@@ -477,10 +476,6 @@ public class FontRenderer extends CFont {
         }
 
         return finalWords;
-    }
-
-    private double getFontScale() {
-        return (Minecraft.getMinecraft().displayWidth / 1920.0D) * 0.5D;
     }
 
     private void setupMinecraftColorcodes() {

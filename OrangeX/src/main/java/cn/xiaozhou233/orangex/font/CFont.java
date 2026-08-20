@@ -1,6 +1,7 @@
 package cn.xiaozhou233.orangex.font;
 
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.DynamicTexture;
@@ -173,7 +174,12 @@ public class CFont
 
     public int getHeight()
     {
-        return (this.fontHeight - 8) / 2;
+        return (int) (((this.fontHeight - 8) / 2) * getFontScale());
+    }
+
+    protected double getFontScale()
+    {
+        return (Minecraft.getMinecraft().displayWidth / 1920.0D) * 0.5D;
     }
 
     public int getStringWidth(String text)

@@ -34,6 +34,7 @@ public class MixinGuiIngame {
         mc.entityRenderer.setupOverlayRendering();
 
         OrangeX.getInstance().getEventBus().post(new EventRender2D(partialTicks));
+        OrangeX.getInstance().getFontManager().JelloMedium32.drawString("OrangeX", 10, 10, 0xFFA500);
 
         GlStateManager.enableDepth();
         GlStateManager.disableBlend();
