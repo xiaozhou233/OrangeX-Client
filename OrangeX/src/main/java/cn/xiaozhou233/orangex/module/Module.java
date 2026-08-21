@@ -1,9 +1,14 @@
 package cn.xiaozhou233.orangex.module;
 
 import cn.xiaozhou233.orangex.OrangeX;
+import cn.xiaozhou233.orangex.module.option.Option;
 import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Keyboard;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 public class Module {
@@ -11,10 +16,10 @@ public class Module {
     protected final String name;
     protected final String description;
     protected final ModuleCategory category;
+    @Setter
     protected int key = Keyboard.KEY_NONE;
     protected boolean enabled = false;
-
-
+    protected final List<Option<?>> options = new ArrayList<>();
 
     public Module(String name, String description, ModuleCategory category) {
         this.name = name;
@@ -25,6 +30,10 @@ public class Module {
     public Module(String name, String description, ModuleCategory category, int key) {
         this(name, description, category);
         this.key = key;
+    }
+
+    public void addOption(Option<?> option) {
+        options.add(option);
     }
 
     protected void onEnable() {
@@ -38,17 +47,19 @@ public class Module {
     public void setEnabled(boolean setEnabled) {
         if (this.enabled == setEnabled) return;
 
-        this.enabled = setEnabled;
-
-        if (this.enabled) {
-            if (OrangeX.getInstance().getEventBus().isRegistered(this))
+        if (setEnabled) {
+            try {
+                OrangeX.getInstance().getEventBus().register(this);
+            } catch (Exception e) {
                 return;
-            try { OrangeX.getInstance().getEventBus().register(this); } catch (Exception ignored) {}
+            }
+            this.enabled = true;
             onEnable();
         } else {
-            if (!OrangeX.getInstance().getEventBus().isRegistered(this))
-                return;
-            try { OrangeX.getInstance().getEventBus().unregister(this); } catch (Exception ignored) {}
+            try {
+                OrangeX.getInstance().getEventBus().unregister(this);
+            } catch (Exception ignored) {}
+            this.enabled = false;
             onDisable();
         }
     }
