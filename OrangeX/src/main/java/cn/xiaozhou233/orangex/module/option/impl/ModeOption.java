@@ -55,4 +55,29 @@ public class ModeOption extends Option<String> {
     public void deserialize(JsonElement element) {
         setValue(element.getAsString());
     }
+
+    public void next() {
+
+        int index = getIndex();
+
+        index++;
+
+        if(index >= modes.length)
+            index = 0;
+
+        setValue(modes[index]);
+    }
+
+
+    public void previous() {
+
+        int index = getIndex();
+
+        index--;
+
+        if(index < 0)
+            index = modes.length - 1;
+
+        setValue(modes[index]);
+    }
 }

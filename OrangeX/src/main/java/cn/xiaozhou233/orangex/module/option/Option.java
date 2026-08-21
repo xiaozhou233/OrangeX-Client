@@ -3,12 +3,14 @@ package cn.xiaozhou233.orangex.module.option;
 import cn.xiaozhou233.orangex.module.Module;
 import com.google.gson.JsonElement;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public abstract class Option<T> {
     protected final String name;
     protected final String description;
     protected final Module parent;
+    @Setter
     protected T value;
     protected final T defaultValue;
 
@@ -18,10 +20,6 @@ public abstract class Option<T> {
         this.parent = parent;
         this.defaultValue = defaultValue;
         this.value = defaultValue;
-    }
-
-    public void setValue(T value) {
-        this.value = value;
     }
 
     public void reset() {
