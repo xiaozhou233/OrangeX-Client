@@ -62,7 +62,14 @@ public class Loader {
                         JOptionPane.ERROR_MESSAGE
                 );
                 throw new IllegalStateException("Unknown Obfuscation");
-
+            default:
+                JOptionPane.showMessageDialog(
+                        null,
+                        "Inject Failed! Cause: Unknown Obfuscation",
+                        "Unknown Obfuscation",
+                        JOptionPane.ERROR_MESSAGE
+                        );
+                throw new IllegalStateException("Unexpected value: " + Detector.detect());
         }
 
         // Load OrangeX
