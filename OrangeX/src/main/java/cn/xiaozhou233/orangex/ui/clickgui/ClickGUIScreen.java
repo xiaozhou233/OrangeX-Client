@@ -6,7 +6,6 @@ import cn.xiaozhou233.orangex.OrangeX;
 import cn.xiaozhou233.orangex.ui.clickgui.component.impl.ModuleButton;
 import com.google.gson.JsonObject;
 import net.minecraft.client.gui.GuiScreen;
-import org.lwjgl.input.Mouse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,25 +78,6 @@ public class ClickGUIScreen extends GuiScreen {
                 mouseY,
                 partialTicks
         );
-    }
-
-    @Override
-    public void handleMouseInput() throws java.io.IOException {
-        int amount = Mouse.getEventDWheel();
-        if (amount != 0) {
-            int mouseX = Mouse.getEventX() * width / mc.displayWidth;
-            int mouseY = height - Mouse.getEventY() * height / mc.displayHeight - 1;
-
-            for (Panel panel : panels) {
-                if (panel.isMouseOver(mouseX, mouseY)) {
-                    int scrollAmount = amount > 0 ? 10 : -10;
-                    panel.handleMouseInput(scrollAmount);
-                    break;
-                }
-            }
-        }
-
-        super.handleMouseInput();
     }
 
     @Override

@@ -35,10 +35,6 @@ public class Panel {
 
     private final List<Component> components = new ArrayList<>();
 
-    private int scrollOffset;
-
-    private int maxScroll;
-
 
     public Panel(ModuleCategory category, int x, int y, int width, int height) {
         this.category = category;
@@ -55,36 +51,31 @@ public class Panel {
             y = mouseY - dragY;
         }
 
-        drawBackground(mouseX, mouseY);
-
-        if (!open)
-            return;
-
-        for (Component component : components) {
-            component.drawScreen(mouseX, mouseY, partialTicks);
-        }
-    }
-
-
-    private void drawBackground(int mouseX, int mouseY) {
         int contentHeight = calculateContentHeight();
         int panelHeight = headerHeight + (open ? contentHeight : 0);
 
-        Gui.drawRect(x, y, x + width, y + panelHeight, 0xff1a1a1a);
+        if (open) {
+            Gui.drawRect(x, y + headerHeight, x + width, y + headerHeight + contentHeight, 0xff1a1a1a);
+        }
 
-        Gui.drawRect(x, y, x + width, y + 1, 0xff3d3d3d);
-        Gui.drawRect(x, y + panelHeight - 1, x + width, y + panelHeight, 0xff3d3d3d);
-        Gui.drawRect(x, y, x + 1, y + panelHeight, 0xff3d3d3d);
-        Gui.drawRect(x + width - 1, y, x + width, y + panelHeight, 0xff3d3d3d);
+        // Components (drawn below header, will be covered by header if scrolled up)
+        if (open) {
+            for (Component component : components) {
+                component.drawScreen(mouseX, mouseY, partialTicks);
+            }
+        }
 
+        // Header background (drawn on top, covers scrolled content)
         boolean headerHovered = isHovered(mouseX, mouseY);
         Gui.drawRect(x + 1, y + 1, x + width - 1, y + headerHeight, headerHovered ? 0xff353535 : 0xff2d2d2d);
 
+        // Category name
         OrangeX.getInstance()
                 .getStbFontManager()
                 .getProxima(18)
                 .drawString(category.getName(), x + 5, y + 5, 0xffffffff);
 
+        // Collapse indicator
         String indicator = open ? "-" : "+";
         int indicatorX = x + width - 5 -
                 (int) OrangeX.getInstance()
@@ -95,6 +86,12 @@ public class Panel {
                 .getStbFontManager()
                 .getProxima(18)
                 .drawString(indicator, indicatorX, y + 5, 0xffaaaaaa);
+
+        // Borders (drawn on top of everything)
+        Gui.drawRect(x, y, x + width, y + 1, 0xff3d3d3d);
+        Gui.drawRect(x, y + panelHeight - 1, x + width, y + panelHeight, 0xff3d3d3d);
+        Gui.drawRect(x, y, x + 1, y + panelHeight, 0xff3d3d3d);
+        Gui.drawRect(x + width - 1, y, x + width, y + panelHeight, 0xff3d3d3d);
     }
 
 
@@ -136,21 +133,6 @@ public class Panel {
     }
 
 
-    public void handleMouseInput(int amount) {
-        if (!open) return;
-
-        scrollOffset += amount;
-        updateMaxScroll();
-        scrollOffset = Math.max(Math.min(scrollOffset, 0), -maxScroll);
-    }
-
-
-    private void updateMaxScroll() {
-        int contentHeight = calculateContentHeight();
-        maxScroll = Math.max(0, contentHeight - (height - headerHeight));
-    }
-
-
     private int calculateContentHeight() {
         int total = 0;
         for (Component component : components) {
@@ -189,11 +171,6 @@ public class Panel {
             component.setOffsetY(offset);
             offset += component.getHeight();
         }
-
-        updateMaxScroll();
     }
 
-    public int getScrollOffset() {
-        return scrollOffset;
     }
-}
