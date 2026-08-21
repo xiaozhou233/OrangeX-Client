@@ -29,7 +29,10 @@ public class ModuleManager {
     public void registerModules() {
         OrangeX.getInstance().getEventBus().register(this);
         addModule(new TestModule());
+
+        // Render
         addModule(new HUD());
+        addModule(new ClickGUI());
     }
 
     public List<Module> getModulesByCategory(ModuleCategory category) {

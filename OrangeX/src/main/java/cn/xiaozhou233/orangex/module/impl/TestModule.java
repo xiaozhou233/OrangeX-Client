@@ -10,7 +10,7 @@ import java.awt.event.KeyEvent;
 
 public class TestModule extends Module {
     public TestModule() {
-        super("Test", "A test module", ModuleCategory.MISC, Keyboard.KEY_SPACE);
+        super("Test", "A test module", ModuleCategory.MISC);
 
         addOption(new BooleanOption("boolean", "Boolean option", this, true));
         addOption(new DoubleOption("double", "Double slider", this, 0.5, 0.0, 1.0, 0.05, 2));
