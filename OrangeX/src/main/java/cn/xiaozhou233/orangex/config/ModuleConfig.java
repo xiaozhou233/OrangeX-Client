@@ -32,6 +32,35 @@ public class ModuleConfig {
             modulesArray.add(moduleObj);
         }
         config.add("modules", modulesArray);
+        writeConfig(config);
+    }
+
+    public void saveClickGui(JsonObject clickGuiData) {
+        JsonObject config = loadRaw();
+        config.add("clickgui", clickGuiData);
+        writeConfig(config);
+    }
+
+    public JsonObject loadClickGui() {
+        JsonObject config = loadRaw();
+        if (config == null || !config.has("clickgui")) {
+            return new JsonObject();
+        }
+        return config.getAsJsonObject("clickgui");
+    }
+
+    private JsonObject loadRaw() {
+        if (!configFile.exists()) return new JsonObject();
+        try (Reader reader = new InputStreamReader(Files.newInputStream(configFile.toPath()), StandardCharsets.UTF_8)) {
+            JsonObject config = gson.fromJson(reader, JsonObject.class);
+            return config != null ? config : new JsonObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new JsonObject();
+        }
+    }
+
+    private void writeConfig(JsonObject config) {
         configFile.getParentFile().mkdirs();
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(configFile.toPath()), StandardCharsets.UTF_8)) {
             gson.toJson(config, writer);

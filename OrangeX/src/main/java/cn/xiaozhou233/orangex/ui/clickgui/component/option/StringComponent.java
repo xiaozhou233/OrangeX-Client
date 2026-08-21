@@ -55,10 +55,13 @@ public class StringComponent extends OptionComponent {
             int mouseY,
             int mouseButton
     ) {
-
-        if(!isHovered(mouseX,mouseY))
+        if (typing && !isHovered(mouseX, mouseY)) {
+            typing = false;
             return;
+        }
 
+        if (!isHovered(mouseX,mouseY))
+            return;
 
         if(mouseButton == 0) {
             typing = true;

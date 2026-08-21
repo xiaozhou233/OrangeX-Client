@@ -72,7 +72,7 @@ public abstract class Component {
 
 
     public int getY() {
-        return parent.getY() + offsetY;
+        return parent.getY() + parent.getScrollOffset() + offsetY;
     }
 
 
