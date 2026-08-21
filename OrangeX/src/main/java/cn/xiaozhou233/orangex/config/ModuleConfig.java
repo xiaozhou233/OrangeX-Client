@@ -1,4 +1,4 @@
-package cn.xiaozhou233.orangex.module.config;
+package cn.xiaozhou233.orangex.config;
 
 import cn.xiaozhou233.orangex.module.Module;
 import cn.xiaozhou233.orangex.module.option.OptionSerializer;

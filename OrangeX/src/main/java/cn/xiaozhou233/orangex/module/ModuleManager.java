@@ -2,7 +2,7 @@ package cn.xiaozhou233.orangex.module;
 
 import cn.xiaozhou233.orangex.OrangeX;
 import cn.xiaozhou233.orangex.event.impl.EventKey;
-import cn.xiaozhou233.orangex.module.config.ModuleConfig;
+import cn.xiaozhou233.orangex.config.ModuleConfig;
 import cn.xiaozhou233.orangex.module.impl.TestModule;
 import cn.xiaozhou233.orangex.module.impl.render.*;
 import lombok.Getter;
