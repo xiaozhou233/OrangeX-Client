@@ -47,19 +47,17 @@ public class Module {
     public void setEnabled(boolean setEnabled) {
         if (this.enabled == setEnabled) return;
 
-        if (setEnabled) {
-            try {
-                OrangeX.getInstance().getEventBus().register(this);
-            } catch (Exception e) {
+        this.enabled = setEnabled;
+
+        if (this.enabled) {
+            if (OrangeX.getInstance().getEventBus().isRegistered(this))
                 return;
-            }
-            this.enabled = true;
+            try { OrangeX.getInstance().getEventBus().register(this); } catch (Exception ignored) {}
             onEnable();
         } else {
-            try {
-                OrangeX.getInstance().getEventBus().unregister(this);
-            } catch (Exception ignored) {}
-            this.enabled = false;
+            if (!OrangeX.getInstance().getEventBus().isRegistered(this))
+                return;
+            try { OrangeX.getInstance().getEventBus().unregister(this); } catch (Exception ignored) {}
             onDisable();
         }
     }
