@@ -10,11 +10,13 @@ public class StbFontManager {
     private byte[] proximaBoldData;
     private byte[] notoData;
     private byte[] poppinsData;
+    private byte[] jelloMediumData;
 
     private final ConcurrentMap<Integer, SmoothFontRenderer> regularFonts = new ConcurrentHashMap<>();
     private final ConcurrentMap<Integer, SmoothFontRenderer> boldFonts = new ConcurrentHashMap<>();
     private final ConcurrentMap<Integer, SmoothFontRenderer> notoFonts = new ConcurrentHashMap<>();
     private final ConcurrentMap<Integer, SmoothFontRenderer> poppinsFonts = new ConcurrentHashMap<>();
+    private final ConcurrentMap<Integer, SmoothFontRenderer> jelloMediumFonts = new ConcurrentHashMap<>();
 
     private boolean initialized = false;
 
@@ -23,6 +25,7 @@ public class StbFontManager {
         this.proximaBoldData = readResource("proximabd.ttf");
         this.notoData = readResource("noto.ttf");
         this.poppinsData = readResource("poppins_rg.ttf");
+        this.jelloMediumData = readResource("JelloMedium.ttf");
         this.initialized = true;
     }
 
@@ -58,6 +61,10 @@ public class StbFontManager {
 
     public SmoothFontRenderer getPoppins(int size) {
         return getFont(poppinsFonts, poppinsData, size, "Poppins");
+    }
+
+    public SmoothFontRenderer getJelloMedium(int size) {
+        return getFont(jelloMediumFonts, jelloMediumData, size, "Jello Medium");
     }
 
     private SmoothFontRenderer getFont(ConcurrentMap<Integer, SmoothFontRenderer> cache, byte[] data, int size, String name) {

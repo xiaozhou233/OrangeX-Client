@@ -4,6 +4,7 @@ import cn.xiaozhou233.orangex.OrangeX;
 import cn.xiaozhou233.orangex.event.impl.EventKey;
 import cn.xiaozhou233.orangex.module.config.ModuleConfig;
 import cn.xiaozhou233.orangex.module.impl.TestModule;
+import cn.xiaozhou233.orangex.module.impl.render.*;
 import lombok.Getter;
 import org.greenrobot.eventbus.Subscribe;
 
@@ -28,6 +29,7 @@ public class ModuleManager {
     public void registerModules() {
         OrangeX.getInstance().getEventBus().register(this);
         addModule(new TestModule());
+        addModule(new HUD());
     }
 
     public List<Module> getModulesByCategory(ModuleCategory category) {

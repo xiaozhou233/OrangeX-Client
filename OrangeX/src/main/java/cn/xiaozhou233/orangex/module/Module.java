@@ -32,6 +32,11 @@ public class Module {
         this.key = key;
     }
 
+    public Module(String name, String description, ModuleCategory category, int key, boolean enabled) {
+        this(name, description, category, key);
+        this.enabled = enabled;
+    }
+
     public void addOption(Option<?> option) {
         options.add(option);
     }

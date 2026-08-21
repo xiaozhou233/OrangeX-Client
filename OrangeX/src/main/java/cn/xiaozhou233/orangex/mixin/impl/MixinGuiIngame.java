@@ -35,9 +35,6 @@ public class MixinGuiIngame {
         mc.entityRenderer.setupOverlayRendering();
 
         OrangeX.getInstance().getEventBus().post(new EventRender2D(partialTicks));
-        SmoothFontRenderer font = OrangeX.getInstance().getStbFontManager().getProxima(18);
-        font.drawString("Hello World!", 50, 50, 0xFFFFFFFF);
-
 
         GlStateManager.enableDepth();
         GlStateManager.disableBlend();
