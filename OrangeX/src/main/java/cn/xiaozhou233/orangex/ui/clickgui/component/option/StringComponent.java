@@ -1,5 +1,6 @@
 package cn.xiaozhou233.orangex.ui.clickgui.component.option;
 
+import cn.xiaozhou233.orangex.OrangeX;
 import cn.xiaozhou233.orangex.module.option.impl.StringOption;
 import cn.xiaozhou233.orangex.ui.clickgui.Panel;
 
@@ -38,9 +39,27 @@ public class StringComponent extends OptionComponent {
             value += "_";
 
 
+        int maxValueWidth = 50;
+        int valueWidth = (int) OrangeX.getInstance()
+                .getStbFontManager()
+                .getProxima(18)
+                .getStringWidth(value);
+
+        if (valueWidth > maxValueWidth) {
+            while ((int) OrangeX.getInstance()
+                    .getStbFontManager()
+                    .getProxima(18)
+                    .getStringWidth(value + "...") > maxValueWidth
+                    && value.length() > 0) {
+                value = value.substring(0, value.length() - 1);
+            }
+            value += "...";
+        }
+
+
         drawString(
                 value,
-                getX() + width - 50,
+                getX() + width - 5 - maxValueWidth,
                 getY() + 5,
                 typing
                         ? 0xff55ffff

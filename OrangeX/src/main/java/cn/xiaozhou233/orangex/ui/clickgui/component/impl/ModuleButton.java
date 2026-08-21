@@ -5,10 +5,10 @@ import cn.xiaozhou233.orangex.module.Module;
 import cn.xiaozhou233.orangex.module.option.Option;
 import cn.xiaozhou233.orangex.ui.clickgui.Panel;
 import cn.xiaozhou233.orangex.ui.clickgui.component.Component;
+import cn.xiaozhou233.orangex.ui.clickgui.component.option.KeybindComponent;
 import cn.xiaozhou233.orangex.ui.clickgui.component.option.OptionComponent;
 import cn.xiaozhou233.orangex.ui.clickgui.component.option.OptionComponentFactory;
 import lombok.Getter;
-import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +43,8 @@ public class ModuleButton extends Component {
 
             optionY += 18;
         }
+
+        options.add(new KeybindComponent(parent, module, offsetX, offsetY + optionY));
     }
 
     @Override
@@ -57,16 +59,6 @@ public class ModuleButton extends Component {
                 getY() + 5,
                 color
         );
-
-        if (module.getKey() != Keyboard.KEY_NONE) {
-            String keyName = Keyboard.getKeyName(module.getKey());
-            int keyX = getX() + width - 5 -
-                    (int) OrangeX.getInstance()
-                            .getStbFontManager()
-                            .getProxima(18)
-                            .getStringWidth(keyName);
-            drawString(keyName, keyX, getY() + 5, 0xff555555);
-        }
 
         if (expanded) {
             for (OptionComponent option : options) {
