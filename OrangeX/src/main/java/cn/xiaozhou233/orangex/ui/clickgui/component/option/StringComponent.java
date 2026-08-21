@@ -4,6 +4,7 @@ import cn.xiaozhou233.orangex.OrangeX;
 import cn.xiaozhou233.orangex.module.option.impl.StringOption;
 import cn.xiaozhou233.orangex.ui.clickgui.Panel;
 
+
 public class StringComponent extends OptionComponent {
 
     private final StringOption option;
@@ -49,11 +50,11 @@ public class StringComponent extends OptionComponent {
             while ((int) OrangeX.getInstance()
                     .getStbFontManager()
                     .getProxima(18)
-                    .getStringWidth(value + "...") > maxValueWidth
+                    .getStringWidth("..." + value) > maxValueWidth
                     && value.length() > 0) {
-                value = value.substring(0, value.length() - 1);
+                value = value.substring(1);
             }
-            value += "...";
+            value = "..." + value;
         }
 
 
@@ -65,6 +66,9 @@ public class StringComponent extends OptionComponent {
                         ? 0xff55ffff
                         : 0xffaaaaaa
         );
+
+
+        
     }
 
 
@@ -111,7 +115,6 @@ public class StringComponent extends OptionComponent {
                         )
                 );
             }
-
             return;
         }
 
