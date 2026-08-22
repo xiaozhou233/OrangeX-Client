@@ -38,8 +38,7 @@ public class Panel {
 
     private final List<Component> components = new ArrayList<>();
 
-    private double scrollOffset;
-    private double targetScrollOffset;
+    private int scrollOffset;
 
     private static final int MAX_VISIBLE_CONTENT_HEIGHT = 300;
 
@@ -60,17 +59,14 @@ public class Panel {
         }
 
         int contentHeight = calculateContentHeight();
-        int maxVisibleContentHeight = getMaxVisibleContentHeight();
+        int visibleHeight = getVisibleHeight(contentHeight);
 
         if (open) {
-            animateScroll(contentHeight, maxVisibleContentHeight);
-
-            Gui.drawRect(x, y + headerHeight, x + width, y + headerHeight + maxVisibleContentHeight, 0xff1a1a1a);
+            Gui.drawRect(x, y + headerHeight, x + width, y + headerHeight + visibleHeight, 0xff1a1a1a);
 
             GL11.glEnable(GL11.GL_SCISSOR_TEST);
             ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
             int scale = sr.getScaleFactor();
-            int visibleHeight = Math.min(maxVisibleContentHeight, contentHeight);
             GL11.glScissor(
                     x * scale,
                     Minecraft.getMinecraft().displayHeight - ((y + headerHeight + visibleHeight) * scale),
@@ -108,7 +104,7 @@ public class Panel {
                 .drawString(indicator, indicatorX, y + 5, 0xffaaaaaa);
 
         // Borders
-        int panelHeight = headerHeight + (open ? maxVisibleContentHeight : 0);
+        int panelHeight = headerHeight + (open ? visibleHeight : 0);
         Gui.drawRect(x, y, x + width, y + 1, 0xff3d3d3d);
         Gui.drawRect(x, y + panelHeight - 1, x + width, y + panelHeight, 0xff3d3d3d);
         Gui.drawRect(x, y, x + 1, y + panelHeight, 0xff3d3d3d);
@@ -131,8 +127,8 @@ public class Panel {
         if (!open)
             return;
 
-        int maxVisibleContentHeight = getMaxVisibleContentHeight();
-        if (mouseY < y + headerHeight || mouseY > y + headerHeight + maxVisibleContentHeight)
+        int visibleHeight = getVisibleHeight(calculateContentHeight());
+        if (mouseY < y + headerHeight || mouseY > y + headerHeight + visibleHeight)
             return;
 
         for (Component component : components) {
@@ -161,24 +157,9 @@ public class Panel {
     public void mouseWheel(int delta) {
         if (!open) return;
         int contentHeight = calculateContentHeight();
-        int maxVisibleContentHeight = getMaxVisibleContentHeight();
-        int maxScroll = Math.max(0, contentHeight - maxVisibleContentHeight);
-        targetScrollOffset -= delta * 0.5;
-        targetScrollOffset = Math.max(0, Math.min(maxScroll, targetScrollOffset));
-    }
-
-
-    private void animateScroll(int contentHeight, int maxVisibleContentHeight) {
-        int maxScroll = Math.max(0, contentHeight - maxVisibleContentHeight);
-        targetScrollOffset = Math.max(0, Math.min(maxScroll, targetScrollOffset));
-
-        double diff = targetScrollOffset - scrollOffset;
-        if (Math.abs(diff) > 0.5) {
-            scrollOffset += diff * 0.3;
-        } else {
-            scrollOffset = targetScrollOffset;
-        }
-        scrollOffset = Math.max(0, Math.min(maxScroll, scrollOffset));
+        int visibleHeight = getVisibleHeight(contentHeight);
+        int maxScroll = Math.max(0, contentHeight - visibleHeight);
+        scrollOffset = Math.max(0, Math.min(maxScroll, scrollOffset - delta / 2));
     }
 
 
@@ -191,8 +172,8 @@ public class Panel {
     }
 
 
-    private int getMaxVisibleContentHeight() {
-        return Math.min(MAX_VISIBLE_CONTENT_HEIGHT, calculateContentHeight());
+    private int getVisibleHeight(int contentHeight) {
+        return Math.min(MAX_VISIBLE_CONTENT_HEIGHT, contentHeight);
     }
 
 
@@ -204,8 +185,8 @@ public class Panel {
     }
 
     public boolean isMouseOver(int mouseX, int mouseY) {
-        int maxVisibleContentHeight = getMaxVisibleContentHeight();
-        int panelHeight = headerHeight + (open ? maxVisibleContentHeight : 0);
+        int visibleHeight = getVisibleHeight(calculateContentHeight());
+        int panelHeight = headerHeight + (open ? visibleHeight : 0);
         return mouseX >= x &&
                 mouseX <= x + width &&
                 mouseY >= y &&
@@ -227,9 +208,9 @@ public class Panel {
         }
 
         int contentHeight = calculateContentHeight();
-        int maxVisibleContentHeight = getMaxVisibleContentHeight();
-        int maxScroll = Math.max(0, contentHeight - maxVisibleContentHeight);
-        targetScrollOffset = Math.max(0, Math.min(maxScroll, targetScrollOffset));
+        int visibleHeight = getVisibleHeight(contentHeight);
+        int maxScroll = Math.max(0, contentHeight - visibleHeight);
+        if (scrollOffset > maxScroll) scrollOffset = maxScroll;
     }
 
     }
