@@ -105,12 +105,14 @@ public class ModuleButton extends Component {
     }
 
     @Override
-    public void keyTyped(char typedChar, int keyCode) {
+    public boolean keyTyped(char typedChar, int keyCode) {
         if (expanded) {
             for (OptionComponent option : options) {
-                option.keyTyped(typedChar, keyCode);
+                if (option.keyTyped(typedChar, keyCode))
+                    return true;
             }
         }
+        return false;
     }
 
     @Override

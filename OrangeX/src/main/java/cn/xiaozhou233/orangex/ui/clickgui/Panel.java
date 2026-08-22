@@ -147,10 +147,13 @@ public class Panel {
     }
 
 
-    public void keyTyped(char typedChar, int keyCode) {
+    public boolean keyTyped(char typedChar, int keyCode) {
+        boolean consumed = false;
         for (Component component : components) {
-            component.keyTyped(typedChar, keyCode);
+            if (component.keyTyped(typedChar, keyCode))
+                consumed = true;
         }
+        return consumed;
     }
 
 

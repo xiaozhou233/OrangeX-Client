@@ -94,13 +94,13 @@ public class StringComponent extends OptionComponent {
 
 
     @Override
-    public void keyTyped(
+    public boolean keyTyped(
             char typedChar,
             int keyCode
     ) {
 
         if(!typing)
-            return;
+            return false;
 
 
         // Backspace
@@ -116,24 +116,25 @@ public class StringComponent extends OptionComponent {
                         )
                 );
             }
-            return;
+            return true;
         }
 
 
         // Enter
         if(keyCode == 28) {
             typing = false;
-            return;
+            return true;
         }
 
 
         if(Character.isISOControl(typedChar))
-            return;
+            return true;
 
 
         option.setValue(
                 option.getValue() + typedChar
         );
+        return true;
     }
 
 

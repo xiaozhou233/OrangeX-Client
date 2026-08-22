@@ -46,22 +46,18 @@ public class KeybindComponent extends OptionComponent {
     }
 
     @Override
-    public void keyTyped(char typedChar, int keyCode) {
-        if (!listening) return;
+    public boolean keyTyped(char typedChar, int keyCode) {
+        if (!listening) return false;
 
         if (keyCode == 1) {
+            module.setKey(0);
             listening = false;
-            return;
-        }
-
-        if (keyCode == Keyboard.KEY_DELETE) {
-            module.setKey(Keyboard.KEY_NONE);
-            listening = false;
-            return;
+            return true;
         }
 
         module.setKey(keyCode);
         listening = false;
+        return true;
     }
 
     @Override

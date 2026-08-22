@@ -143,21 +143,19 @@ public class ClickGUIScreen extends GuiScreen {
             char typedChar,
             int keyCode
     ) throws java.io.IOException {
+        boolean consumed = false;
         for (Panel panel : panels) {
-            panel.keyTyped(
-                    typedChar,
-                    keyCode
-            );
+            if (panel.keyTyped(typedChar, keyCode))
+                consumed = true;
         }
 
-        if (keyCode == 1) {
+        if (keyCode == 1 && !consumed) {
             mc.displayGuiScreen(null);
         }
 
-        super.keyTyped(
-                typedChar,
-                keyCode
-        );
+        if (!consumed) {
+            super.keyTyped(typedChar, keyCode);
+        }
     }
 
     @Override

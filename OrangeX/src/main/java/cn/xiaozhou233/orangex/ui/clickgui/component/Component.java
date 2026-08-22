@@ -58,11 +58,11 @@ public abstract class Component {
     }
 
 
-    public void keyTyped(
+    public boolean keyTyped(
             char typedChar,
             int keyCode
     ) {
-
+        return false;
     }
 
 
