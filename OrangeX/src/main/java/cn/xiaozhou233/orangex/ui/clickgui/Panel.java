@@ -192,7 +192,7 @@ public class Panel {
 
 
     private int getMaxVisibleContentHeight() {
-        return MAX_VISIBLE_CONTENT_HEIGHT;
+        return Math.min(MAX_VISIBLE_CONTENT_HEIGHT, calculateContentHeight());
     }
 
 
