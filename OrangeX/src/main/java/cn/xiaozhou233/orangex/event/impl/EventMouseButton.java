@@ -1,12 +1,13 @@
 package cn.xiaozhou233.orangex.event.impl;
 
-import cn.xiaozhou233.orangex.event.Event;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class EventKey extends Event {
-    private final int key;
+public class EventMouseButton {
+    private final int button;
     private final boolean pressed;
+    private final int x;
+    private final int y;
 }

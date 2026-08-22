@@ -4,6 +4,7 @@ import cn.xiaozhou233.orangex.font.FontManager;
 import cn.xiaozhou233.orangex.font.StbFontManager;
 import cn.xiaozhou233.orangex.mixin.MixinManager;
 import cn.xiaozhou233.orangex.module.ModuleManager;
+import cn.xiaozhou233.orangex.nativebridge.NativeBridge;
 import lombok.Getter;
 import org.greenrobot.eventbus.EventBus;
 
@@ -24,12 +25,15 @@ public class OrangeX {
 
     public void start() {
         System.out.println("OrangeX starting...");
+        NativeBridge.preload();
+        NativeBridge.init();
 
         stbFontManager.loadFonts();
         mixinManager.start();
         moduleManager.registerModules();
         moduleManager.loadConfig();
 
+        NativeBridge.installNUpdateHook();
         System.out.println("OrangeX started.");
     }
 

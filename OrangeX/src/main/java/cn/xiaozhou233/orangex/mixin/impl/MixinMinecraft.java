@@ -30,18 +30,19 @@ public class MixinMinecraft {
         OrangeX.getInstance().stop();
     }
 
-    @Inject(
-            method = "runTick", desc = "()V",
-            target = @Target(
-                    value = "INVOKESTATIC",
-                    target = "org/lwjgl/input/Keyboard.getEventKeyState()Z",
-                    shift = Target.Shift.AFTER
-            )
-    )
-    public void onKey(@Local(source = "key", index = 1) int key) {
-        if (Minecraft.getMinecraft().currentScreen == null && Keyboard.getEventKeyState())
-            OrangeX.getInstance().getEventBus().post(new EventKey(key));
-    }
+    // Not working in Badlion Client
+//    @Inject(
+//            method = "runTick", desc = "()V",
+//            target = @Target(
+//                    value = "INVOKESTATIC",
+//                    target = "org/lwjgl/input/Keyboard.getEventKeyState()Z",
+//                    shift = Target.Shift.AFTER
+//            )
+//    )
+//    public void onKey(@Local(source = "key", index = 1) int key) {
+//        if (Minecraft.getMinecraft().currentScreen == null && Keyboard.getEventKeyState())
+//            OrangeX.getInstance().getEventBus().post(new EventKey(key));
+//    }
 
     @Inject(method = "loadWorld", desc = "(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", target = @Target("HEAD"))
     public void onLoadWorld() {

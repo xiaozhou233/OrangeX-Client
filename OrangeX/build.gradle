@@ -32,3 +32,8 @@ shadowJar {
     relocate 'org.objectweb.asm', 'cn.xiaozhou233.asm9'
     relocate 'com.google.gson', "cn.xiaozhou233.gson"
 }
+
+// JNI Header Build
+tasks.withType(JavaCompile).configureEach {
+    options.headerOutputDirectory.set(file("../OrangeX-Native/includes"))
+}
