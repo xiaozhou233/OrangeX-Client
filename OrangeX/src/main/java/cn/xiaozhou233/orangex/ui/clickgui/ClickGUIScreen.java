@@ -24,6 +24,10 @@ public class ClickGUIScreen extends GuiScreen {
         panels.clear();
 
         int x = 20;
+        int y = 30;
+        int panelWidth = 120;
+        int gap = 20;
+        int rowHeight = 30;
 
         for (ModuleCategory category : ModuleCategory.values()) {
             List<Module> categoryModules = OrangeX.getInstance()
@@ -33,15 +37,20 @@ public class ClickGUIScreen extends GuiScreen {
             if (categoryModules.isEmpty())
                 continue;
 
+            if (x + panelWidth > this.width) {
+                x = 20;
+                y += 300 + rowHeight;
+            }
+
             Panel panel = new Panel(
                     category,
                     x,
-                    30,
-                    120,
+                    y,
+                    panelWidth,
                     20
             );
 
-            int y = 20;
+            int moduleY = 20;
 
             for (Module module : categoryModules) {
                 panel.addComponent(
@@ -49,16 +58,16 @@ public class ClickGUIScreen extends GuiScreen {
                                 panel,
                                 module,
                                 0,
-                                y
+                                moduleY
                         )
                 );
 
-                y += 20;
+                moduleY += 20;
             }
 
             panels.add(panel);
 
-            x += 140;
+            x += panelWidth + gap;
         }
 
         loadPanelPositions();

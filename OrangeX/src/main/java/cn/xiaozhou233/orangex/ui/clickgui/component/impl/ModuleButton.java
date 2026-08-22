@@ -54,15 +54,11 @@ public class ModuleButton extends Component {
             Gui.drawRect(getX(), getY(), getX() + width, getY() + height, 0xff1a4a2a);
         }
 
-        int color = module.isEnabled()
-                ? 0xff55ffff
-                : 0xffffffff;
-
         drawString(
                 module.getName(),
                 getX() + 5,
                 getY() + 5,
-                color
+                0xffffffff
         );
 
         if (expanded) {
