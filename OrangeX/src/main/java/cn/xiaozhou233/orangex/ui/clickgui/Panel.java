@@ -41,7 +41,7 @@ public class Panel {
     private double scrollOffset;
     private double targetScrollOffset;
 
-    private static final int BOTTOM_PADDING = 20;
+    private static final int MAX_VISIBLE_CONTENT_HEIGHT = 300;
 
 
     public Panel(ModuleCategory category, int x, int y, int width, int height) {
@@ -192,9 +192,7 @@ public class Panel {
 
 
     private int getMaxVisibleContentHeight() {
-        ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
-        int screenHeight = sr.getScaledHeight();
-        return Math.max(0, screenHeight - y - headerHeight - BOTTOM_PADDING);
+        return MAX_VISIBLE_CONTENT_HEIGHT;
     }
 
 
