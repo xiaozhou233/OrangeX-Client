@@ -35,6 +35,7 @@ public class ModuleManager {
         // Render
         addModule(new HUD());
         addModule(new ClickGUI());
+        addModule(new ESP());
     }
 
     public List<Module> getModulesByCategory(ModuleCategory category) {

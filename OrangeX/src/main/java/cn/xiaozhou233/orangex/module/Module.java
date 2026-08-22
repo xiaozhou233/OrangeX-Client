@@ -71,4 +71,12 @@ public class Module {
         setEnabled(!this.enabled);
     }
 
+    public <T extends Option<?>> T getOption(String name, Class<T> clazz) {
+        for (Option<?> option : options) {
+            if (option.getName().equalsIgnoreCase(name) && clazz.isInstance(option)) {
+                return clazz.cast(option);
+            }
+        }
+        return null;
+    }
 }
