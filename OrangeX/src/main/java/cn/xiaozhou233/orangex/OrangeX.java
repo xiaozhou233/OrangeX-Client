@@ -2,6 +2,7 @@ package cn.xiaozhou233.orangex;
 
 import cn.xiaozhou233.orangex.font.FontManager;
 import cn.xiaozhou233.orangex.font.StbFontManager;
+import cn.xiaozhou233.orangex.manager.ThreadManager;
 import cn.xiaozhou233.orangex.mixin.MixinManager;
 import cn.xiaozhou233.orangex.module.ModuleManager;
 import cn.xiaozhou233.orangex.nativebridge.NativeBridge;
@@ -15,6 +16,7 @@ public class OrangeX {
     FontManager fontManager = new FontManager();
     StbFontManager stbFontManager = new StbFontManager();
     ModuleManager moduleManager = new ModuleManager();
+    ThreadManager threadManager = new ThreadManager();
     private final EventBus eventBus = EventBus.builder()
             .logNoSubscriberMessages(false)
             .logSubscriberExceptions(false)
@@ -30,6 +32,7 @@ public class OrangeX {
 
         stbFontManager.loadFonts();
         mixinManager.start();
+        threadManager.init();
         moduleManager.registerModules();
         moduleManager.loadConfig();
 

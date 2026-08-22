@@ -1,4 +1,6 @@
 package cn.xiaozhou233.orangex.event.impl;
 
-public class EventTimerThread {
+import cn.xiaozhou233.orangex.event.Event;
+
+public class EventTimerThread extends Event {
 }
