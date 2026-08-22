@@ -61,8 +61,11 @@ public class ModuleButton extends Component {
         );
 
         if (expanded) {
+            int optionY = 20;
             for (OptionComponent option : options) {
+                option.setOffsetY(getOffsetY() + optionY);
                 option.drawScreen(mouseX, mouseY, partialTicks);
+                optionY += 18;
             }
         }
     }
@@ -80,8 +83,11 @@ public class ModuleButton extends Component {
         }
 
         if (expanded) {
+            int optionY = 20;
             for (OptionComponent option : options) {
+                option.setOffsetY(getOffsetY() + optionY);
                 option.mouseClicked(mouseX, mouseY, mouseButton);
+                optionY += 18;
             }
         }
     }
