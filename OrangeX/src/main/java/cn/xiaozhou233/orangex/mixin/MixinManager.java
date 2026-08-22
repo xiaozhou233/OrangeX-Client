@@ -64,6 +64,8 @@ public final class MixinManager {
         try {
             transformer.addMixin(MixinMinecraft.class);
             transformer.addMixin(MixinGuiIngame.class);
+            transformer.addMixin(MixinEntityRenderer.class);
+            transformer.addMixin(MixinNetHandlerPlayClient.class);
         } catch (Throwable e) {
             throw new RuntimeException("Failed to add mixin", e);
         }

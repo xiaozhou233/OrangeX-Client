@@ -9,6 +9,7 @@ import cn.yapeteam.ymixin.annotations.Target;
 
 import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 
 @Mixin(Minecraft.class)
 public class MixinMinecraft {

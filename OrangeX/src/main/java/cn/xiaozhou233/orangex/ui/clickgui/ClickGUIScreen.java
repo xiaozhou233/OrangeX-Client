@@ -5,8 +5,10 @@ import cn.xiaozhou233.orangex.module.ModuleCategory;
 import cn.xiaozhou233.orangex.OrangeX;
 import cn.xiaozhou233.orangex.ui.clickgui.component.impl.ModuleButton;
 import com.google.gson.JsonObject;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,6 +67,8 @@ public class ClickGUIScreen extends GuiScreen {
             int mouseY,
             float partialTicks
     ) {
+        Gui.drawRect(0, 0, width, height, new Color(50, 50, 50, 100).getRGB());
+
         for (Panel panel : panels) {
             panel.drawScreen(
                     mouseX,
