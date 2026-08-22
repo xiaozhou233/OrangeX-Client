@@ -1,12 +1,9 @@
 package cn.xiaozhou233.orangex.module;
 
 import cn.xiaozhou233.orangex.OrangeX;
-import cn.xiaozhou233.orangex.event.impl.EventKey;
 import cn.xiaozhou233.orangex.config.ModuleConfig;
 import cn.xiaozhou233.orangex.event.impl.EventKeyDown;
-import cn.xiaozhou233.orangex.event.impl.EventKeyUp;
 import cn.xiaozhou233.orangex.module.impl.TestModule;
-import cn.xiaozhou233.orangex.module.impl.combat.LeftClicker;
 import cn.xiaozhou233.orangex.module.impl.render.*;
 import lombok.Getter;
 import org.greenrobot.eventbus.Subscribe;
@@ -34,7 +31,6 @@ public class ModuleManager {
         addModule(new TestModule());
 
         // Combat
-        addModule(new LeftClicker());
 
         // Render
         addModule(new HUD());
