@@ -9,6 +9,7 @@ import cn.xiaozhou233.orangex.ui.clickgui.component.option.KeybindComponent;
 import cn.xiaozhou233.orangex.ui.clickgui.component.option.OptionComponent;
 import cn.xiaozhou233.orangex.ui.clickgui.component.option.OptionComponentFactory;
 import lombok.Getter;
+import net.minecraft.client.gui.Gui;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +50,10 @@ public class ModuleButton extends Component {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        if (module.isEnabled()) {
+            Gui.drawRect(getX(), getY(), getX() + width, getY() + height, 0xff1a4a2a);
+        }
+
         int color = module.isEnabled()
                 ? 0xff55ffff
                 : 0xffffffff;
