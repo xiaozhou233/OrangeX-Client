@@ -5,7 +5,10 @@ import cn.xiaozhou233.orangex.module.ModuleCategory;
 import cn.xiaozhou233.orangex.ui.clickgui.component.Component;
 import lombok.Getter;
 import lombok.Setter;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.ScaledResolution;
+import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +38,11 @@ public class Panel {
 
     private final List<Component> components = new ArrayList<>();
 
+    private double scrollOffset;
+    private double targetScrollOffset;
+
+    private static final int BOTTOM_PADDING = 20;
+
 
     public Panel(ModuleCategory category, int x, int y, int width, int height) {
         this.category = category;
@@ -52,20 +60,32 @@ public class Panel {
         }
 
         int contentHeight = calculateContentHeight();
-        int panelHeight = headerHeight + (open ? contentHeight : 0);
+        int maxVisibleContentHeight = getMaxVisibleContentHeight();
 
         if (open) {
-            Gui.drawRect(x, y + headerHeight, x + width, y + headerHeight + contentHeight, 0xff1a1a1a);
-        }
+            animateScroll(contentHeight, maxVisibleContentHeight);
 
-        // Components (drawn below header, will be covered by header if scrolled up)
-        if (open) {
+            Gui.drawRect(x, y + headerHeight, x + width, y + headerHeight + maxVisibleContentHeight, 0xff1a1a1a);
+
+            GL11.glEnable(GL11.GL_SCISSOR_TEST);
+            ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
+            int scale = sr.getScaleFactor();
+            int visibleHeight = Math.min(maxVisibleContentHeight, contentHeight);
+            GL11.glScissor(
+                    x * scale,
+                    Minecraft.getMinecraft().displayHeight - ((y + headerHeight + visibleHeight) * scale),
+                    width * scale,
+                    visibleHeight * scale
+            );
+
             for (Component component : components) {
                 component.drawScreen(mouseX, mouseY, partialTicks);
             }
+
+            GL11.glDisable(GL11.GL_SCISSOR_TEST);
         }
 
-        // Header background (drawn on top, covers scrolled content)
+        // Header background
         boolean headerHovered = isHovered(mouseX, mouseY);
         Gui.drawRect(x + 1, y + 1, x + width - 1, y + headerHeight, headerHovered ? 0xff353535 : 0xff2d2d2d);
 
@@ -87,7 +107,8 @@ public class Panel {
                 .getProxima(18)
                 .drawString(indicator, indicatorX, y + 5, 0xffaaaaaa);
 
-        // Borders (drawn on top of everything)
+        // Borders
+        int panelHeight = headerHeight + (open ? maxVisibleContentHeight : 0);
         Gui.drawRect(x, y, x + width, y + 1, 0xff3d3d3d);
         Gui.drawRect(x, y + panelHeight - 1, x + width, y + panelHeight, 0xff3d3d3d);
         Gui.drawRect(x, y, x + 1, y + panelHeight, 0xff3d3d3d);
@@ -108,6 +129,10 @@ public class Panel {
         }
 
         if (!open)
+            return;
+
+        int maxVisibleContentHeight = getMaxVisibleContentHeight();
+        if (mouseY < y + headerHeight || mouseY > y + headerHeight + maxVisibleContentHeight)
             return;
 
         for (Component component : components) {
@@ -133,12 +158,43 @@ public class Panel {
     }
 
 
+    public void mouseWheel(int delta) {
+        if (!open) return;
+        int contentHeight = calculateContentHeight();
+        int maxVisibleContentHeight = getMaxVisibleContentHeight();
+        int maxScroll = Math.max(0, contentHeight - maxVisibleContentHeight);
+        targetScrollOffset -= delta * 0.5;
+        targetScrollOffset = Math.max(0, Math.min(maxScroll, targetScrollOffset));
+    }
+
+
+    private void animateScroll(int contentHeight, int maxVisibleContentHeight) {
+        int maxScroll = Math.max(0, contentHeight - maxVisibleContentHeight);
+        targetScrollOffset = Math.max(0, Math.min(maxScroll, targetScrollOffset));
+
+        double diff = targetScrollOffset - scrollOffset;
+        if (Math.abs(diff) > 0.5) {
+            scrollOffset += diff * 0.3;
+        } else {
+            scrollOffset = targetScrollOffset;
+        }
+        scrollOffset = Math.max(0, Math.min(maxScroll, scrollOffset));
+    }
+
+
     private int calculateContentHeight() {
         int total = 0;
         for (Component component : components) {
             total += component.getHeight();
         }
         return total;
+    }
+
+
+    private int getMaxVisibleContentHeight() {
+        ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
+        int screenHeight = sr.getScaledHeight();
+        return Math.max(0, screenHeight - y - headerHeight - BOTTOM_PADDING);
     }
 
 
@@ -150,8 +206,8 @@ public class Panel {
     }
 
     public boolean isMouseOver(int mouseX, int mouseY) {
-        int contentHeight = calculateContentHeight();
-        int panelHeight = headerHeight + (open ? contentHeight : 0);
+        int maxVisibleContentHeight = getMaxVisibleContentHeight();
+        int panelHeight = headerHeight + (open ? maxVisibleContentHeight : 0);
         return mouseX >= x &&
                 mouseX <= x + width &&
                 mouseY >= y &&
@@ -171,6 +227,11 @@ public class Panel {
             component.setOffsetY(offset);
             offset += component.getHeight();
         }
+
+        int contentHeight = calculateContentHeight();
+        int maxVisibleContentHeight = getMaxVisibleContentHeight();
+        int maxScroll = Math.max(0, contentHeight - maxVisibleContentHeight);
+        targetScrollOffset = Math.max(0, Math.min(maxScroll, targetScrollOffset));
     }
 
     }

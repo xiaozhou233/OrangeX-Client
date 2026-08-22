@@ -8,7 +8,10 @@ import com.google.gson.JsonObject;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 
+import org.lwjgl.input.Mouse;
+
 import java.awt.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -146,6 +149,22 @@ public class ClickGUIScreen extends GuiScreen {
                 typedChar,
                 keyCode
         );
+    }
+
+    @Override
+    public void handleMouseInput() throws IOException {
+        super.handleMouseInput();
+        int wheel = Mouse.getEventDWheel();
+        if (wheel != 0) {
+            int mx = Mouse.getEventX() * this.width / this.mc.displayWidth;
+            int my = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
+            for (Panel panel : panels) {
+                if (panel.isMouseOver(mx, my)) {
+                    panel.mouseWheel(wheel);
+                    break;
+                }
+            }
+        }
     }
 
     @Override
