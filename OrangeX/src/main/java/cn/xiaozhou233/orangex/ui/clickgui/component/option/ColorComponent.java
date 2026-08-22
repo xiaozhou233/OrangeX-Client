@@ -23,6 +23,7 @@ public class ColorComponent extends OptionComponent {
 
     @Override
     public void drawScreen(int mouseX,int mouseY,float partialTicks) {
+        drawRect(getX(), getY(), getX() + width, getY() + height, 0xff252525);
 
         drawString(
                 option.getName(),
