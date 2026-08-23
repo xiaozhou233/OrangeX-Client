@@ -36,6 +36,7 @@ public class ModuleManager {
         addModule(new HUD());
         addModule(new ClickGUI());
         addModule(new ESP());
+        addModule(new NameTag());
     }
 
     public List<Module> getModulesByCategory(ModuleCategory category) {
