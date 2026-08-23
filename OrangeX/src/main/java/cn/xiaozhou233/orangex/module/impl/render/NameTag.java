@@ -79,8 +79,8 @@ public class NameTag extends Module {
             if (screenZ >= 1.0f) continue;
 
             int scaleFactor = new ScaledResolution(mc).getScaleFactor();
-            float screenX = screenCoords.get(0) / scaleFactor;
-            float screenY = (mc.displayHeight - screenCoords.get(1)) / scaleFactor;
+            float screenX = (float) Math.floor(screenCoords.get(0) / scaleFactor);
+            float screenY = (float) Math.floor((mc.displayHeight - screenCoords.get(1)) / scaleFactor);
 
             String name = player.getDisplayName().getFormattedText();
             String healthText = "";
