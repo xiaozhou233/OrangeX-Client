@@ -2,7 +2,6 @@ package cn.xiaozhou233.orangex.loader;
 
 
 import cn.xiaozhou233.juiceagent.api.JuiceAgent;
-import cn.xiaozhou233.juiceremapper.JuiceRemapper;
 
 import javax.swing.*;
 import java.io.File;
@@ -39,25 +38,29 @@ public class Loader {
             case MCP:
                 break;
             case VANILLA:
-                System.load(new File(userDir, "/.orangex/libremapper.dll").getAbsolutePath());
-
-                JuiceRemapper.init();
-                JuiceRemapper.addInclude("cn/xiaozhou233/orangex/");
-                JuiceRemapper.addExclude("cn/xiaozhou233/orangex/mixin/");
-                break;
+                // No more support
+                JOptionPane.showMessageDialog(
+                        null,
+                        "Not support Vanilla Client! \n 不支持原版客户端!",
+                        "Vanilla Obfuscation",
+                        JOptionPane.ERROR_MESSAGE
+                        );
+                throw new IllegalStateException("Not support Vanilla Client!");
             case LUNAR:
                 break;
             case BADLION:
-                System.load(new File(userDir, "/.orangex/libremapper.dll").getAbsolutePath());
-
-                JuiceRemapper.init();
-                JuiceRemapper.addInclude("cn/xiaozhou233/orangex/");
-                JuiceRemapper.addExclude("cn/xiaozhou233/orangex/mixin/");
-                break;
+                // No more support
+                JOptionPane.showMessageDialog(
+                        null,
+                        "Not support Badlion Client! \n 不支持Badlion客户端!",
+                        "Badlion Obfuscation",
+                        JOptionPane.ERROR_MESSAGE
+                        );
+                throw new IllegalStateException("Not support Badlion Client!");
             case UNKNOWN:
                 JOptionPane.showMessageDialog(
                         null,
-                        "Inject Failed! Cause: Unknown Obfuscation",
+                        "Inject Failed! Cause: Unknown Obfuscation \n 注入失败! 原因: 未知的混淆",
                         "Unknown Obfuscation",
                         JOptionPane.ERROR_MESSAGE
                 );
