@@ -2,7 +2,7 @@ package cn.xiaozhou233.orangex.module;
 
 import cn.xiaozhou233.orangex.OrangeX;
 import cn.xiaozhou233.orangex.config.ModuleConfig;
-import cn.xiaozhou233.orangex.event.impl.EventKeyDown;
+import cn.xiaozhou233.orangex.event.impl.EventKey;
 import cn.xiaozhou233.orangex.module.impl.TestModule;
 import cn.xiaozhou233.orangex.module.impl.render.*;
 import lombok.Getter;
@@ -76,7 +76,7 @@ public class ModuleManager {
     }
 
     @Subscribe
-    public void onKeyDown(EventKeyDown event) {
+    public void onKeyDown(EventKey event) {
         for (Module module : OrangeX.getInstance().getModuleManager().getModules()) {
             if (module.getKey() == event.getKey()) {
                 module.toggle();

@@ -8,5 +8,4 @@ import lombok.Getter;
 @AllArgsConstructor
 public class EventKey extends Event {
     private final int key;
-    private final boolean pressed;
 }
