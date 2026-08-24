@@ -33,6 +33,11 @@ shadowJar {
     relocate 'com.google.gson', "cn.xiaozhou233.gson"
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
 // JNI Header Build
 tasks.withType(JavaCompile).configureEach {
     options.headerOutputDirectory.set(file("../OrangeX-Native/includes"))

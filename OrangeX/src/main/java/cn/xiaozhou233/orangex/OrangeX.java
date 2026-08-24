@@ -5,6 +5,7 @@ import org.greenrobot.eventbus.EventBus;
 @Getter
 public class OrangeX {
     public static final OrangeX INSTANCE = new OrangeX();
+
     private final EventBus eventBus = EventBus.builder()
             .logNoSubscriberMessages(false)
             .logSubscriberExceptions(false)
