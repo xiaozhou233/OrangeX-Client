@@ -4,6 +4,6 @@ import cn.xiaozhou233.orangex.runtime.RuntimeDetector;
 
 public class Entry {
     public static void entry() {
-
+        RuntimeDetector.debug();
     }
 }

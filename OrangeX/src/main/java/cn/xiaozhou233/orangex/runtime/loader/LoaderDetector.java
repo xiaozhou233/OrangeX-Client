@@ -1,6 +1,6 @@
 package cn.xiaozhou233.orangex.runtime.loader;
 
-import cn.xiaozhou233.orangex.runtime.probe.ClassProbe;
+import cn.xiaozhou233.orangex.runtime.ClassProbe;
 
 public class LoaderDetector {
     public static LoaderType detect(ClassLoader loader) {

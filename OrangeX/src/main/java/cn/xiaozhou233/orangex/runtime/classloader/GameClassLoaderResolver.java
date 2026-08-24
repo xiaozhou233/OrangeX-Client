@@ -1,6 +1,6 @@
 package cn.xiaozhou233.orangex.runtime.classloader;
 
-import cn.xiaozhou233.orangex.runtime.probe.ClassProbe;
+import cn.xiaozhou233.orangex.runtime.ClassProbe;
 
 public final class GameClassLoaderResolver {
 

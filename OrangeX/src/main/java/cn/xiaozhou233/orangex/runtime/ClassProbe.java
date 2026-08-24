@@ -1,4 +1,4 @@
-package cn.xiaozhou233.orangex.runtime.probe;
+package cn.xiaozhou233.orangex.runtime;
 
 public class ClassProbe {
     public static boolean exists(ClassLoader loader, String... names) {
