@@ -10,5 +10,5 @@ JuiceAgentNativeLibraryPath = ""
 Enabled = true
 InjectionDir = "./injection"
 JarPath = "./OrangeX.jar"
-EntryClass = "cn.xiaozhou233.orangex.loader.Loader"
-EntryMethod = "start"
+EntryClass = "cn.xiaozhou233.orangex.entry.Entry"
+EntryMethod = "entry"
