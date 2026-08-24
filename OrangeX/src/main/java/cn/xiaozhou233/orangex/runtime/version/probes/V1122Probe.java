@@ -5,22 +5,23 @@ import cn.xiaozhou233.orangex.runtime.utils.ReflectUtils;
 import cn.xiaozhou233.orangex.runtime.version.MinecraftProbe;
 import cn.xiaozhou233.orangex.runtime.version.MinecraftVersion;
 import cn.xiaozhou233.orangex.runtime.version.VersionProbe;
-public final class V189Probe implements VersionProbe {
+
+public final class V1122Probe implements VersionProbe {
 
     @Override
     public MinecraftVersion getVersion() {
-        return MinecraftVersion.V1_8_9;
+        return MinecraftVersion.V1_12_2;
     }
 
     @Override
     public int score(ClassLoader loader) {
         int score = 0;
-        // Vanilla
+        // Obfuscated
         MinecraftProbe.ProbeResult probeObf = new MinecraftProbe(
-                "ave",
-                "A",
-                "S",
-                "bew", "adm")
+                "bib",
+                "z",
+                "R",
+                "bud", "amu")
                 .probe(loader);
         score+= probeObf.getScore();
         probeObf.getMatched().forEach(System.out::println);
@@ -31,9 +32,9 @@ public final class V189Probe implements VersionProbe {
                     "net.minecraftforge.common.ForgeVersion", "minorVersion");
             if (minorVersion instanceof Number) {
                 int forgeMinorVersion = ((Number) minorVersion).intValue();
-                if (forgeMinorVersion == 15) {
+                if (forgeMinorVersion == 23) {
                     score += 100;
-                    System.out.println("[DEBUG] Forge Version Probe Success! Version: 1.8.9");
+                    System.out.println("[DEBUG] Forge Version Probe Success! Version: 1.12.2");
                 }
             }
         } catch (Exception ignore) {

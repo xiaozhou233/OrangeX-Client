@@ -1,6 +1,6 @@
 package cn.xiaozhou233.orangex.runtime.version;
 
-import cn.xiaozhou233.orangex.runtime.version.probes.V189Probe;
+import cn.xiaozhou233.orangex.runtime.version.probes.*;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ public final class VersionDetector {
     private static List<ProbeScore> scores = null;
     // List of VersionProbe
     private static final List<VersionProbe> PROBES = Arrays.asList(
-            new V189Probe()
+            new V189Probe(), new V1122Probe()
     );
 
 
