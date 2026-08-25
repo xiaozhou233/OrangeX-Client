@@ -24,7 +24,13 @@ public final class LoaderDetector {
             return LoaderType.FABRIC;
         }
 
-        // No mod loader found
+        // MCP: Minecraft deobfuscated (development) environment
+        // Has real class names (net.minecraft.client.Minecraft) but no mod loader
+        if (isMCP(loader)) {
+            return LoaderType.MCP;
+        }
+
+        // No mod loader found, obfuscated vanilla
         return LoaderType.VANILLA;
     }
 
@@ -48,6 +54,16 @@ public final class LoaderDetector {
     private static boolean isFabric(ClassLoader loader) {
         return ClassProbe.exists(loader,
                 "net.fabricmc.loader.api.FabricLoader");
+    }
+
+    private static boolean isMCP(ClassLoader loader) {
+        try {
+            Class<?> mcClass = Class.forName("net.minecraft.client.Minecraft", false, loader);
+            mcClass.getDeclaredMethod("getMinecraft");
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
     }
 
 }

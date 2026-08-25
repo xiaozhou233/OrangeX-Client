@@ -97,7 +97,7 @@ public final class VersionDetector {
         }
 
         if (lastFailure != null) {
-            lastFailure.printStackTrace();
+            System.out.println("[VersionDetector] Forge/Fabric version detection failed, falling back to structural probe");
         }
         return 0;
     }
@@ -142,6 +142,14 @@ public final class VersionDetector {
                 "com/mojang/blaze3d/buffers/GpuBuffer",
                 "com/mojang/blaze3d/systems/CommandEncoder");
 
+        // MCP (deobfuscated) detection - only 1.8.9
+        boolean mcp = isMCPPresent(loaders,
+                "net.minecraft.client.Minecraft", "getMinecraft", "theMinecraft",
+                "net.minecraft.client.entity.EntityPlayerSP",
+                "net.minecraft.client.gui.GuiIngame",
+                "net.minecraft.client.renderer.EntityRenderer",
+                "net.minecraft.client.network.NetHandlerPlayClient");
+
         int matchingVersions = (vanilla189 ? 1 : 0)
                 + (vanilla1122 ? 1 : 0)
                 + (vanilla1165 ? 1 : 0)
@@ -149,7 +157,8 @@ public final class VersionDetector {
                 + (vanilla1211 || neoForge1211 ? 1 : 0)
                 + (vanilla1206 ? 1 : 0)
                 + (vanilla12111 || fabric12111 ? 1 : 0)
-                + (vanilla262 || fabric262 ? 1 : 0);
+                + (vanilla262 || fabric262 ? 1 : 0)
+                + (mcp ? 1 : 0);
 
         if (matchingVersions == 1) {
             if (vanilla189) return 15;
@@ -163,9 +172,39 @@ public final class VersionDetector {
                 int modernProtocol = getModernProtocol(loaders);
                 return modernProtocol != 0 ? modernProtocol : 110;
             }
+            if (mcp) return 15;
         }
 
         return 0;
+    }
+
+    private static boolean isMCPPresent(Set<ClassLoader> loaders,
+                                         String minecraftClassName,
+                                         String getterName,
+                                         String instanceFieldName,
+                                         String... anchorClasses) {
+        for (ClassLoader loader : loaders) {
+            Class<?> mcClass = resolveClass(minecraftClassName, loader);
+            if (mcClass == null) continue;
+
+            ClassLoader definingLoader = mcClass.getClassLoader();
+            if (definingLoader == null) continue;
+
+            boolean anchorsMatch = true;
+            for (String anchor : anchorClasses) {
+                Class<?> anchorClass = resolveClass(anchor, definingLoader);
+                if (anchorClass == null) {
+                    anchorsMatch = false;
+                    break;
+                }
+            }
+            if (!anchorsMatch) continue;
+
+            if (matchesMinecraftStructure(mcClass, getterName, instanceFieldName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static boolean isRuntimePresent(Set<ClassLoader> loaders,
