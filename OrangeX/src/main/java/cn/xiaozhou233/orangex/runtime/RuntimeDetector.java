@@ -16,10 +16,22 @@ public final class RuntimeDetector {
 
     public static void debug() {
         RuntimeInfo runtime = detect();
+        ClassLoader loader = runtime.getMinecraftClassLoader();
+        MinecraftVersion version = runtime.getMinecraftVersion();
+        int protocol = MinecraftVersion.getCurrentProtocolVersion();
+
         System.out.println("======== Minecraft Runtime Info ========");
-        System.out.println("Minecraft ClassLoader: " + runtime.getMinecraftClassLoader().getClass().getName());
+        System.out.println("Minecraft ClassLoader: " + loader.getClass().getName());
+        System.out.println("Context ClassLoader: " + Thread.currentThread().getContextClassLoader());
+        System.out.print("ClassLoader Hierarchy: " + loader.getClass().getName());
+        ClassLoader parent = loader.getParent();
+        while (parent != null) {
+            System.out.print(" -> " + parent.getClass().getName());
+            parent = parent.getParent();
+        }
+        System.out.println();
         System.out.println("Loader Type: " + runtime.getLoaderType().name());
-        System.out.println("Minecraft Version: " + runtime.getMinecraftVersion().name());
+        System.out.println("Minecraft Version: " + version.name() + " (protocol " + protocol + ")");
         System.out.println("========================================");
     }
 }
