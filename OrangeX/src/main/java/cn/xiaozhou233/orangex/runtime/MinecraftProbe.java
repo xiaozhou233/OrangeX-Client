@@ -1,6 +1,4 @@
-package cn.xiaozhou233.orangex;
-
-import cn.xiaozhou233.orangex.runtime.ClassProbe;
+package cn.xiaozhou233.orangex.runtime;
 
 public class MinecraftProbe {
     private final String minecraftClass;
