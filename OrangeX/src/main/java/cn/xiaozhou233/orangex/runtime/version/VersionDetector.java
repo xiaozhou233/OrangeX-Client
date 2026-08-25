@@ -13,7 +13,7 @@ public final class VersionDetector {
     private static List<ProbeScore> scores = null;
     // List of VersionProbe
     private static final List<VersionProbe> PROBES = Arrays.asList(
-            new V189Probe(), new V1122Probe(), new V1165Probe(), new V12111Probe()
+            new V189Probe(), new V1122Probe(), new V1165Probe(), new V12111Probe(), new V262Probe()
     );
 
 

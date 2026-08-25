@@ -40,6 +40,11 @@ public final class V189Probe implements VersionProbe {
             System.out.println("[DEBUG] Forge Version Probe Failed");
         }
 
+        // MCP
+        MinecraftProbe.ProbeResult probeMCP = new MinecraftProbe("net.minecraft.client.Minecraft", "getMinecraft", "theMinecraft").probe(loader);
+        score += probeMCP.getScore();
+        probeMCP.getMatched().forEach(System.out::println);
+
         return score;
     }
 }
