@@ -1,9 +1,13 @@
 package cn.xiaozhou233.orangex;
+import cn.xiaozhou233.orangex.runtime.RuntimeInfo;
 import lombok.Getter;
+import lombok.Setter;
 import org.greenrobot.eventbus.EventBus;
 
 @Getter
 public class OrangeX {
+    @Setter
+    private RuntimeInfo runtime = null;
     public static final OrangeX INSTANCE = new OrangeX();
 
     private final EventBus eventBus = EventBus.builder()
@@ -16,7 +20,9 @@ public class OrangeX {
 
     public void start() {
         System.out.println("OrangeX starting...");
-
+        if(runtime==null) {
+            throw new RuntimeException("Runtime not set.");
+        }
         System.out.println("OrangeX started.");
     }
 

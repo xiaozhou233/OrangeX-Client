@@ -14,8 +14,7 @@ public final class RuntimeDetector {
         return new RuntimeInfo(classLoader, loaderType, version);
     }
 
-    public static void debug() {
-        RuntimeInfo runtime = detect();
+    public static void debug(RuntimeInfo runtime) {
         ClassLoader loader = runtime.getMinecraftClassLoader();
         MinecraftVersion version = runtime.getMinecraftVersion();
         int protocol = MinecraftVersion.getCurrentProtocolVersion();
