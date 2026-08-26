@@ -23,7 +23,7 @@ public final class GameClassLoaderResolver {
             for (Thread thread : Thread.getAllStackTraces().keySet()) {
                 String name = thread.getName();
 
-                if (!"Render thread".equals(name) && !"Client thread".equals(name)) {
+                if (!"Client thread".equals(name)  && !"Render thread".equals(name)) {
                     continue;
                 }
 
