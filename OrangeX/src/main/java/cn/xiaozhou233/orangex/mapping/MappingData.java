@@ -5,74 +5,81 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class MappingData {
-    private final Map<String, String> classNames;
-    private final Map<String, String> classNamesReversed;
-    private final Map<String, String> fieldNames;
-    private final Map<String, String> fieldNamesReversed;
-    private final Map<String, String> methodNames;
-    private final Map<String, String> methodNamesReversed;
+    // Readable -> Obfuscated
+    private final Map<String, String> className;
+    private final Map<String, String> methodName;
+    private final Map<String, String> fieldName;
+
+    // Obfuscated -> Readable
+    private final Map<String, String> classNameReversed;
+    private final Map<String, String> methodNameReversed;
+    private final Map<String, String> fieldNameReversed;
 
     public MappingData() {
-        this.classNames = new LinkedHashMap<>();
-        this.classNamesReversed = new LinkedHashMap<>();
-        this.fieldNames = new LinkedHashMap<>();
-        this.fieldNamesReversed = new LinkedHashMap<>();
-        this.methodNames = new LinkedHashMap<>();
-        this.methodNamesReversed = new LinkedHashMap<>();
+        this.className = new LinkedHashMap<>();
+        this.methodName = new LinkedHashMap<>();
+        this.fieldName = new LinkedHashMap<>();
+
+        this.classNameReversed = new LinkedHashMap<>();
+        this.methodNameReversed = new LinkedHashMap<>();
+        this.fieldNameReversed = new LinkedHashMap<>();
     }
 
-    public void addClass(String obfuscated, String readable) {
-        classNames.put(obfuscated, readable);
-        classNamesReversed.put(readable, obfuscated);
+    // Add
+
+    public void addClass(String readable, String obfuscated) {
+        className.put(readable, obfuscated);
+        classNameReversed.put(obfuscated, readable);
     }
 
-    public void addField(String obfuscated, String readable) {
-        fieldNames.put(obfuscated, readable);
-        fieldNamesReversed.put(readable, obfuscated);
+    public void addMethod(String readable, String obfuscated) {
+        methodName.put(readable, obfuscated);
+        methodNameReversed.put(obfuscated, readable);
     }
 
-    public void addMethod(String obfuscated, String readable) {
-        methodNames.put(obfuscated, readable);
-        methodNamesReversed.put(readable, obfuscated);
+    public void addField(String readable, String obfuscated) {
+        fieldName.put(readable, obfuscated);
+        fieldNameReversed.put(obfuscated, readable);
     }
 
-    public String lookupClass(String obfuscated) {
-        return classNames.get(obfuscated);
+    // Lookup
+
+    public String lookupClass(String readable) {
+        return className.get(readable);
     }
 
-    public String reverseClass(String readable) {
-        return classNamesReversed.get(readable);
+    public String lookupMethod(String readable) {
+        return methodName.get(readable);
     }
 
-    public String lookupField(String obfuscated) {
-        return fieldNames.get(obfuscated);
+    public String lookupField(String readable) {
+        return fieldName.get(readable);
     }
 
-    public String reverseField(String readable) {
-        return fieldNamesReversed.get(readable);
+    // Reverse Lookup
+    public String reverseClass(String obfuscated) {
+        return classNameReversed.get(obfuscated);
     }
 
-    public String lookupMethod(String obfuscated) {
-        return methodNames.get(obfuscated);
+    public String reverseMethod(String obfuscated) {
+        return methodNameReversed.get(obfuscated);
     }
 
-    public String reverseMethod(String readable) {
-        return methodNamesReversed.get(readable);
+    public String reverseField(String obfuscated) {
+        return fieldNameReversed.get(obfuscated);
     }
 
-    public Map<String, String> getClassNames() {
-        return Collections.unmodifiableMap(classNames);
+    // Getters
+
+    public Map<String, String> getClassName() {
+        return Collections.unmodifiableMap(className);
     }
 
-    public Map<String, String> getFieldNames() {
-        return Collections.unmodifiableMap(fieldNames);
+    public Map<String, String> getMethodName() {
+        return Collections.unmodifiableMap(methodName);
     }
 
-    public Map<String, String> getMethodNames() {
-        return Collections.unmodifiableMap(methodNames);
-    }
-
-    public boolean isEmpty() {
-        return classNames.isEmpty() && fieldNames.isEmpty() && methodNames.isEmpty();
+    public Map<String, String> getFieldName() {
+        return Collections.unmodifiableMap(fieldName);
     }
 }
