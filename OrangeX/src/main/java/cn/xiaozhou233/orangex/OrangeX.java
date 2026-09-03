@@ -1,4 +1,6 @@
 package cn.xiaozhou233.orangex;
+import cn.xiaozhou233.orangex.mapping.MappingData;
+import cn.xiaozhou233.orangex.mapping.MappingReader;
 import cn.xiaozhou233.orangex.runtime.RuntimeInfo;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +11,7 @@ public class OrangeX {
     @Setter
     private RuntimeInfo runtime = null;
     public static final OrangeX INSTANCE = new OrangeX();
+    MappingData mappingData;
 
     private final EventBus eventBus = EventBus.builder()
             .logNoSubscriberMessages(false)
@@ -23,6 +26,8 @@ public class OrangeX {
         if(runtime==null) {
             throw new RuntimeException("Runtime not set.");
         }
+        mappingData = MappingReader.getInstance().load(runtime.getLoaderType(), runtime.getMinecraftVersion());
+
         System.out.println("OrangeX started.");
     }
 

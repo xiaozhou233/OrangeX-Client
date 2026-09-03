@@ -27,17 +27,17 @@ public class MappingData {
 
     // Add
 
-    public void addClass(String readable, String obfuscated) {
+    public void addClass(String obfuscated, String readable) {
         className.put(readable, obfuscated);
         classNameReversed.put(obfuscated, readable);
     }
 
-    public void addMethod(String readable, String obfuscated) {
+    public void addMethod(String obfuscated, String readable) {
         methodName.put(readable, obfuscated);
         methodNameReversed.put(obfuscated, readable);
     }
 
-    public void addField(String readable, String obfuscated) {
+    public void addField(String obfuscated, String readable) {
         fieldName.put(readable, obfuscated);
         fieldNameReversed.put(obfuscated, readable);
     }

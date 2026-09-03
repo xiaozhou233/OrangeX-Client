@@ -46,6 +46,7 @@ public final class MappingReader {
     private String switchLoaderDir(LoaderType loaderType) {
         switch (loaderType) {
             case VANILLA:
+                return "vanilla";
             case MCP:
                 return null;
             case FORGE:
