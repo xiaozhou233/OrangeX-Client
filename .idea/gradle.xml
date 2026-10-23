@@ -4,12 +4,14 @@
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleHome" value="" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/Loader" />
+            <option value="$PROJECT_DIR$/Minecraft1.8.8" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="true" />
       </GradleProjectSettings>
     </option>
   </component>
