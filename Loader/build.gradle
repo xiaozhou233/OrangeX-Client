@@ -14,10 +14,6 @@ dependencies {
     implementation files("../libraries/JuiceAgent-API-1.4.1+build.1.jar")
 }
 
-test {
-    useJUnitPlatform()
-}
-
 tasks.named('shadowJar') {
     destinationDirectory = rootProject.layout.projectDirectory.dir('out/tmp')
     archiveFileName = "${project.name}.jar"

@@ -9,4 +9,12 @@ public class OrangeX {
     public OrangeX() {
         System.out.println("OrangeX <init> start!");
     }
+
+    public void start() {
+        System.out.println("OrangeX start!");
+    }
+
+    public void stop() {
+        System.out.println("OrangeX stop!");
+    }
 }

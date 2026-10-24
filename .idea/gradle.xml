@@ -9,6 +9,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/Loader" />
+            <option value="$PROJECT_DIR$/Minecraft1.8.8" />
             <option value="$PROJECT_DIR$/OrangeX" />
           </set>
         </option>
