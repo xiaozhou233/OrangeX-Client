@@ -2,3 +2,25 @@ plugins {
     id 'base'
 }
 
+def outputDir = layout.projectDirectory.dir('out/tmp')
+
+tasks.register('cleanOut') {
+    group = 'build'
+    description = 'Deletes the shaded jar output directory (out/tmp)'
+    doLast {
+        delete outputDir
+    }
+}
+
+tasks.register('packageAll') {
+    group = 'build'
+    description = 'Builds the shaded Loader and OrangeX jars into out/tmp'
+    dependsOn cleanOut
+    dependsOn ':Loader:shadowJar', ':OrangeX:shadowJar'
+}
+
+subprojects {
+    tasks.matching { it.name == 'shadowJar' }.configureEach {
+        mustRunAfter rootProject.tasks.named('cleanOut')
+    }
+}

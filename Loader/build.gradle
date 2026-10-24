@@ -17,3 +17,8 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+tasks.named('shadowJar') {
+    destinationDirectory = rootProject.layout.projectDirectory.dir('out/tmp')
+    archiveFileName = "${project.name}.jar"
+}
