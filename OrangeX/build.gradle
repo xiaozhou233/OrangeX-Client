@@ -1,0 +1,20 @@
+plugins {
+    id 'java'
+}
+
+group = 'cn.xiaozhou233.orangex'
+version = 'unspecified'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Source: https://mvnrepository.com/artifact/org.projectlombok/lombok
+    implementation 'org.projectlombok:lombok:1.18.48'
+    annotationProcessor 'org.projectlombok:lombok:1.18.48'
+}
+
+test {
+    useJUnitPlatform()
+}
