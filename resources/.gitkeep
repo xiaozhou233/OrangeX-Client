@@ -1,0 +1,3 @@
+# Placeholder so the resources directory is tracked by git.
+# Files put here are flattened into the injection zip (e.g. config.toml ends up
+# next to the jars in ~/.orangex).
