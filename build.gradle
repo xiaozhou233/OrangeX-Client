@@ -3,6 +3,9 @@ plugins {
 }
 
 def outputDir = layout.projectDirectory.dir('out/tmp')
+def distDir = layout.projectDirectory.dir('out')
+def resourcesDir = layout.projectDirectory.dir('resources')
+def nativesDir = layout.projectDirectory.dir('natives')
 
 tasks.register('cleanOut') {
     group = 'build'
@@ -12,11 +15,39 @@ tasks.register('cleanOut') {
     }
 }
 
-tasks.register('packageAll') {
+tasks.register('prepareInjection') {
     group = 'build'
-    description = 'Builds the shaded Loader and OrangeX jars into out/tmp'
+    description = 'Copies resources and natives into out/tmp (both flattened)'
     dependsOn cleanOut
     dependsOn ':Loader:shadowJar', ':OrangeX:shadowJar'
+    doLast {
+        copy {
+            from resourcesDir
+            into outputDir
+            exclude '**/.gitkeep'
+        }
+        copy {
+            from nativesDir
+            into outputDir
+        }
+    }
+}
+
+tasks.register('injectionZip', Zip) {
+    group = 'build'
+    description = 'Zips out/tmp into out/injection.zip'
+    dependsOn prepareInjection
+    destinationDirectory = distDir
+    archiveFileName = 'injection.zip'
+    from outputDir
+}
+
+tasks.register('packageAll') {
+    group = 'build'
+    description = 'Builds Loader, OrangeX and Injector, then zips out/tmp into out/injection.zip'
+    dependsOn cleanOut
+    dependsOn ':Loader:shadowJar', ':OrangeX:shadowJar', ':Injector:jar'
+    dependsOn injectionZip
 }
 
 subprojects {

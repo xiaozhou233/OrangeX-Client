@@ -1,0 +1,31 @@
+plugins {
+    id 'java'
+}
+
+group = 'cn.xiaozhou233.orangex.injector'
+version = 'unspecified'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+tasks.named('jar') {
+    destinationDirectory = rootProject.layout.projectDirectory.dir('out')
+    archiveFileName = 'injector.jar'
+    manifest {
+        attributes 'Main-Class': 'cn.xiaozhou233.orangex.injector.Main'
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}

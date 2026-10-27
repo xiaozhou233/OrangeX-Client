@@ -1,4 +1,5 @@
 rootProject.name = 'OrangeX-Client'
 include 'Loader'
 include 'OrangeX'
+include 'Injector'
 include 'Minecraft1.8.8'
