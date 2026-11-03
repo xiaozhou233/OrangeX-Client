@@ -1,40 +1,41 @@
-package cn.xiaozhou233.orangex.runtime;
+package cn.xiaozhou233.orangex.runtime.probe;
 
-public class ClassProbe {
+/**
+ * Small reflection helper for checking whether classes are visible to a loader.
+ *
+ * <p>Accepts both binary names ({@code net.minecraft.client.Minecraft}) and
+ * internal names ({@code net/minecraft/client/Minecraft}).</p>
+ */
+public final class ClassProbe {
+
     public static boolean exists(ClassLoader loader, String... names) {
         return find(loader, names) != null;
     }
 
     public static Class<?> find(ClassLoader loader, String... names) {
-        if (loader == null)
+        if (loader == null || names == null) {
             return null;
-
-        if (names == null)
-            return null;
+        }
 
         for (String name : names) {
-            // Check for empty names
             if (name == null || name.isEmpty()) {
                 continue;
             }
 
-            String binaryName = toBinaryName(name);
-
-            // Check for class existence
             try {
-                return Class.forName(binaryName, false, loader);
+                return Class.forName(toBinaryName(name), false, loader);
             } catch (Throwable ignored) {
+                // Missing classes are expected while probing.
             }
         }
 
         return null;
     }
 
-    /**
-     * Accepts both binary names ({@code net.minecraft.client.Minecraft}) and
-     * internal names ({@code net/minecraft/client/Minecraft}).
-     */
     private static String toBinaryName(String name) {
         return name.indexOf('/') >= 0 ? name.replace('/', '.') : name;
+    }
+
+    private ClassProbe() {
     }
 }

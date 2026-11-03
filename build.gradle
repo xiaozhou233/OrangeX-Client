@@ -51,6 +51,21 @@ tasks.register('packageAll') {
 }
 
 subprojects {
+    plugins.withId('java') {
+        java {
+            sourceCompatibility = JavaVersion.VERSION_1_8
+            targetCompatibility = JavaVersion.VERSION_1_8
+        }
+
+        tasks.withType(JavaCompile).configureEach {
+            options.encoding = 'UTF-8'
+            if (JavaVersion.current().isJava9Compatible()) {
+                // Fail fast if a post-Java-8 API is used.
+                options.release = 8
+            }
+        }
+    }
+
     tasks.matching { it.name == 'shadowJar' }.configureEach {
         mustRunAfter rootProject.tasks.named('cleanOut')
     }

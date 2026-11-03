@@ -1,12 +1,16 @@
 package cn.xiaozhou233.orangex.runtime.version;
 
 import lombok.Getter;
-import lombok.Setter;
 
+/**
+ * Minecraft versions supported by OrangeX.
+ *
+ * <p>The numbers are OrangeX's internal version ids, <strong>not</strong>
+ * Minecraft network protocol numbers (for example, 1.8.9 is id 15 here, while
+ * its network protocol is 47).</p>
+ */
+@Getter
 public enum MinecraftVersion {
-    // Note: the numbers below are OrangeX's internal version ids, NOT the
-    // Minecraft network protocol numbers (e.g. 1.8.9 is id 15 here, but its
-    // network protocol is 47).
     V1_7_10(13),
     V1_8_9(15),
     V1_12_2(23),
@@ -27,43 +31,21 @@ public enum MinecraftVersion {
     V26_2(110),
     UNKNOWN(0);
 
-    @Setter
-    @Getter
-    public static int currentProtocolVersion;
-    @Getter
-    private final int protocolVersion;
+    public static final int UNKNOWN_ID = 0;
 
-    MinecraftVersion(int protocolVersion) {
-        this.protocolVersion = protocolVersion;
+    private final int id;
+
+    MinecraftVersion(int id) {
+        this.id = id;
     }
 
-    public boolean is(int current) {
-        return current == this.protocolVersion;
+    public boolean isUnknown() {
+        return this == UNKNOWN;
     }
 
-    public boolean isNot(int current) {
-        return current != this.protocolVersion;
-    }
-
-    public boolean greaterThan(int current) {
-        return current > this.protocolVersion;
-    }
-
-    public boolean greaterThanOrEqual(int current) {
-        return current >= this.protocolVersion;
-    }
-
-    public boolean lessThan(int current) {
-        return current < this.protocolVersion;
-    }
-
-    public boolean lessThanOrEqual(int current) {
-        return current <= this.protocolVersion;
-    }
-
-    public static MinecraftVersion fromProtocolId(int protocolId) {
+    public static MinecraftVersion fromId(int id) {
         for (MinecraftVersion version : values()) {
-            if (version.protocolVersion == protocolId) {
+            if (version.id == id) {
                 return version;
             }
         }
