@@ -1,4 +1,4 @@
-package cn.xiaozhou233.orangex.loader.runtime.loader;
+package cn.xiaozhou233.orangex.runtime.loader;
 
 public enum LoaderType {
     VANILLA,

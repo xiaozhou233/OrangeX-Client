@@ -14,9 +14,16 @@ dependencies {
     // Source: https://mvnrepository.com/artifact/org.projectlombok/lombok
     compileOnly 'org.projectlombok:lombok:1.18.48'
     annotationProcessor 'org.projectlombok:lombok:1.18.48'
+
+    // Source: https://mvnrepository.com/artifact/com.google.code.gson/gson
+    implementation 'com.google.code.gson:gson:2.15.0'
 }
 
 tasks.named('shadowJar') {
     destinationDirectory = rootProject.layout.projectDirectory.dir('out/tmp')
     archiveFileName = "${project.name}.jar"
+}
+
+shadowJar {
+    relocate 'com.google.gson', 'cn.xiaozhou233.orangex.shaded.gson'
 }

@@ -1,8 +1,7 @@
 package cn.xiaozhou233.orangex.loader;
 
 import cn.xiaozhou233.juiceagent.api.JuiceAgent;
-import cn.xiaozhou233.orangex.loader.runtime.RuntimeDetector;
-import cn.xiaozhou233.orangex.loader.runtime.RuntimeInfo;
+import cn.xiaozhou233.orangex.loader.classloader.GameClassLoaderResolver;
 
 import java.io.File;
 
@@ -17,8 +16,8 @@ public class Loader {
     public static void entry() {
         System.out.println("OrangeX-Loader " + VERSION + " loaded!");
 
-        RuntimeInfo info = RuntimeDetector.detect();
-        RuntimeDetector.debug(info);
+        // Resolve the Minecraft ClassLoader (runtime detection itself lives in OrangeX)
+        ClassLoader gameClassLoader = GameClassLoaderResolver.resolve();
 
         // Find client thread
         for (Thread t : Thread.getAllStackTraces().keySet()) {
@@ -31,9 +30,9 @@ public class Loader {
             throw new IllegalStateException("Cannot find Minecraft client thread");
         }
 
-        // Get Minecraft ClassLoader (prefer the detected game class loader)
-        minecraftClassLoader = info.getMinecraftClassLoader() != null
-                ? info.getMinecraftClassLoader()
+        // Get Minecraft ClassLoader (prefer the resolved game class loader)
+        minecraftClassLoader = gameClassLoader != null
+                ? gameClassLoader
                 : clientThread.getContextClassLoader();
         if (minecraftClassLoader == null) {
             throw new IllegalStateException("Cannot find Minecraft ClassLoader");

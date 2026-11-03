@@ -1,10 +1,15 @@
 package cn.xiaozhou233.orangex;
 
+import cn.xiaozhou233.orangex.runtime.RuntimeDetector;
+import cn.xiaozhou233.orangex.runtime.RuntimeInfo;
 import lombok.Getter;
 
 public class OrangeX {
     @Getter
     private static final OrangeX instance = new OrangeX();
+
+    @Getter
+    private RuntimeInfo runtimeInfo;
 
     public OrangeX() {
         System.out.println("OrangeX <init> start!");
@@ -12,6 +17,9 @@ public class OrangeX {
 
     public void start() {
         System.out.println("OrangeX start!");
+
+        runtimeInfo = RuntimeDetector.detect();
+        RuntimeDetector.debug(runtimeInfo);
     }
 
     public void stop() {

@@ -1,4 +1,4 @@
-package cn.xiaozhou233.orangex.loader.runtime.utils;
+package cn.xiaozhou233.orangex.runtime.utils;
 
 public class ForgeUtils {
     public static int parseForgeVersion(Object value) {

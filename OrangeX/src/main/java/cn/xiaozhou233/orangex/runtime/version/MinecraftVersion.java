@@ -1,4 +1,4 @@
-package cn.xiaozhou233.orangex.loader.runtime.version;
+package cn.xiaozhou233.orangex.runtime.version;
 
 import lombok.Getter;
 import lombok.Setter;

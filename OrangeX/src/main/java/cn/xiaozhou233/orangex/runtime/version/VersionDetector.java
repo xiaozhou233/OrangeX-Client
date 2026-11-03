@@ -1,11 +1,11 @@
-package cn.xiaozhou233.orangex.loader.runtime.version;
+package cn.xiaozhou233.orangex.runtime.version;
 
-import cn.xiaozhou233.orangex.loader.runtime.ClassProbe;
-import cn.xiaozhou233.orangex.loader.runtime.MinecraftProbe;
-import cn.xiaozhou233.orangex.loader.runtime.loader.LoaderType;
-import cn.xiaozhou233.orangex.loader.runtime.utils.ForgeUtils;
-import cn.xiaozhou233.orangex.loader.runtime.utils.MinecraftUtils;
-import cn.xiaozhou233.orangex.loader.runtime.utils.ReflectUtils;
+import cn.xiaozhou233.orangex.runtime.ClassProbe;
+import cn.xiaozhou233.orangex.runtime.MinecraftProbe;
+import cn.xiaozhou233.orangex.runtime.loader.LoaderType;
+import cn.xiaozhou233.orangex.runtime.utils.ForgeUtils;
+import cn.xiaozhou233.orangex.runtime.utils.MinecraftUtils;
+import cn.xiaozhou233.orangex.runtime.utils.ReflectUtils;
 
 import java.util.LinkedHashSet;
 import java.util.Set;

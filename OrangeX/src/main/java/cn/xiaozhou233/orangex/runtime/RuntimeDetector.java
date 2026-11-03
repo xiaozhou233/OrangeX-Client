@@ -1,10 +1,10 @@
-package cn.xiaozhou233.orangex.loader.runtime;
+package cn.xiaozhou233.orangex.runtime;
 
-import cn.xiaozhou233.orangex.loader.runtime.classloader.GameClassLoaderResolver;
-import cn.xiaozhou233.orangex.loader.runtime.loader.LoaderDetector;
-import cn.xiaozhou233.orangex.loader.runtime.loader.LoaderType;
-import cn.xiaozhou233.orangex.loader.runtime.version.MinecraftVersion;
-import cn.xiaozhou233.orangex.loader.runtime.version.VersionDetector;
+import cn.xiaozhou233.orangex.runtime.classloader.GameClassLoaderResolver;
+import cn.xiaozhou233.orangex.runtime.loader.LoaderDetector;
+import cn.xiaozhou233.orangex.runtime.loader.LoaderType;
+import cn.xiaozhou233.orangex.runtime.version.MinecraftVersion;
+import cn.xiaozhou233.orangex.runtime.version.VersionDetector;
 
 public final class RuntimeDetector {
     public static RuntimeInfo detect() {

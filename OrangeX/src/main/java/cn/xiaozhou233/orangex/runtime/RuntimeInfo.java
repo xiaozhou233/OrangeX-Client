@@ -1,7 +1,7 @@
-package cn.xiaozhou233.orangex.loader.runtime;
+package cn.xiaozhou233.orangex.runtime;
 
-import cn.xiaozhou233.orangex.loader.runtime.loader.LoaderType;
-import cn.xiaozhou233.orangex.loader.runtime.version.MinecraftVersion;
+import cn.xiaozhou233.orangex.runtime.loader.LoaderType;
+import cn.xiaozhou233.orangex.runtime.version.MinecraftVersion;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

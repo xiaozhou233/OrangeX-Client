@@ -1,4 +1,4 @@
-package cn.xiaozhou233.orangex.loader.runtime.utils;
+package cn.xiaozhou233.orangex.runtime.utils;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
