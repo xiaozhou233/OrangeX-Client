@@ -4,6 +4,8 @@ import cn.xiaozhou233.juiceagent.api.JuiceAgent;
 import cn.xiaozhou233.orangex.loader.classloader.GameClassLoaderResolver;
 
 import java.io.File;
+import java.lang.reflect.Method;
+import java.nio.file.Path;
 
 public class Loader {
     public static final String VERSION = "1.0.0-SNAPSHOT";
@@ -47,7 +49,7 @@ public class Loader {
             orangexFile = new File(OrangeXPath + "/OrangeX.jar");
         }
         System.out.println("OrangeX Injection: " + orangexFile.getAbsolutePath());
-        JuiceAgent.addToClassLoader(orangexFile.getAbsolutePath(), minecraftClassLoader);
+        addToGameClassLoader(orangexFile, minecraftClassLoader);
 
         // Start OrangeX
         try {
@@ -86,5 +88,45 @@ public class Loader {
         }
 
         return renderThread;
+    }
+
+    /**
+     * Fabric's KnotClassLoader keeps its own code-source list and rejects jars
+     * that were added with a plain URLClassLoader-style addURL. Expose the jar
+     * through KnotClassDelegate#addCodeSource, which updates both the code
+     * source list and the internal URL loader.
+     */
+    private static void addToGameClassLoader(File jar, ClassLoader loader) {
+        if (isKnotClassLoader(loader)) {
+            try {
+                addToKnotClassLoader(loader, jar.toPath());
+                return;
+            } catch (ReflectiveOperationException | RuntimeException e) {
+                System.err.println(
+                        "Failed to expose " + jar.getName()
+                                + " to Fabric KnotClassLoader: " + e);
+                e.printStackTrace();
+            }
+        }
+
+        JuiceAgent.addToClassLoader(jar.getAbsolutePath(), loader);
+    }
+
+    private static boolean isKnotClassLoader(ClassLoader loader) {
+        return loader != null
+                && "net.fabricmc.loader.impl.launch.knot.KnotClassLoader"
+                .equals(loader.getClass().getName());
+    }
+
+    private static void addToKnotClassLoader(ClassLoader loader, Path jar)
+            throws ReflectiveOperationException {
+        Method getDelegate = loader.getClass().getDeclaredMethod("getDelegate");
+        getDelegate.setAccessible(true);
+        Object delegate = getDelegate.invoke(loader);
+
+        Method addCodeSource = delegate.getClass()
+                .getMethod("addCodeSource", Path.class);
+        addCodeSource.setAccessible(true);
+        addCodeSource.invoke(delegate, jar);
     }
 }

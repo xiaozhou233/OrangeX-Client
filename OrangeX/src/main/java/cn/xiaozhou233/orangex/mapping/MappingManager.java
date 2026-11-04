@@ -31,15 +31,16 @@ public class MappingManager {
             }
 
             case V26_2: {
-                if (loaderType == LoaderType.VANILLA
-                        || loaderType == LoaderType.MCP
-                        || loaderType == LoaderType.NEOFORGE) {
-                    // 26.x runtimes use Mojang names for classes, fields and
-                    // methods, so no obfuscation mapping is needed.
+                // 26.x normally uses Mojang names. Fabric 26.2 currently ships
+                // empty intermediary mappings, so it also runs with Mojang
+                // names. Verify the runtime instead of trusting the loader type.
+                if (usesMojangNames(info)) {
                     resolver = new IdentityFallbackMappingResolver();
                 } else {
                     throw new RuntimeException(
-                            "Unsupported loader for 26.2: " + loaderType);
+                            "Unsupported runtime naming for 26.2 ("
+                                    + loaderType + "): expected "
+                                    + "net.minecraft.client.Minecraft");
                 }
 
                 break;
@@ -52,6 +53,20 @@ public class MappingManager {
 
     public static boolean isInitialized() {
         return resolver != null;
+    }
+
+    private static boolean usesMojangNames(RuntimeInfo info) {
+        ClassLoader loader = info.getMinecraftClassLoader();
+        if (loader == null) {
+            return false;
+        }
+
+        try {
+            Class.forName("net.minecraft.client.Minecraft", false, loader);
+            return true;
+        } catch (Throwable ignored) {
+            return false;
+        }
     }
 
     public static MappingResolver getResolver() {
