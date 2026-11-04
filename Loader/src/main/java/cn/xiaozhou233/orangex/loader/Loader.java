@@ -19,21 +19,15 @@ public class Loader {
         // Resolve the Minecraft ClassLoader (runtime detection itself lives in OrangeX)
         ClassLoader gameClassLoader = GameClassLoaderResolver.resolve();
 
-        // Find client thread
-        for (Thread t : Thread.getAllStackTraces().keySet()) {
-            if ("Client thread".equals(t.getName())) {
-                clientThread = t;
-                break;
-            }
-        }
-        if (clientThread == null) {
-            throw new IllegalStateException("Cannot find Minecraft client thread");
-        }
+        // Find the game thread. Modern clients use "Render thread"; legacy
+        // clients use "Client thread". It is only needed as a class loader
+        // fallback, so a miss here must not abort injection.
+        clientThread = findGameThread();
 
         // Get Minecraft ClassLoader (prefer the resolved game class loader)
         minecraftClassLoader = gameClassLoader != null
                 ? gameClassLoader
-                : clientThread.getContextClassLoader();
+                : clientThread != null ? clientThread.getContextClassLoader() : null;
         if (minecraftClassLoader == null) {
             throw new IllegalStateException("Cannot find Minecraft ClassLoader");
         }
@@ -68,5 +62,29 @@ public class Loader {
 
     public static boolean isDevEnvironment() {
         return Boolean.getBoolean("orangex.dev");
+    }
+
+    /**
+     * Legacy clients call the game thread "Client thread"; 1.13+ calls it
+     * "Render thread". Return whichever is available.
+     */
+    private static Thread findGameThread() {
+        Thread renderThread = null;
+
+        try {
+            for (Thread thread : Thread.getAllStackTraces().keySet()) {
+                String name = thread.getName();
+
+                if ("Client thread".equals(name)) {
+                    return thread;
+                }
+                if ("Render thread".equals(name) && renderThread == null) {
+                    renderThread = thread;
+                }
+            }
+        } catch (Throwable ignored) {
+        }
+
+        return renderThread;
     }
 }

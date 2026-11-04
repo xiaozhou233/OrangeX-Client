@@ -3,6 +3,7 @@ package cn.xiaozhou233.orangex.wrapper.internal;
 import cn.xiaozhou233.orangex.runtime.version.MinecraftVersion;
 import cn.xiaozhou233.orangex.wrapper.api.Minecraft;
 import cn.xiaozhou233.orangex.wrapper.internal.v1_8_9.V1_8_9WrapperProvider;
+import cn.xiaozhou233.orangex.wrapper.internal.v26_2.V26_2WrapperProvider;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -21,6 +22,7 @@ public final class WrapperRegistry {
 
     static {
         register(MinecraftVersion.V1_8_9, new V1_8_9WrapperProvider());
+        register(MinecraftVersion.V26_2, new V26_2WrapperProvider());
     }
 
     public static void register(MinecraftVersion version, WrapperProvider provider) {

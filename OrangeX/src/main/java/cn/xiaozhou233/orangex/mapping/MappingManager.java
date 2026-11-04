@@ -1,5 +1,6 @@
 package cn.xiaozhou233.orangex.mapping;
 
+import cn.xiaozhou233.orangex.mapping.impl.IdentityFallbackMappingResolver;
 import cn.xiaozhou233.orangex.mapping.impl.MCPMappingResolver;
 import cn.xiaozhou233.orangex.mapping.impl.SrgMappingResolver;
 import cn.xiaozhou233.orangex.runtime.RuntimeInfo;
@@ -24,6 +25,21 @@ public class MappingManager {
                     resolver = new SrgMappingResolver("mappings/forge189/joined.srg");
                 } else {
                     throw new RuntimeException("Unsupported loader for 1.8.9: " + loaderType);
+                }
+
+                break;
+            }
+
+            case V26_2: {
+                if (loaderType == LoaderType.VANILLA
+                        || loaderType == LoaderType.MCP
+                        || loaderType == LoaderType.NEOFORGE) {
+                    // 26.x runtimes use Mojang names for classes, fields and
+                    // methods, so no obfuscation mapping is needed.
+                    resolver = new IdentityFallbackMappingResolver();
+                } else {
+                    throw new RuntimeException(
+                            "Unsupported loader for 26.2: " + loaderType);
                 }
 
                 break;
