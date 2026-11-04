@@ -155,3 +155,6 @@ RuntimeDetector.debug(info);
    - 如果只需检查 marker 类，使用 `ClassPresenceLoaderProbe`。
    - 如果需要结构判断，实现 `LoaderProbe`。
 3. 如果新加载器需要专属版本签名，在 `VersionSignatureRegistry` 中使用 `VersionSignature.forLoader(...)`。
+
+版本检测完成后，如果需要为该版本提供跨版本 API，见
+[adding-wrapper-versions.md](adding-wrapper-versions.md)。

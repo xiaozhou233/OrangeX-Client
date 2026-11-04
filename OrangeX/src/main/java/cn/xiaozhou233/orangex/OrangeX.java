@@ -1,7 +1,10 @@
 package cn.xiaozhou233.orangex;
 
+import cn.xiaozhou233.orangex.mapping.MappingManager;
 import cn.xiaozhou233.orangex.runtime.RuntimeDetector;
 import cn.xiaozhou233.orangex.runtime.RuntimeInfo;
+import cn.xiaozhou233.orangex.wrapper.MinecraftFactory;
+import cn.xiaozhou233.orangex.wrapper.api.Minecraft;
 import lombok.Getter;
 
 public class OrangeX {
@@ -20,6 +23,11 @@ public class OrangeX {
 
         runtimeInfo = RuntimeDetector.detect();
         RuntimeDetector.debug(runtimeInfo);
+
+        MappingManager.init(runtimeInfo);
+
+        Minecraft minecraft = MinecraftFactory.create(runtimeInfo, MappingManager.getResolver());
+        System.out.println(minecraft.getMinecraft());
     }
 
     public void stop() {
