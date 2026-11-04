@@ -46,7 +46,9 @@ public final class V1_8_9Minecraft implements Minecraft {
                     "No mapping for field '" + INSTANCE_FIELD + "' on " + MINECRAFT_CLASS);
         }
 
-        String targetClassName = mappingMinecraft.getTargetName();
+        // Mapping files use internal names (a/b/C); Class.forName needs binary
+        // names (a.b.C). Vanilla target names such as "ave" are unaffected.
+        String targetClassName = mappingMinecraft.getTargetName().replace('/', '.');
         Class<?> minecraftClass;
         try {
             minecraftClass = Class.forName(

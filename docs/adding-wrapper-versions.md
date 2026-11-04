@@ -144,7 +144,7 @@ public final class V1_12_2Minecraft implements Minecraft {
         Class<?> minecraftClass;
         try {
             minecraftClass = Class.forName(
-                    mappingMinecraft.getTargetName(),
+                    mappingMinecraft.getTargetName().replace('/', '.'),
                     false,
                     runtimeInfo.getMinecraftClassLoader());
         } catch (ClassNotFoundException e) {
@@ -165,6 +165,8 @@ public final class V1_12_2Minecraft implements Minecraft {
 
 - 字段名、方法名、参数描述符统一使用 MCP 名称。
 - 通过 `MappingClass` / `MappingResolver` 转换成当前运行时名称。
+- 映射文件里的类名是 internal name（`a/b/C`），传给 `Class.forName`
+  前必须转成 binary name（`a.b.C`）；`getTargetName().replace('/', '.')`。
 - 私有字段用 `getDeclaredField` + `setAccessible(true)`，不要用
   `getField`（它只能找到 public 字段）。
 - 需要跨线程访问的单例缓存加 `synchronized` 或 `volatile`。
