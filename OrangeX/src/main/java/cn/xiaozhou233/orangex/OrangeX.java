@@ -47,7 +47,7 @@ public class OrangeX {
                 runtimeInfo, MappingManager.getResolver(), minecraft.getMinecraft());
         System.out.println("[OrangeX] Font backend: " + render2DManager.getBackendName());
 
-        if (Boolean.getBoolean("orangex.debugFont")) {
+        if (!"false".equalsIgnoreCase(System.getProperty("orangex.debugFont", "true"))) {
             eventBus.register(new FontDebugOverlay());
         }
 
