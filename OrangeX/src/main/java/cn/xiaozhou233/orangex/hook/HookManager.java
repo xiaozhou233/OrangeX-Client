@@ -16,6 +16,7 @@ public final class HookManager {
 
     private HookManager() {
         register(new TickHook());
+        register(new Render2DHook());
     }
 
     public void register(ClassHook hook) {
