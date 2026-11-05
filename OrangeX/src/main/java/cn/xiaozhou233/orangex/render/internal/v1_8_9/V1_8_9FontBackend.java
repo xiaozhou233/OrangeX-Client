@@ -26,7 +26,8 @@ public final class V1_8_9FontBackend implements FontBackend {
     private final RuntimeInfo runtimeInfo;
     private final MappingResolver resolver;
     private final Object minecraft;
-    private final V1_8_9GlyphDrawer drawer = new V1_8_9GlyphDrawer();
+    private final V1_8_9RenderState state = new V1_8_9RenderState();
+    private final V1_8_9GlyphDrawer drawer = new V1_8_9GlyphDrawer(state);
 
     public V1_8_9FontBackend(RuntimeInfo runtimeInfo,
                              MappingResolver resolver,
@@ -80,7 +81,7 @@ public final class V1_8_9FontBackend implements FontBackend {
 
     @Override
     public Render2D createRender2D(FontManager fonts, Object platformContext) {
-        return new V1_8_9Render2D(fonts, runtimeInfo, resolver, minecraft, drawer);
+        return new V1_8_9Render2D(fonts, runtimeInfo, resolver, minecraft, drawer, state);
     }
 
     @Override

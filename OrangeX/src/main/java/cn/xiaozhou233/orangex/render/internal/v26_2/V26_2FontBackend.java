@@ -7,10 +7,6 @@ import cn.xiaozhou233.orangex.render.internal.FontBackend;
 import cn.xiaozhou233.orangex.render.internal.FontTexture;
 import cn.xiaozhou233.orangex.runtime.RuntimeInfo;
 
-import java.lang.reflect.Constructor;
-import java.nio.ByteBuffer;
-import java.util.function.Supplier;
-
 /**
  * 26.x backend.
  *
@@ -21,64 +17,36 @@ import java.util.function.Supplier;
 public final class V26_2FontBackend implements FontBackend {
 
     private final ClassLoader loader;
+    private final V26_2ShapeCache shapes;
 
     public V26_2FontBackend(RuntimeInfo runtimeInfo) {
         this.loader = runtimeInfo.getMinecraftClassLoader();
+        this.shapes = new V26_2ShapeCache(loader);
     }
 
     @Override
     public FontTexture createTexture(FontAtlas atlas) {
-        try {
-            int width = atlas.getWidth();
-            int height = atlas.getHeight();
-            byte[] coverage = atlas.getPixels();
+        int width = atlas.getWidth();
+        int height = atlas.getHeight();
+        byte[] coverage = atlas.getPixels();
 
-            byte[] rgba = new byte[coverage.length * 4];
-            for (int i = 0, j = 0; i < coverage.length; i++, j += 4) {
-                rgba[j] = (byte) 0xFF;
-                rgba[j + 1] = (byte) 0xFF;
-                rgba[j + 2] = (byte) 0xFF;
-                rgba[j + 3] = coverage[i];
-            }
-
-            Class<?> nativeImageClass = Class.forName(
-                    "com.mojang.blaze3d.platform.NativeImage", false, loader);
-            Constructor<?> nativeImageConstructor = nativeImageClass
-                    .getDeclaredConstructor(int.class, int.class, boolean.class);
-            Object image = nativeImageConstructor.newInstance(width, height, false);
-            ByteBuffer buffer = (ByteBuffer) nativeImageClass
-                    .getMethod("getPixelBytes").invoke(image);
-            buffer.put(rgba);
-
-            Class<?> dynamicTextureClass = Class.forName(
-                    "net.minecraft.client.renderer.texture.DynamicTexture", false, loader);
-            Constructor<?> dynamicTextureConstructor = dynamicTextureClass
-                    .getDeclaredConstructor(Supplier.class, nativeImageClass);
-            Object dynamicTexture = dynamicTextureConstructor.newInstance(
-                    new Supplier<String>() {
-                        @Override
-                        public String get() {
-                            return "OrangeX font atlas";
-                        }
-                    },
-                    image);
-
-            Object textureView = dynamicTextureClass.getMethod("getTextureView")
-                    .invoke(dynamicTexture);
-            Object sampler = dynamicTextureClass.getMethod("getSampler")
-                    .invoke(dynamicTexture);
-
-            return new V26_2FontTexture(dynamicTexture, textureView, sampler,
-                    width, height);
-        } catch (Throwable throwable) {
-            throw new IllegalStateException("Cannot upload the 26.2 font atlas",
-                    throwable);
+        byte[] rgba = new byte[coverage.length * 4];
+        for (int i = 0, j = 0; i < coverage.length; i++, j += 4) {
+            rgba[j] = (byte) 0xFF;
+            rgba[j + 1] = (byte) 0xFF;
+            rgba[j + 2] = (byte) 0xFF;
+            rgba[j + 3] = coverage[i];
         }
+
+        V26_2GpuTexture texture = V26_2TextureHelper.create(
+                loader, width, height, rgba);
+        return new V26_2FontTexture(texture.texture, texture.textureView,
+                texture.sampler, width, height);
     }
 
     @Override
     public Render2D createRender2D(FontManager fonts, Object platformContext) {
-        return new V26_2Render2D(fonts, platformContext, loader);
+        return new V26_2Render2D(fonts, platformContext, loader, shapes);
     }
 
     @Override

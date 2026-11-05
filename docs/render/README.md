@@ -8,6 +8,7 @@
 | --- | --- |
 | [vape-font-gui-rendering.md](vape-font-gui-rendering.md) | Vape 4.21 的字体光栅化、文本排版、GUI 组件树、双渲染后端与 1.7.10–26.2 跨版本路径分析 |
 | [font-port.md](font-port.md) | OrangeX 的字体移植实现：TTF 烘焙、Render2D API、1.8.9 / 26.2 接入、调试参数与限制 |
+| [gui-rendering.md](gui-rendering.md) | 2D GUI 绘制层：矩形、渐变、圆角、描边、直线、裁剪及两版本实现 |
 
 ## 快速导航
 

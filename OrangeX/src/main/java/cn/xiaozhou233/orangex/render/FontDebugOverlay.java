@@ -14,6 +14,13 @@ public final class FontDebugOverlay {
     @Subscribe(threadMode = ThreadMode.POSTING)
     public void onRender2D(EventRender2D event) {
         Render2D render2D = event.getRender2D();
+
+        render2D.fillRoundedRect(4, 4, 250, 120, 8,
+                1.0, 0xD0141414, 0xFF303030);
+        render2D.fillGradient(10, 112, 238, 6,
+                0xFF55FFFF, 0xFF55FF55);
+        render2D.drawLine(10, 124, 248, 124, 1.0, 0x80FFFFFF);
+
         FontRenderer title = render2D.getFont(14.0f, true);
         FontRenderer body = render2D.getFont(10.0f, false);
 

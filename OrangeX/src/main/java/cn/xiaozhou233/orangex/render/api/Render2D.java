@@ -20,6 +20,28 @@ public interface Render2D {
 
     FontRenderer getFont(float size, boolean bold);
 
+    void fillRect(double x, double y, double width, double height, int argb);
+
+    void fillGradient(double x, double y, double width, double height,
+                      int topArgb, int bottomArgb);
+
+    void drawRect(double x, double y, double width, double height,
+                  double thickness, int argb);
+
+    void fillRoundedRect(double x, double y, double width, double height,
+                         double radius, int argb);
+
+    void fillRoundedRect(double x, double y, double width, double height,
+                         double radius, double borderWidth,
+                         int argb, int borderArgb);
+
+    void drawLine(double x1, double y1, double x2, double y2,
+                  double thickness, int argb);
+
+    void enableScissor(double x, double y, double width, double height);
+
+    void disableScissor();
+
     /**
      * Framework-internal: restores any state the backend changed for this
      * frame. Feature code should not call it.
