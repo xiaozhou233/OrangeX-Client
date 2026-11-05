@@ -41,6 +41,9 @@ tasks.named('shadowJar') {
 
 shadowJar {
     relocate 'com.google.gson', 'cn.xiaozhou233.orangex.shaded.gson'
-    relocate 'org.javassist', 'cn.xiaozhou233.orangex.shaded.javassist'
+    // Javassist must live in OrangeX's own namespace: Forge's
+    // LaunchClassLoader delegates the "javassist." package to its parent,
+    // which cannot see the injected jar.
+    relocate 'javassist', 'cn.xiaozhou233.orangex.shaded.javassist'
     relocate 'org.greenrobot.eventbus', 'cn.xiaozhou233.orangex.shaded.eventbus'
 }
