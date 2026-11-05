@@ -49,6 +49,9 @@ public class Loader {
             orangexFile = new File(OrangeXPath + "/OrangeX.jar");
         }
         System.out.println("OrangeX Injection: " + orangexFile.getAbsolutePath());
+        // javassist's ClassPool cannot always discover this jar through the
+        // game ClassLoader, so expose the path to OrangeX explicitly.
+        System.setProperty("orangex.jar", orangexFile.getAbsolutePath());
         addToGameClassLoader(orangexFile, minecraftClassLoader);
 
         // Start OrangeX

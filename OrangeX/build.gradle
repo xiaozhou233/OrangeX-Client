@@ -17,6 +17,16 @@ dependencies {
 
     // Source: https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation 'com.google.code.gson:gson:2.15.0'
+
+    // Source: https://mvnrepository.com/artifact/org.javassist/javassist
+    implementation 'org.javassist:javassist:3.33.0-GA'
+
+    // Source: https://mvnrepository.com/artifact/org.greenrobot/eventbus
+    implementation 'org.greenrobot:eventbus:3.2.0'
+
+    // JuiceAgent is provided at runtime by the agent (see JuiceAgentBridge).
+    // Do NOT bundle it: Fabric's KnotClassLoader would load a second copy of
+    // the API whose native methods are not registered.
 }
 
 tasks.named('shadowJar') {
@@ -26,4 +36,6 @@ tasks.named('shadowJar') {
 
 shadowJar {
     relocate 'com.google.gson', 'cn.xiaozhou233.orangex.shaded.gson'
+    relocate 'org.javassist', 'cn.xiaozhou233.orangex.shaded.javassist'
+    relocate 'org.greenrobot.eventbus', 'cn.xiaozhou233.orangex.shaded.eventbus'
 }
