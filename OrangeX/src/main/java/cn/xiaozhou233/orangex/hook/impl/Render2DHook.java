@@ -10,6 +10,8 @@ import cn.xiaozhou233.orangex.runtime.loader.LoaderType;
 import javassist.CtClass;
 import javassist.CtMethod;
 
+import java.lang.reflect.Modifier;
+
 /**
  * Fires {@link cn.xiaozhou233.orangex.event.impl.EventRender2D} once per frame.
  *
@@ -60,6 +62,31 @@ public final class Render2DHook extends ClassHook {
         }
     }
 
+    /**
+     * Finds the HUD entry point in a Forge class whose member names depend on
+     * the remapping stage (Notch {@code a}, SRG {@code func_175180_a}, MCP
+     * {@code renderGameOverlay}).
+     */
+    private static CtMethod findFloatOverlayMethod(CtClass ctClass) {
+        CtMethod fallback = null;
+        for (CtMethod method : ctClass.getDeclaredMethods()) {
+            if (!"(F)V".equals(method.getSignature())
+                    || Modifier.isStatic(method.getModifiers())) {
+                continue;
+            }
+            String name = method.getName();
+            if ("renderGameOverlay".equals(name)
+                    || "func_175180_a".equals(name)
+                    || "a".equals(name)) {
+                return method;
+            }
+            if (fallback == null) {
+                fallback = method;
+            }
+        }
+        return fallback;
+    }
+
     @Override
     protected void transform(CtClass ctClass) throws Exception {
         switch (runtimeInfo.getMinecraftVersion()) {
@@ -68,9 +95,20 @@ public final class Render2DHook extends ClassHook {
                 String methodDescriptor;
                 if (runtimeInfo.getLoaderType() == LoaderType.FORGE
                         && classPresent("net.minecraftforge.client.GuiIngameForge")) {
-                    // Forge's GuiIngameForge is not obfuscated.
-                    methodName = "renderGameOverlay";
-                    methodDescriptor = "(F)V";
+                    // Forge's GuiIngameForge is remapped to SRG names at
+                    // runtime (func_175180_a), but the universal jar contains
+                    // the Notch name (a). Locate the override by its descriptor
+                    // instead of hardcoding any of them.
+                    CtMethod method = findFloatOverlayMethod(ctClass);
+                    if (method == null) {
+                        throw new IllegalStateException(
+                                "No (F)V HUD method found in " + ctClass.getName());
+                    }
+                    method.insertAfter("Render2DEvents.fire(null);");
+                    System.out.println("[OrangeX] Render2DHook injected: "
+                            + ctClass.getName() + "#" + method.getName()
+                            + method.getSignature());
+                    return;
                 } else {
                     MappingMethod target = resolver.mapMethod(
                             "net/minecraft/client/gui/GuiIngame",
