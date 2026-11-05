@@ -25,13 +25,15 @@ final class V1_8_9Render2D implements Render2D {
 
     private final FontManager fonts;
     private final double guiScale;
-    private final V1_8_9GlyphDrawer drawer = new V1_8_9GlyphDrawer();
+    private final V1_8_9GlyphDrawer drawer;
     private final int width;
     private final int height;
 
     V1_8_9Render2D(FontManager fonts, RuntimeInfo runtimeInfo,
-                   MappingResolver resolver, Object minecraft) {
+                   MappingResolver resolver, Object minecraft,
+                   V1_8_9GlyphDrawer drawer) {
         this.fonts = fonts;
+        this.drawer = drawer;
 
         int resolvedWidth = 854;
         int resolvedHeight = 480;

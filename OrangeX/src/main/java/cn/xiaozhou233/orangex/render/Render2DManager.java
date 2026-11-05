@@ -18,7 +18,6 @@ public final class Render2DManager {
 
     private final FontBackend backend;
     private final FontManager fonts;
-    private boolean hookLogged;
 
     public Render2DManager(RuntimeInfo runtimeInfo,
                            MappingResolver mappingResolver,
@@ -30,14 +29,7 @@ public final class Render2DManager {
 
     public void fire(Object platformContext) {
         EventBus eventBus = OrangeX.getInstance().getEventBus();
-        boolean hasSubscribers = eventBus.hasSubscriberForEvent(EventRender2D.class);
-        if (!hookLogged) {
-            hookLogged = true;
-            System.out.println("[OrangeX] Render2D hook fired; subscribers="
-                    + hasSubscribers + ", context="
-                    + (platformContext == null ? "null" : platformContext.getClass().getName()));
-        }
-        if (!hasSubscribers) {
+        if (!eventBus.hasSubscriberForEvent(EventRender2D.class)) {
             return;
         }
 

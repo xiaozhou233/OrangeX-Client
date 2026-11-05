@@ -22,8 +22,6 @@ import java.lang.reflect.Method;
  */
 final class V26_2Render2D implements Render2D {
 
-    private static boolean contextLogged;
-
     private final FontManager fonts;
     private final V26_2GlyphDrawer drawer;
     private final int width;
@@ -60,12 +58,6 @@ final class V26_2Render2D implements Render2D {
                     .invoke(window);
             this.guiScale = Math.max(1, (Integer) window.getClass()
                     .getMethod("getGuiScale").invoke(window));
-
-            if (!contextLogged) {
-                contextLogged = true;
-                System.out.println("[OrangeX] 26.2 Render2D: "
-                        + width + "x" + height + " scale=" + guiScale);
-            }
 
             Class<?> pipelineClass = Class.forName(
                     "com.mojang.blaze3d.pipeline.RenderPipeline", false, loader);

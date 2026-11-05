@@ -26,6 +26,7 @@ public final class V1_8_9FontBackend implements FontBackend {
     private final RuntimeInfo runtimeInfo;
     private final MappingResolver resolver;
     private final Object minecraft;
+    private final V1_8_9GlyphDrawer drawer = new V1_8_9GlyphDrawer();
 
     public V1_8_9FontBackend(RuntimeInfo runtimeInfo,
                              MappingResolver resolver,
@@ -71,11 +72,6 @@ public final class V1_8_9FontBackend implements FontBackend {
                 atlas.getWidth(), atlas.getHeight(), 0,
                 GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
 
-        int glError = GL11.glGetError();
-        System.out.println("[OrangeX] Font texture uploaded: id=" + textureId
-                + " size=" + atlas.getWidth() + "x" + atlas.getHeight()
-                + " glError=" + glError);
-
         GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, previousAlignment);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, previousTexture);
         GL13.glActiveTexture(previousActiveTexture);
@@ -84,7 +80,7 @@ public final class V1_8_9FontBackend implements FontBackend {
 
     @Override
     public Render2D createRender2D(FontManager fonts, Object platformContext) {
-        return new V1_8_9Render2D(fonts, runtimeInfo, resolver, minecraft);
+        return new V1_8_9Render2D(fonts, runtimeInfo, resolver, minecraft, drawer);
     }
 
     @Override

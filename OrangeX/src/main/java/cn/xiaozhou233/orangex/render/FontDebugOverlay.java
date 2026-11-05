@@ -11,17 +11,9 @@ import org.greenrobot.eventbus.ThreadMode;
  */
 public final class FontDebugOverlay {
 
-    private static boolean logged;
-
     @Subscribe(threadMode = ThreadMode.POSTING)
     public void onRender2D(EventRender2D event) {
         Render2D render2D = event.getRender2D();
-        if (!logged) {
-            logged = true;
-            System.out.println("[OrangeX] Render2D event: "
-                    + render2D.getWidth() + "x" + render2D.getHeight()
-                    + " scale=" + render2D.getGuiScale());
-        }
         FontRenderer title = render2D.getFont(14.0f, true);
         FontRenderer body = render2D.getFont(10.0f, false);
 

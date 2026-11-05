@@ -133,10 +133,10 @@ drawScale    = logicalSize / rasterHeight
 > 启动器会读取 `%USERPROFILE%\.orangex\OrangeX.jar`。改完代码后必须把新
 > jar 同步过去，否则会出现“MCP 正常、其他版本没反应”。
 
-调试 Overlay 默认开启；不需要时加：
+调试 Overlay 默认关闭；需要时加：
 
 ```text
--Dorangex.debugFont=false
+-Dorangex.debugFont=true
 ```
 
 会在屏幕左上角绘制：
@@ -159,8 +159,6 @@ ASCII 0123456789
 
 ```text
 [OrangeX] Font backend: 1.8.9/GL11
-[OrangeX] Baked proxima 20px (191 glyphs, 33 ms)
-[OrangeX] Baked noto 28px (... glyphs, ... ms)
 ```
 
 ## 6. 添加新版本

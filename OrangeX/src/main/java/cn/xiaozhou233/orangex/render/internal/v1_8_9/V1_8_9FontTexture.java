@@ -1,6 +1,7 @@
 package cn.xiaozhou233.orangex.render.internal.v1_8_9;
 
 import cn.xiaozhou233.orangex.render.internal.FontTexture;
+import org.lwjgl.opengl.GL11;
 
 public final class V1_8_9FontTexture implements FontTexture {
 
@@ -30,6 +31,6 @@ public final class V1_8_9FontTexture implements FontTexture {
 
     @Override
     public void close() {
-        org.lwjgl.opengl.GL11.glDeleteTextures(textureId);
+        GL11.glDeleteTextures(textureId);
     }
 }

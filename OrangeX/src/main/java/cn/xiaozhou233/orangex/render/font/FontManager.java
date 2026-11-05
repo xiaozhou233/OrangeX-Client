@@ -56,7 +56,6 @@ public final class FontManager {
         }
 
         byte[] data = loadFont(family.getResource(bold));
-        long start = System.currentTimeMillis();
         FontAtlas atlas = StbFontBaker.bake(
                 data,
                 rasterHeight,
@@ -69,11 +68,6 @@ public final class FontManager {
         float drawScale = logicalSize / (float) rasterHeight;
         FontFace face = new FontFace(family, atlas, texture, logicalSize, drawScale);
         faces.put(key, face);
-
-        System.out.println("[OrangeX] Baked " + family.name().toLowerCase()
-                + (bold ? "-bold" : "") + " " + rasterHeight + "px ("
-                + atlas.getGlyphs().size() + " glyphs, "
-                + (System.currentTimeMillis() - start) + " ms)");
         return face;
     }
 

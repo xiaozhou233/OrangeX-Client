@@ -68,8 +68,6 @@ public final class V26_2FontBackend implements FontBackend {
             Object sampler = dynamicTextureClass.getMethod("getSampler")
                     .invoke(dynamicTexture);
 
-            System.out.println("[OrangeX] 26.2 font texture created: "
-                    + width + "x" + height);
             return new V26_2FontTexture(dynamicTexture, textureView, sampler,
                     width, height);
         } catch (Throwable throwable) {

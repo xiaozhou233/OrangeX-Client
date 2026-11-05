@@ -11,8 +11,6 @@ import java.lang.reflect.Method;
  */
 final class V26_2GlyphDrawer implements GlyphDrawer {
 
-    private static boolean firstDrawLogged;
-
     private final Object extractor;
     private final Method innerBlit;
     private final Object guiPipeline;
@@ -46,12 +44,6 @@ final class V26_2GlyphDrawer implements GlyphDrawer {
                     glyph.getU0(), glyph.getU1(),
                     glyph.getV0(), glyph.getV1(),
                     argb);
-            if (!firstDrawLogged) {
-                firstDrawLogged = true;
-                System.out.println("[OrangeX] 26.2 first glyph blit: "
-                        + x0 + "," + y0 + " -> " + x1 + "," + y1
-                        + " tex=" + fontTexture.getTextureView());
-            }
         } catch (Throwable throwable) {
             throw new IllegalStateException("Failed to submit a GUI glyph", throwable);
         }

@@ -105,9 +105,6 @@ public final class Render2DHook extends ClassHook {
                                 "No (F)V HUD method found in " + ctClass.getName());
                     }
                     method.insertAfter("Render2DEvents.fire(null);");
-                    System.out.println("[OrangeX] Render2DHook injected: "
-                            + ctClass.getName() + "#" + method.getName()
-                            + method.getSignature());
                     return;
                 } else {
                     MappingMethod target = resolver.mapMethod(
@@ -119,8 +116,6 @@ public final class Render2DHook extends ClassHook {
                 }
                 CtMethod method = ctClass.getMethod(methodName, methodDescriptor);
                 method.insertAfter("Render2DEvents.fire(null);");
-                System.out.println("[OrangeX] Render2DHook injected: "
-                        + ctClass.getName() + "#" + methodName + methodDescriptor);
                 break;
             }
             case V26_2: {
@@ -131,9 +126,6 @@ public final class Render2DHook extends ClassHook {
                 CtMethod method = ctClass.getMethod(
                         target.getTargetName(), target.getTargetDescriptor());
                 method.insertAfter("Render2DEvents.fire($0);");
-                System.out.println("[OrangeX] Render2DHook injected: "
-                        + ctClass.getName() + "#" + target.getTargetName()
-                        + target.getTargetDescriptor());
                 break;
             }
             default:

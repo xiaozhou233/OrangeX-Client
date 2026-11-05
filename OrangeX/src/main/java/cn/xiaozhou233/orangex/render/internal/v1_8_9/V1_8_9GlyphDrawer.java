@@ -5,6 +5,7 @@ import cn.xiaozhou233.orangex.render.internal.FontTexture;
 import cn.xiaozhou233.orangex.render.internal.GlyphDrawer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 
 import java.nio.FloatBuffer;
 
@@ -14,7 +15,6 @@ import java.nio.FloatBuffer;
 final class V1_8_9GlyphDrawer implements GlyphDrawer {
 
     private int boundTexture = -1;
-    private static boolean firstDrawLogged;
 
     private boolean initialized;
     private boolean previousBlend;
@@ -42,13 +42,6 @@ final class V1_8_9GlyphDrawer implements GlyphDrawer {
         if (textureId != boundTexture) {
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
             boundTexture = textureId;
-        }
-
-        if (!firstDrawLogged) {
-            firstDrawLogged = true;
-            System.out.println("[OrangeX] Font first glyph draw: tex=" + textureId
-                    + " penX=" + penX + " baseline=" + baseline
-                    + " scale=" + scale + " glError=" + GL11.glGetError());
         }
 
         float red = ((argb >> 16) & 0xFF) / 255.0f;
@@ -91,7 +84,7 @@ final class V1_8_9GlyphDrawer implements GlyphDrawer {
         setEnabled(GL11.GL_FOG, previousFog);
         GL11.glTexEnvi(GL11.GL_TEXTURE_ENV,
                 GL11.GL_TEXTURE_ENV_MODE, previousTextureEnvMode);
-        org.lwjgl.opengl.GL13.glActiveTexture(previousActiveTexture);
+        GL13.glActiveTexture(previousActiveTexture);
         initialized = false;
         boundTexture = -1;
     }
@@ -113,8 +106,8 @@ final class V1_8_9GlyphDrawer implements GlyphDrawer {
         previousFog = GL11.glIsEnabled(GL11.GL_FOG);
         previousTextureEnvMode = GL11.glGetTexEnvi(GL11.GL_TEXTURE_ENV,
                 GL11.GL_TEXTURE_ENV_MODE);
-        previousActiveTexture = GL11.glGetInteger(org.lwjgl.opengl.GL13.GL_ACTIVE_TEXTURE);
-        org.lwjgl.opengl.GL13.glActiveTexture(org.lwjgl.opengl.GL13.GL_TEXTURE0);
+        previousActiveTexture = GL11.glGetInteger(GL13.GL_ACTIVE_TEXTURE);
+        GL13.glActiveTexture(GL13.GL_TEXTURE0);
 
         previousColor.clear();
         GL11.glGetFloat(GL11.GL_CURRENT_COLOR, previousColor);
