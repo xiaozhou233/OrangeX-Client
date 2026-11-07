@@ -96,16 +96,6 @@ public final class V26_2Minecraft implements Minecraft {
     }
 
     @Override
-    public boolean isToggleKeyDown() {
-        return input().isToggleKeyDown();
-    }
-
-    @Override
-    public boolean isToggleEventDriven() {
-        return input().isToggleEventDriven();
-    }
-
-    @Override
     public double getGuiMouseX() {
         return input().getGuiMouseX();
     }

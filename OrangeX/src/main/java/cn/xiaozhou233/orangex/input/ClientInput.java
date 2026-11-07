@@ -16,8 +16,7 @@ import cn.xiaozhou233.orangex.wrapper.api.Minecraft;
 public final class ClientInput {
 
     /**
-     * GUI toggle key. The actual key code is version-specific and is handled
-     * by {@code VersionInput}; this is only for documentation.
+     * GUI toggle key name. The canonical key code is {@link KeyCodes#M}.
      */
     public static final String TOGGLE_KEY_NAME = "M";
 
@@ -28,7 +27,6 @@ public final class ClientInput {
     private static volatile boolean rightDown;
     private static volatile boolean middleDown;
 
-    private static boolean toggleWasDown;
     private static boolean started;
     private static boolean pendingOpen;
     private static boolean pendingClose;
@@ -37,7 +35,9 @@ public final class ClientInput {
     }
 
     /**
-     * Called once per client tick by {@link InputController}.
+     * Called once per client tick by {@link InputController}. The toggle
+     * itself is event-driven on every supported version; this only reconciles
+     * the tracked state with the actual Minecraft screen.
      */
     public static void tick(Minecraft minecraft) {
         if (!started) {
@@ -52,39 +52,17 @@ public final class ClientInput {
         } else if (!open && screenOpen) {
             onScreenOpened(minecraft.getGuiMouseX(), minecraft.getGuiMouseY());
         }
-
-        boolean down = minecraft.isToggleKeyDown();
-
-        if (minecraft.isToggleEventDriven()) {
-            // 1.8.9 opens from KeyBinding#onTick (pendingOpen). Closing is
-            // polled here and applied at the end of the tick so the same key
-            // event is not also delivered to the freshly opened screen.
-            if (open && down && !toggleWasDown) {
-                pendingClose = true;
-            }
-        } else if (down && !toggleWasDown) {
-            // 26.2: no injected Screen subclass key handling, so opening /
-            // closing here cannot bounce.
-            if (open) {
-                minecraft.closeInputScreen();
-            } else if (minecraft.isInWorld() && !minecraft.isScreenOpen()) {
-                minecraft.openInputScreen();
-            }
-        }
-
-        toggleWasDown = down;
     }
 
     /**
-     * Applies a queued 1.8.9 toggle after the tick's keyboard/mouse handling.
+     * Applies queued open / close requests after the tick's keyboard and mouse
+     * handling.
      */
     public static void applyPending(Minecraft minecraft) {
         if (pendingOpen) {
             pendingOpen = false;
             if (!open && minecraft.isInWorld() && !minecraft.isScreenOpen()) {
                 minecraft.openInputScreen();
-                // The key event that opened the screen is still held down.
-                toggleWasDown = true;
             }
         }
 
@@ -92,7 +70,6 @@ public final class ClientInput {
             pendingClose = false;
             if (open) {
                 minecraft.closeInputScreen();
-                toggleWasDown = true;
             }
         }
     }
@@ -103,6 +80,23 @@ public final class ClientInput {
 
     public static void requestClose() {
         pendingClose = true;
+    }
+
+    /**
+     * Handles a key event posted on the EventBus. Only the canonical toggle
+     * key (M) changes the GUI state; all other keys are ignored here but stay
+     * available to other subscribers.
+     */
+    public static void onKey(Minecraft minecraft, int key) {
+        if (minecraft == null || key != KeyCodes.M) {
+            return;
+        }
+
+        if (minecraft.isInputScreenOpen()) {
+            requestClose();
+        } else if (minecraft.isInWorld() && !minecraft.isScreenOpen()) {
+            requestOpen();
+        }
     }
 
     public static void onMouseMove(double x, double y) {
@@ -117,7 +111,6 @@ public final class ClientInput {
         open = true;
         mouseX = x;
         mouseY = y;
-        toggleWasDown = true;
         System.out.println("[OrangeX] Input screen opened");
     }
 

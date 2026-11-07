@@ -3,7 +3,6 @@ package cn.xiaozhou233.orangex.input.v26_2;
 import cn.xiaozhou233.orangex.input.ClientInput;
 import cn.xiaozhou233.orangex.input.internal.VersionInput;
 import cn.xiaozhou233.orangex.runtime.RuntimeInfo;
-import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 
@@ -14,9 +13,6 @@ import net.minecraft.client.gui.screens.Screen;
  * of these references.</p>
  */
 public final class V26_2Input implements VersionInput {
-
-    /** GLFW_KEY_M. */
-    private static final int TOGGLE_KEY = 77;
 
     private final Minecraft minecraft;
 
@@ -66,16 +62,6 @@ public final class V26_2Input implements VersionInput {
         minecraft.gui.setScreen(null);
         shellScreen = null;
         ClientInput.reset();
-    }
-
-    @Override
-    public boolean isToggleKeyDown() {
-        return InputConstants.isKeyDown(minecraft.getWindow(), TOGGLE_KEY);
-    }
-
-    @Override
-    public boolean isToggleEventDriven() {
-        return false;
     }
 
     @Override

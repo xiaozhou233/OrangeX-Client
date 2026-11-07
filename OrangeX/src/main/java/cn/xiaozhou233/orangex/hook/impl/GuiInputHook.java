@@ -57,11 +57,11 @@ public final class GuiInputHook extends ClassHook {
         injectBefore(ctClass, "mouseClickMove", "(IIIJ)V",
                 "orangexbridge.Hooks.inputDrag($0, $1, $2, $3);");
 
-        // Close with M while the empty screen is open. Repeat events are
-        // ignored so holding the key does not bounce the screen.
+        // Forward every key typed on our empty screen as an EventKey. The
+        // facade only consumes the toggle key so ESC and other keys keep
+        // their vanilla Screen behaviour.
         injectBefore(ctClass, "keyTyped", "(CI)V",
-                "if ($2 == orangexbridge.Legacy.TOGGLE_KEY"
-                        + " && !orangexbridge.Legacy.isRepeatEvent()"
+                "if (!orangexbridge.Legacy.isRepeatEvent()"
                         + " && orangexbridge.Hooks.inputKeyTyped($0, $2)) return;");
 
         // The empty screen is an overlay: it must not pause singleplayer.

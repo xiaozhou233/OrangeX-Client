@@ -36,9 +36,6 @@ import java.lang.reflect.Modifier;
  */
 public final class V1_8_9Input implements VersionInput {
 
-    /** LWJGL 2 {@code Keyboard.KEY_M}. */
-    public static final int TOGGLE_KEY = Keyboard.KEY_M;
-
     private static final String MINECRAFT_CLASS = "net/minecraft/client/Minecraft";
     private static final String GUI_SCREEN_CLASS = "net/minecraft/client/gui/GuiScreen";
     private static final String GENERATED_SCREEN =
@@ -272,16 +269,6 @@ public final class V1_8_9Input implements VersionInput {
         } catch (ReflectiveOperationException e) {
             throw new IllegalStateException("Cannot close the 1.8.9 input screen", e);
         }
-    }
-
-    @Override
-    public boolean isToggleKeyDown() {
-        return Keyboard.isKeyDown(TOGGLE_KEY);
-    }
-
-    @Override
-    public boolean isToggleEventDriven() {
-        return true;
     }
 
     /**

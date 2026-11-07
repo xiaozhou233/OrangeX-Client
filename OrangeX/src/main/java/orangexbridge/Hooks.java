@@ -61,6 +61,10 @@ public final class Hooks {
         InputEvents.onKeyPressed(keyCode);
     }
 
+    public static void inputGlfwKeyPressed(int glfwKeyCode) {
+        InputEvents.onGlfwKeyPressed(glfwKeyCode);
+    }
+
     public static boolean isOurScreen(Object screen) {
         return InputEvents.isOurInputScreen(screen);
     }

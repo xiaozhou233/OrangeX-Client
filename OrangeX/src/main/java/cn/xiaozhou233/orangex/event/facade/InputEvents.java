@@ -2,19 +2,20 @@ package cn.xiaozhou233.orangex.event.facade;
 
 import cn.xiaozhou233.orangex.OrangeX;
 import cn.xiaozhou233.orangex.input.ClientInput;
+import cn.xiaozhou233.orangex.input.KeyCodes;
 import cn.xiaozhou233.orangex.wrapper.api.Minecraft;
 
 /**
- * Entry point used by injected 1.8.9 {@code GuiScreen} / {@code KeyBinding}
- * code.
+ * Input entry point shared by injected 1.8.9 code and the 26.2 input screen.
  *
  * <p>Every vanilla screen goes through these methods, so each callback first
- * checks whether the instance is the empty input screen created by OrangeX.</p>
+ * checks whether the instance is the empty input screen created by OrangeX.
+ * Key events are not handled here: they are posted as
+ * {@link cn.xiaozhou233.orangex.event.impl.EventKey} so features can subscribe
+ * to them, and {@link cn.xiaozhou233.orangex.input.InputController} consumes
+ * the GUI toggle.</p>
  */
 public final class InputEvents {
-
-    /** LWJGL 2 {@code Keyboard.KEY_M}. */
-    private static final int KEY_M = 50;
 
     private static final boolean DEBUG = Boolean.getBoolean("orangex.debugInput");
 
@@ -36,44 +37,34 @@ public final class InputEvents {
 
     /**
      * Called from {@code KeyBinding#onTick(int)} for every key press while no
-     * screen is open. This queues the 1.8.9 open; it is applied at the end of
-     * the tick so the same key event is not also delivered to the new screen.
+     * screen is open. The injected code already dropped auto-repeat events.
      */
     public static void onKeyPressed(int keyCode) {
-        if (keyCode != KEY_M) {
-            return;
+        if (DEBUG) {
+            System.out.println("[OrangeX] key pressed: " + keyCode);
         }
-        try {
-            Minecraft minecraft = minecraft();
-            if (minecraft == null || minecraft.isScreenOpen()) {
-                return;
-            }
-            boolean inWorld = minecraft.isInWorld();
-            if (DEBUG) {
-                System.out.println("[OrangeX] M pressed: inWorld=" + inWorld);
-            }
-            if (inWorld) {
-                ClientInput.requestOpen();
-            }
-        } catch (Throwable throwable) {
-            logFailure(throwable);
-        }
+        KeyEvents.fire(keyCode);
     }
 
     /**
-     * Called from {@code GuiScreen#keyTyped(char, int)}. This queues the
-     * 1.8.9 close; it is applied at the end of the tick.
+     * Called from the 26.2 {@code KeyboardHandler#keyPress} hook. Translates
+     * the GLFW key code to the canonical 1.8.9 numbering before posting.
+     */
+    public static void onGlfwKeyPressed(int glfwKeyCode) {
+        onKeyPressed(KeyCodes.fromGlfw(glfwKeyCode));
+    }
+
+    /**
+     * Called from {@code GuiScreen#keyTyped(char, int)}. Returns {@code true}
+     * only for the toggle key, so other keys (ESC, etc.) still reach vanilla
+     * screen handling.
      */
     public static boolean onKeyTyped(Object screen, int keyCode) {
-        if (!isOurs(screen) || keyCode != KEY_M) {
+        if (!isOurs(screen)) {
             return false;
         }
-        try {
-            ClientInput.requestClose();
-        } catch (Throwable throwable) {
-            logFailure(throwable);
-        }
-        return true;
+        KeyEvents.fire(keyCode);
+        return keyCode == KeyCodes.M;
     }
 
     public static void onDrawScreen(Object screen, int mouseX, int mouseY) {

@@ -36,18 +36,6 @@ public interface VersionInput {
 
     void closeInputScreen();
 
-    /**
-     * M: {@code Keyboard.KEY_M} on 1.8.9, GLFW 77 on 26.2.
-     */
-    boolean isToggleKeyDown();
-
-    /**
-     * {@code true} when opening/closing is driven by injected key events
-     * instead of polling {@link #isToggleKeyDown()} once per tick. 1.8.9 uses
-     * this so a very short key tap is not missed between ticks.
-     */
-    boolean isToggleEventDriven();
-
     double getGuiMouseX();
 
     double getGuiMouseY();

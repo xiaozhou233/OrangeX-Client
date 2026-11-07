@@ -10,9 +10,6 @@ import cn.xiaozhou233.orangex.input.internal.v1_8_9.V1_8_9Input;
  */
 public final class Legacy {
 
-    /** LWJGL 2 {@code Keyboard.KEY_M}. */
-    public static final int TOGGLE_KEY = 50;
-
     public static boolean isRepeatEvent() {
         return V1_8_9Input.isRepeatEvent();
     }

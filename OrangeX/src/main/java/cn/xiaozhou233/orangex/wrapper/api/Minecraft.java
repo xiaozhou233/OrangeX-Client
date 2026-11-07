@@ -50,17 +50,6 @@ public interface Minecraft {
     void closeInputScreen();
 
     /**
-     * {@code true} while the GUI toggle key (M) is held.
-     */
-    boolean isToggleKeyDown();
-
-    /**
-     * {@code true} when the toggle is driven by key events (1.8.9) rather
-     * than per-tick polling (26.2).
-     */
-    boolean isToggleEventDriven();
-
-    /**
      * Current cursor X in Minecraft GUI pixels.
      */
     double getGuiMouseX();

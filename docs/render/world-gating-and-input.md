@@ -280,29 +280,35 @@ Minecraft262Stubs/
 OrangeX/src/main/java/cn/xiaozhou233/orangex/
 ├── input/
 │   ├── ClientInput.java                 跨版本输入状态：开/关、鼠标坐标、按键状态
-│   ├── InputController.java             在 EventTickPre 中驱动 ClientInput
+│   ├── InputController.java             订阅 EventKey 并驱动 ClientInput
+│   ├── KeyCodes.java                    统一的按键编号（1.8.9 LWJGL 2）+ GLFW 转换
 │   ├── internal/
 │   │   ├── VersionInput.java            版本输入接口
 │   │   └── v1_8_9/V1_8_9Input.java      1.8.9：运行时生成 GuiScreen 子类 + LWJGL 2
 │   └── v26_2/
-│       ├── V26_2Input.java              26.2：gui.setScreen + InputConstants
+│       ├── V26_2Input.java              26.2：gui.setScreen
 │       └── V26_2InputScreen.java        26.2 空 Screen
-├── event/facade/InputEvents.java        1.8.9 注入代码的门面
+├── event/
+│   ├── facade/InputEvents.java          输入门面（1.8.9 注入代码）
+│   ├── facade/KeyEvents.java            按键事件统一投递到 EventBus
+│   └── impl/EventKey.java               按键事件（统一使用 1.8.9 key code）
 └── hook/impl/
-    ├── GuiInputHook.java                1.8.9 GuiScreen 输入 / 关闭 Hook
-    └── KeyPressHook.java                1.8.9 KeyBinding.onTick 打开 Hook
+    ├── GuiInputHook.java                1.8.9 GuiScreen 输入 / 按键 Hook
+    └── KeyPressHook.java                1.8.9 KeyBinding#onTick / 26.2 KeyboardHandler#keyPress 按键 Hook
 ```
 
 行为：
 
 - M 键在**世界内**打开空 GUI；再次按下关闭。
-- 1.8.9 的开关走事件而不是 tick 轮询：
-  - 打开：`KeyBinding#onTick(int)` → `InputEvents.onKeyPressed` → `ClientInput.requestOpen()`
-  - 关闭：`GuiScreen#keyTyped(char, int)` → `InputEvents.onKeyTyped` → `ClientInput.requestClose()`
-  - 两者都只在 tick 末尾（`EventTickPost` → `ClientInput.applyPending`）真正执行。
+- 所有 `EventKey#getKey()` 都使用 1.8.9 / LWJGL 2 键码，26.2 的 GLFW 键码在投递前通过 `KeyCodes.fromGlfw` 转换。
+- 按键统一走 EventBus：
+  - 1.8.9 打开：`KeyBinding#onTick(int)` → `InputEvents.onKeyPressed` → `KeyEvents.fire` → `EventBus.post(EventKey)` → `InputController.onKey` → `ClientInput.requestOpen()`
+  - 1.8.9 关闭：`GuiScreen#keyTyped(char, int)` → `InputEvents.onKeyTyped` → 同一条 EventBus 链路 → `requestClose()`
+  - 26.2：`KeyboardHandler#keyPress(long, int, KeyEvent)` 全局 Hook → `InputEvents.onGlfwKeyPressed` → 键码转换 → 同一条 EventBus 链路。行走、无界面时也能收到按键，不再依赖 tick 轮询。
+  - 其他功能可以直接 `@Subscribe` `EventKey` 读取按键，不需要再改注入代码。
+  - 打开 / 关闭都只在 tick 末尾（`EventTickPost` → `ClientInput.applyPending`）真正执行。
   - 原因：如果在键盘循环里直接打开 Screen，同一个 M 事件会立刻被 `currentScreen.handleKeyboardInput()` 再处理一次，导致刚打开就关闭。
-  - 自动重复事件通过 `V1_8_9Input.isRepeatEvent()` 过滤，按住 M 不会反复开关。
-- 26.2 仍然每 tick 用 `InputConstants.isKeyDown(window, 77)` 轮询 M。
+  - 自动重复事件：1.8.9 通过 `Keyboard.isRepeatEvent()` 过滤，26.2 只处理 GLFW action == 1（press），按住 M 不会反复开关。
 - 打开时：
   - 1.8.9：运行时生成 `GuiScreen` 具体子类，再 `Minecraft#displayGuiScreen(...)`；`doesGuiPauseGame()` 对自己的空壳返回 `false`。
   - 26.2：`Gui#setScreen(new V26_2InputScreen())`，`isPauseScreen()` 返回 `false`。
