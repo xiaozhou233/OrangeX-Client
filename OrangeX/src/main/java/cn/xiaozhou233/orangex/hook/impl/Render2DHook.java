@@ -33,13 +33,6 @@ public final class Render2DHook extends ClassHook {
     private static final MappingResolver resolver = MappingManager.getResolver();
 
     @Override
-    protected String[] getInjectedClassNames() {
-        return new String[]{
-                "cn.xiaozhou233.orangex.event.facade.Render2DEvents"
-        };
-    }
-
-    @Override
     protected String getTargetClass() {
         switch (runtimeInfo.getMinecraftVersion()) {
             case V1_8_9:
@@ -108,7 +101,7 @@ public final class Render2DHook extends ClassHook {
                         throw new IllegalStateException(
                                 "No (F)V HUD method found in " + ctClass.getName());
                     }
-                    method.insertAfter("Render2DEvents.fire(null, true);");
+                    method.insertAfter("orangexbridge.Hooks.render2d(null, true);");
                     return;
                 } else {
                     MappingMethod target = resolver.mapMethod(
@@ -119,7 +112,7 @@ public final class Render2DHook extends ClassHook {
                     methodDescriptor = target.getTargetDescriptor();
                 }
                 CtMethod method = ctClass.getMethod(methodName, methodDescriptor);
-                method.insertAfter("Render2DEvents.fire(null, true);");
+                method.insertAfter("orangexbridge.Hooks.render2d(null, true);");
                 break;
             }
             case V26_2: {
@@ -132,7 +125,7 @@ public final class Render2DHook extends ClassHook {
                 // $0 is this, $1 is the DeltaTracker, $2 is shouldRenderLevel:
                 // false on the title screen, true while a level (including its
                 // pause/ClickGUI screens) exists.
-                method.insertAfter("Render2DEvents.fire($0, $2);");
+                method.insertAfter("orangexbridge.Hooks.render2d($0, $2);");
                 break;
             }
             default:

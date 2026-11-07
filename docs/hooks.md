@@ -17,7 +17,7 @@
                     ├── hook.getTargetClass()                 目标类（点分名）
                     ├── JuiceAgent.getClassBytesByName(...)   读取原始字节码
                     ├── hook.transform(loader, bytes)
-                    │     ├── ClassPoolUtils.prepare(...)     准备 Javassist 环境
+                    │     ├── ClassPoolUtils.createPool(loader)   新建 Javassist 环境
                     │     ├── transform(ctClass)              插入调用
                     │     └── ctClass.toBytecode()            生成新字节码
                     └── JuiceAgent.retransformClassByName(...) 写回 JVM
@@ -31,7 +31,9 @@
 | --- | --- | --- |
 | `HookManager` | `hook/HookManager` | 注册所有 Hook，遍历、读取字节码、触发重转换 |
 | `ClassHook` | `hook/ClassHook` | Hook 基类：目标类、注入逻辑、注入代码引用的类 |
-| `ClassPoolUtils` | `hook/ClassPoolUtils` | 准备 Javassist `ClassPool`（导入包、加入 OrangeX.jar） |
+| `ClassPoolUtils` | `hook/ClassPoolUtils` | 创建 Javassist `ClassPool`（OrangeX.jar + agent 字节 + loader） |
+| `AgentClassPath` | `hook/AgentClassPath` | 用 agent 读取已加载类的运行时字节，兼容 Lunar 等启动器 |
+| `orangexbridge.Hooks` | `orangexbridge/Hooks` | 注入代码统一入口，避免 `cn` 默认包冲突 |
 | `JuiceAgentBridge` | `hook/JuiceAgentBridge` | 通过 system ClassLoader 反射调用 JuiceAgent API（Fabric 必需） |
 | `TickHook` | `hook/impl/TickHook` | 在 `Minecraft.runTick()` 前后插入事件调用 |
 | `TickEvents` | `event/facade/TickEvents` | 注入代码唯一引用的门面，负责 post 事件 |
@@ -142,11 +144,9 @@ MappingMethod m = resolver.mapMethod("net/minecraft/client/Minecraft", "runTick"
 
 ## 4. 注入代码的硬性规则
 
-### 4.1 不要写全限定名（1.8.8 的 `cn` 类）
+### 4.1 注入代码统一走 `orangexbridge`
 
-Vanilla 1.8.8 的客户端 jar 里有一个**默认包**下的混淆类 `cn`（`1.8.8.jar!/cn.class`）。
-
-Javassist 解析限定名是从左往右的，写：
+Vanilla 1.8.8 的客户端 jar 里有一个**默认包**下的混淆类 `cn`（`1.8.8.jar!/cn.class`）。Javassist 解析限定名是从左往右的，写：
 
 ```java
 method.insertBefore("cn.xiaozhou233.orangex.event.facade.TickEvents.firePre();");
@@ -158,38 +158,46 @@ method.insertBefore("cn.xiaozhou233.orangex.event.facade.TickEvents.firePre();")
 no such class: cn$xiaozhou233.orangex.event.facade.TickEvents
 ```
 
-这**不是** classpath 问题，加多少类路径都没用。正确做法是让 `ClassPoolUtils` 导入包，注入代码里只写简单类名：
+这**不是** classpath 问题，加多少类路径都没用。现在所有注入代码都通过一个不会和默认包冲突的顶层包：
 
 ```java
-@Override
-protected String[] getInjectedClassNames() {
-    return new String[]{"cn.xiaozhou233.orangex.event.facade.TickEvents"};
-}
-
-// 注入时：
-method.insertBefore("TickEvents.firePre();");
+method.insertBefore("orangexbridge.Hooks.tickPre();");
 ```
 
-`getInjectedClassNames()` 返回的类所在的包会被 `pool.importPackage(...)` 导入，Javassist 会通过 `searchImports` 找到 `TickEvents`，不再触发 `cn` 冲突。
+`orangexbridge.Hooks` 只是转发到真正的 facade；1.8.9 专用的辅助方法在 `orangexbridge.Legacy`。这样不需要 `importPackage`，也不会触发 `cn` 冲突。
 
 ### 4.2 被引用的类必须对 Javassist 可见
 
-`ClassPool.getDefault()` 只认识 JVM 启动时的 classpath，而 OrangeX.jar 是运行时注入的。`Loader` 会设置系统属性：
+`Loader` 会设置系统属性：
 
 ```java
 System.setProperty("orangex.jar", orangexFile.getAbsolutePath());
 ```
 
-`ClassPoolUtils.prepare(...)` 读取该属性，把 jar 加到 `ClassPool` 的 classpath。因此：
+`ClassPoolUtils.createPool(loader)` 会读取该属性，把 OrangeX.jar 放在 classpath 第一位，因此 `orangexbridge.*` 和 `cn.xiaozhou233.*` 都能从 jar 直接解析。
 
-- 新增 Hook 时，凡是注入代码引用到的类，都要放进 `getInjectedClassNames()`；
-- 不要绕过 `ClassHook.transform()` 自己创建 `ClassPool`，否则会缺少这些准备。
+游戏类则由 `AgentClassPath` 通过 `JuiceAgent#getClassBytesByName` 提供**运行时字节码**。原因是一些启动器（例如 Lunar 的 GenesisClassLoader）按 MCP 名字提供资源，但资源里的字节仍然是混淆名，Javassist 会报：
 
-### 4.3 `ClassPool` 是单例
+```text
+cannot find net.minecraft.util.IThreadListener: od found in net/minecraft/util/IThreadListener.class
+```
 
-`ClassPool.getDefault()` 返回全局单例，`ClassPoolUtils` 只会往里面加一次路径/导入项。不要在每个 Hook 里重复 `insertClassPath`，否则路径会无限增长。
+从 agent 拿到已加载类的字节可以保证类名和目标类一致。
 
-`ClassHook.transform()` 在最后会 `ctClass.detach()`，避免 `ClassPool` 长期持有一个不可回收的 `CtClass`。
+### 4.3 `ClassPool` 不再用全局单例
+
+`ClassPoolUtils.createPool(loader)` 每次创建一个新的 `ClassPool(false)`，包含：
+
+```text
+OrangeX.jar
+AgentClassPath（已加载游戏类的运行时字节）
+LoaderClassPath(game loader)   兜底
+LoaderClassPath(system loader) JDK 类
+```
+
+不再使用 `ClassPool.getDefault()`：某些启动器的注入线程 `Thread.currentThread().getContextClassLoader()` 为 `null`，`getDefault()` 的系统路径会在解析类时抛异常。
+
+`ClassHook.transform()` 最后会 `ctClass.detach()`，避免 `ClassPool` 长期持有 `CtClass`。
 
 ### 4.4 异常不要外泄
 

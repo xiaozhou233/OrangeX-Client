@@ -6,11 +6,21 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class HookManager {
 
     @Getter
     private static final HookManager INSTANCE = new HookManager();
+
+    /**
+     * Original (pre-injection) bytes of every hook target, keyed by dot name.
+     * Used by 1.8.9 screen generation so it never has to retransform a class
+     * that has already been patched.
+     */
+    private static final Map<String, byte[]> TARGET_BYTES =
+            new ConcurrentHashMap<String, byte[]>();
 
     private final List<ClassHook> hooks = new ArrayList<ClassHook>();
 
@@ -40,6 +50,7 @@ public final class HookManager {
                 if (classBytes == null) {
                     continue;
                 }
+                TARGET_BYTES.put(className, classBytes);
 
                 byte[] bytes = hook.transform(loader, classBytes);
                 JuiceAgentBridge.retransformClassByName(className, bytes);
@@ -48,5 +59,9 @@ public final class HookManager {
                 t.printStackTrace();
             }
         }
+    }
+
+    public static byte[] getTargetBytes(String className) {
+        return TARGET_BYTES.get(className);
     }
 }

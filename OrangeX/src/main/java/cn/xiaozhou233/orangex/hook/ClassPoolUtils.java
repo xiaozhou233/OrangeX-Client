@@ -2,13 +2,17 @@ package cn.xiaozhou233.orangex.hook;
 
 import javassist.ClassClassPath;
 import javassist.ClassPool;
+import javassist.LoaderClassPath;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Javassist setup shared by all hooks.
+ *
+ * <p>A fresh pool is created for each transform instead of using
+ * {@link ClassPool#getDefault()}: on some launchers the current thread has a
+ * {@code null} context class loader, which makes the default pool's system
+ * path throw while resolving imported class names.</p>
  */
 public final class ClassPoolUtils {
 
@@ -18,69 +22,66 @@ public final class ClassPoolUtils {
      */
     private static final String ORANGEX_JAR_PROPERTY = "orangex.jar";
 
-    private static final Set<String> importedPackages = new HashSet<String>();
-
-    private static boolean classPathAdded;
+    private static boolean bridgeChecked;
 
     /**
-     * Prepares {@code pool} for compiling injected code.
-     *
-     * <p>Solves two problems:</p>
-     *
+     * Creates a pool that can resolve:
      * <ul>
-     *   <li>{@link ClassPool#getDefault()} only knows the JVM class path. The
-     *   OrangeX jar is injected into the game class loader at runtime, so it
-     *   must be added explicitly, otherwise javassist cannot find OrangeX
-     *   classes.</li>
-     *   <li>Vanilla 1.8.8 contains an obfuscated class in the default package
-     *   named {@code cn}, which collides with the first segment of our
-     *   package. Javassist resolves qualified names from left to right, finds
-     *   that class instead of the package, and fails with the misleading
-     *   {@code no such class: cn$xiaozhou233...}. Importing the packages lets
-     *   injected code use simple class names and avoids the collision.</li>
+     *   <li>OrangeX classes from the injected jar;</li>
+     *   <li>game classes from their runtime (post-transform) bytes through
+     *       the agent, avoiding launchers whose class-loader resources still
+     *       contain obfuscated names;</li>
+     *   <li>anything else via the game loader and the system loader.</li>
      * </ul>
      *
-     * @param classNames fully qualified names of the classes referenced by the
-     *                   injected code; their packages are imported
+     * @param loader the game class loader
      */
-    public static synchronized void prepare(ClassPool pool, String... classNames) {
-        importPackages(pool, classNames);
-
-        if (classPathAdded) {
-            return;
-        }
-
-        classPathAdded = true;
+    public static ClassPool createPool(ClassLoader loader) {
+        ClassPool pool = new ClassPool(false);
 
         File jar = orangeXJar();
-        if (jar == null) {
+        if (jar != null) {
+            try {
+                pool.insertClassPath(jar.getAbsolutePath());
+                System.out.println("[OrangeX] javassist classpath: "
+                        + jar.getAbsolutePath());
+            } catch (Throwable t) {
+                System.out.println("[OrangeX] Failed to add javassist classpath: "
+                        + jar.getAbsolutePath() + " (" + t + ")");
+            }
+        } else {
             System.out.println("[OrangeX] WARNING: OrangeX.jar not found for javassist; "
                     + "injected classes may fail to compile");
             pool.insertClassPath(new ClassClassPath(ClassPoolUtils.class));
-            return;
         }
 
-        try {
-            pool.insertClassPath(jar.getAbsolutePath());
-            System.out.println("[OrangeX] javassist classpath: " + jar.getAbsolutePath());
-        } catch (Throwable t) {
-            System.out.println("[OrangeX] Failed to add javassist classpath: "
-                    + jar.getAbsolutePath() + " (" + t + ")");
-        }
-    }
+        // Runtime bytes of already-loaded game classes (MCP-named even when
+        // the launcher's resource stream is still obfuscated).
+        pool.appendClassPath(new AgentClassPath(loader));
 
-    private static void importPackages(ClassPool pool, String[] classNames) {
-        for (String className : classNames) {
-            int dot = className.lastIndexOf('.');
-            if (dot <= 0) {
-                continue;
+        if (loader != null) {
+            pool.appendClassPath(new SafeClassPath(new LoaderClassPath(loader)));
+        }
+
+        ClassLoader system = ClassLoader.getSystemClassLoader();
+        if (system != null) {
+            pool.appendClassPath(new SafeClassPath(new LoaderClassPath(system)));
+        } else {
+            pool.appendClassPath(new ClassClassPath(Object.class));
+        }
+
+        if (!bridgeChecked) {
+            bridgeChecked = true;
+            try {
+                pool.get("orangexbridge.Hooks");
+                System.out.println("[OrangeX] javassist bridge OK");
+            } catch (Throwable t) {
+                System.out.println("[OrangeX] javassist bridge FAILED");
+                t.printStackTrace();
             }
-
-            String packageName = className.substring(0, dot);
-            if (importedPackages.add(packageName)) {
-                pool.importPackage(packageName);
-            }
         }
+
+        return pool;
     }
 
     private static File orangeXJar() {

@@ -29,14 +29,6 @@ public final class GuiInputHook extends ClassHook {
     private static final MappingResolver resolver = MappingManager.getResolver();
 
     @Override
-    protected String[] getInjectedClassNames() {
-        return new String[]{
-                "cn.xiaozhou233.orangex.event.facade.InputEvents",
-                "cn.xiaozhou233.orangex.input.internal.v1_8_9.V1_8_9Input"
-        };
-    }
-
-    @Override
     protected String getTargetClass() {
         switch (runtimeInfo.getMinecraftVersion()) {
             case V1_8_9:
@@ -54,27 +46,27 @@ public final class GuiInputHook extends ClassHook {
         }
 
         injectBefore(ctClass, "drawScreen", "(IIF)V",
-                "InputEvents.onDrawScreen($0, $1, $2);");
+                "orangexbridge.Hooks.inputDraw($0, $1, $2);");
 
         injectBefore(ctClass, "mouseClicked", "(III)V",
-                "if (InputEvents.onMouseClicked($0, $1, $2, $3)) return;");
+                "if (orangexbridge.Hooks.inputClick($0, $1, $2, $3)) return;");
 
         injectBefore(ctClass, "mouseReleased", "(III)V",
-                "if (InputEvents.onMouseReleased($0, $1, $2, $3)) return;");
+                "if (orangexbridge.Hooks.inputRelease($0, $1, $2, $3)) return;");
 
         injectBefore(ctClass, "mouseClickMove", "(IIIJ)V",
-                "InputEvents.onMouseDragged($0, $1, $2, $3);");
+                "orangexbridge.Hooks.inputDrag($0, $1, $2, $3);");
 
         // Close with M while the empty screen is open. Repeat events are
         // ignored so holding the key does not bounce the screen.
         injectBefore(ctClass, "keyTyped", "(CI)V",
-                "if ($2 == V1_8_9Input.TOGGLE_KEY"
-                        + " && !V1_8_9Input.isRepeatEvent()"
-                        + " && InputEvents.onKeyTyped($0, $2)) return;");
+                "if ($2 == orangexbridge.Legacy.TOGGLE_KEY"
+                        + " && !orangexbridge.Legacy.isRepeatEvent()"
+                        + " && orangexbridge.Hooks.inputKeyTyped($0, $2)) return;");
 
         // The empty screen is an overlay: it must not pause singleplayer.
         injectAfter(ctClass, "doesGuiPauseGame", "()Z",
-                "if (InputEvents.isOurInputScreen($0)) { $_ = false; }");
+                "if (orangexbridge.Hooks.isOurScreen($0)) { $_ = false; }");
     }
 
     private void injectBefore(CtClass ctClass, String name,

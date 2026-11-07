@@ -1,5 +1,7 @@
 package cn.xiaozhou233.orangex.input.internal.v1_8_9;
 
+import cn.xiaozhou233.orangex.hook.ClassPoolUtils;
+import cn.xiaozhou233.orangex.hook.HookManager;
 import cn.xiaozhou233.orangex.hook.JuiceAgentBridge;
 import cn.xiaozhou233.orangex.input.ClientInput;
 import cn.xiaozhou233.orangex.input.internal.VersionInput;
@@ -11,7 +13,6 @@ import cn.xiaozhou233.orangex.runtime.RuntimeInfo;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtConstructor;
-import javassist.LoaderClassPath;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -201,22 +202,30 @@ public final class V1_8_9Input implements VersionInput {
         }
 
         try {
-            ClassPool pool = new ClassPool(true);
-            pool.appendClassPath(new LoaderClassPath(loader));
+            ClassPool pool = ClassPoolUtils.createPool(loader);
 
             CtClass base;
-            try {
-                base = pool.get(guiScreenClass.getName());
-            } catch (Throwable notFound) {
-                // Some launch environments hide transformed class resources;
-                // fall back to the bytes the agent can read for the loaded class.
-                byte[] baseBytes = JuiceAgentBridge.getClassBytesByName(
-                        guiScreenClass.getName().replace('.', '/'));
-                if (baseBytes == null) {
-                    throw new IllegalStateException(
-                            "Cannot load " + guiScreenClass.getName(), notFound);
+            byte[] cachedBase = HookManager.getTargetBytes(
+                    guiScreenClass.getName());
+            if (cachedBase != null) {
+                // Prefer the original bytes captured before our hooks were
+                // applied: retransforming GuiScreen again could drop the
+                // injected methods.
+                base = pool.makeClass(new ByteArrayInputStream(cachedBase));
+            } else {
+                try {
+                    base = pool.get(guiScreenClass.getName());
+                } catch (Throwable notFound) {
+                    // Some launch environments hide transformed class resources;
+                    // fall back to the bytes the agent can read for the loaded class.
+                    byte[] baseBytes = JuiceAgentBridge.getClassBytesByName(
+                            guiScreenClass.getName().replace('.', '/'));
+                    if (baseBytes == null) {
+                        throw new IllegalStateException(
+                                "Cannot load " + guiScreenClass.getName(), notFound);
+                    }
+                    base = pool.makeClass(new ByteArrayInputStream(baseBytes));
                 }
-                base = pool.makeClass(new ByteArrayInputStream(baseBytes));
             }
 
             CtClass generated = pool.makeClass(GENERATED_SCREEN);

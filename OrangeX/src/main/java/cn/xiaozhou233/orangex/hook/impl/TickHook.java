@@ -19,15 +19,11 @@ public final class TickHook extends ClassHook {
     private static final MappingResolver resolver = MappingManager.getResolver();
 
     @Override
-    protected String[] getInjectedClassNames() {
-        return new String[]{"cn.xiaozhou233.orangex.event.facade.TickEvents"};
-    }
-
-    @Override
     protected String getTargetClass() {
         switch (runtimeInfo.getMinecraftVersion()) {
             case V1_8_9:
-                return resolver.mapClass("net/minecraft/client/Minecraft").getTargetName().replace("/", ".");
+                return resolver.mapClass("net/minecraft/client/Minecraft")
+                        .getTargetName().replace("/", ".");
             case V26_2:
                 return "net.minecraft.client.Minecraft";
             default:
@@ -66,9 +62,8 @@ public final class TickHook extends ClassHook {
 
         CtMethod method = ctClass.getMethod(methodName, methodDesc);
 
-        // Simple names: the package is imported by ClassPoolUtils.
-        // Fully qualified "cn.*" names collide with the vanilla "cn" class.
-        method.insertBefore("TickEvents.firePre();");
-        method.insertAfter("TickEvents.firePost();");
+        // Fully qualified bridge name avoids the default-package "cn" class.
+        method.insertBefore("orangexbridge.Hooks.tickPre();");
+        method.insertAfter("orangexbridge.Hooks.tickPost();");
     }
 }

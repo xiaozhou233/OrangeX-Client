@@ -27,14 +27,6 @@ public final class KeyPressHook extends ClassHook {
     private static final MappingResolver resolver = MappingManager.getResolver();
 
     @Override
-    protected String[] getInjectedClassNames() {
-        return new String[]{
-                "cn.xiaozhou233.orangex.event.facade.InputEvents",
-                "cn.xiaozhou233.orangex.input.internal.v1_8_9.V1_8_9Input"
-        };
-    }
-
-    @Override
     protected String getTargetClass() {
         switch (runtimeInfo.getMinecraftVersion()) {
             case V1_8_9:
@@ -58,8 +50,8 @@ public final class KeyPressHook extends ClassHook {
         // Static method: $1 is the key code. Ignore auto-repeat so holding
         // M does not toggle repeatedly.
         method.insertBefore(
-                "if ($1 == V1_8_9Input.TOGGLE_KEY"
-                        + " && !V1_8_9Input.isRepeatEvent())"
-                        + " { InputEvents.onKeyPressed($1); }");
+                "if ($1 == orangexbridge.Legacy.TOGGLE_KEY"
+                        + " && !orangexbridge.Legacy.isRepeatEvent())"
+                        + " { orangexbridge.Hooks.inputKeyPressed($1); }");
     }
 }
