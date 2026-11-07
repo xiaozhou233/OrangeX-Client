@@ -22,18 +22,53 @@ public final class FontManager {
     private static final int MAX_RASTER_HEIGHT = 64;
     private static final int MAX_CJK_RASTER_HEIGHT = 36;
 
+    private static final FontFamily FALLBACK_FAMILY = FontFamily.PROXIMA;
+
     private final FontBackend backend;
     private final Map<Key, FontFace> faces = new HashMap<Key, FontFace>();
     private final Map<String, byte[]> fontData = new HashMap<String, byte[]>();
+    private FontFamily defaultFamily;
 
     public FontManager(FontBackend backend) {
         this.backend = backend;
+        this.defaultFamily = resolveDefaultFamily();
+    }
+
+    private static FontFamily resolveDefaultFamily() {
+        String configured = System.getProperty("orangex.font.family");
+        if (configured == null || configured.trim().isEmpty()) {
+            return FALLBACK_FAMILY;
+        }
+        FontFamily family = FontFamily.byName(configured);
+        if (family == null) {
+            System.out.println("[OrangeX] Unknown font family '" + configured
+                    + "', falling back to " + FALLBACK_FAMILY.getDisplayName());
+            return FALLBACK_FAMILY;
+        }
+        return family;
+    }
+
+    /**
+     * The family used by {@code Render2D#getFont(size)}. Defaults to
+     * {@link #FALLBACK_FAMILY}, overridable with
+     * {@code -Dorangex.font.family=<name>}.
+     */
+    public synchronized FontFamily getDefaultFamily() {
+        return defaultFamily;
+    }
+
+    /**
+     * Switches the family used by the size-only {@code getFont} overloads.
+     * Already created {@link FontFace} instances stay valid.
+     */
+    public synchronized void setDefaultFamily(FontFamily defaultFamily) {
+        this.defaultFamily = defaultFamily != null ? defaultFamily : FALLBACK_FAMILY;
     }
 
     public synchronized FontFace getFace(FontFamily family, float logicalSize,
                                          boolean bold, double guiScale) {
         if (family == null) {
-            family = FontFamily.PROXIMA;
+            family = defaultFamily;
         }
         if (logicalSize <= 0.0f) {
             throw new IllegalArgumentException("logicalSize must be positive");

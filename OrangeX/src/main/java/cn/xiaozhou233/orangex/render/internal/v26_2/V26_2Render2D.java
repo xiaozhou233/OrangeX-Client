@@ -140,7 +140,17 @@ final class V26_2Render2D implements Render2D {
 
     @Override
     public FontRenderer getFont(float size, boolean bold) {
-        FontFace face = fonts.getFace(FontFamily.PROXIMA, size, bold, guiScale);
+        return getFont(fonts.getDefaultFamily(), size, bold);
+    }
+
+    @Override
+    public FontRenderer getFont(FontFamily family, float size) {
+        return getFont(family, size, false);
+    }
+
+    @Override
+    public FontRenderer getFont(FontFamily family, float size, boolean bold) {
+        FontFace face = fonts.getFace(family, size, bold, guiScale);
         return new TrueTypeFontRenderer(fonts, face, bold, guiScale, drawer);
     }
 

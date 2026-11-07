@@ -1,5 +1,7 @@
 package cn.xiaozhou233.orangex.render.api;
 
+import cn.xiaozhou233.orangex.render.font.FontFamily;
+
 /**
  * The 2D drawing context for one frame.
  *
@@ -16,9 +18,21 @@ public interface Render2D {
 
     double getGuiScale();
 
+    /**
+     * Font using the configured default family
+     * ({@code -Dorangex.font.family}, Proxima when unset).
+     */
     FontRenderer getFont(float size);
 
     FontRenderer getFont(float size, boolean bold);
+
+    /**
+     * Font using an explicit bundled family, e.g.
+     * {@link FontFamily#MONTSERRAT} or {@link FontFamily#JELLO_LIGHT}.
+     */
+    FontRenderer getFont(FontFamily family, float size);
+
+    FontRenderer getFont(FontFamily family, float size, boolean bold);
 
     void fillRect(double x, double y, double width, double height, int argb);
 
