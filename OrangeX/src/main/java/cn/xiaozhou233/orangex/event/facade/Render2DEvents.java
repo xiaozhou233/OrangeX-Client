@@ -11,11 +11,16 @@ public final class Render2DEvents {
 
     private static boolean failureLogged;
 
-    public static void fire(Object platformContext) {
+    /**
+     * @param inWorld whether the game is currently rendering a loaded level.
+     *                Modern versions call the GUI extraction on the title
+     *                screen too, so the hook must pass this through.
+     */
+    public static void fire(Object platformContext, boolean inWorld) {
         try {
             Render2DManager manager = OrangeX.getInstance().getRender2DManager();
             if (manager != null) {
-                manager.fire(platformContext);
+                manager.fire(platformContext, inWorld);
             }
         } catch (Throwable throwable) {
             if (!failureLogged) {
@@ -24,6 +29,13 @@ public final class Render2DEvents {
                 throwable.printStackTrace();
             }
         }
+    }
+
+    /**
+     * Legacy entry point for hooks that only run in world (1.8.9 HUD).
+     */
+    public static void fire(Object platformContext) {
+        fire(platformContext, true);
     }
 
     private Render2DEvents() {

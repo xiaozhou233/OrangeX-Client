@@ -27,7 +27,12 @@ dependencies {
     // Legacy OpenGL entry points for the 1.8.9 font backend. This is compile
     // only: the 1.8.9 runtime provides its own LWJGL 2, and the 26.2 backend
     // never loads these classes.
-    compileOnly files('../Minecraft1.8.8/runtime/libraries/org/lwjgl/lwjgl/lwjgl/2.9.4-nightly-20150209/lwjgl-2.9.4-nightly-20150209.jar')
+    compileOnly files('../libraries/lwjgl-2.9.4-nightly-20150209.jar')
+
+    // The real 26.2 client jar is Java 25 bytecode and cannot be read by the
+    // JDK 17 used for this build. These compile-time stubs mirror only the
+    // members OrangeX touches; the real jar is still the runtime reference.
+    compileOnly project(':Minecraft262Stubs')
 
     // JuiceAgent is provided at runtime by the agent (see JuiceAgentBridge).
     // Do NOT bundle it: Fabric's KnotClassLoader would load a second copy of

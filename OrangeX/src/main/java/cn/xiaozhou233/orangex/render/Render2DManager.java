@@ -19,6 +19,14 @@ public final class Render2DManager {
     private final FontBackend backend;
     private final FontManager fonts;
 
+    /**
+     * Whether the overlay is drawn on screens that are not backed by a loaded
+     * level (title screen, world selection, ...). 1.8.9 never renders the HUD
+     * there, and this defaults to the same behaviour on every version.
+     * Enable with {@code -Dorangex.renderInMenus=true}.
+     */
+    private volatile boolean renderInMenus = Boolean.getBoolean("orangex.renderInMenus");
+
     public Render2DManager(RuntimeInfo runtimeInfo,
                            MappingResolver mappingResolver,
                            Object minecraft) {
@@ -28,6 +36,19 @@ public final class Render2DManager {
     }
 
     public void fire(Object platformContext) {
+        fire(platformContext, true);
+    }
+
+    /**
+     * @param inWorld {@code true} when a level is loaded (the game's own
+     *                "should render level" flag). When {@code false} the
+     *                event is dropped unless {@link #isRenderInMenus()} is on.
+     */
+    public void fire(Object platformContext, boolean inWorld) {
+        if (!inWorld && !renderInMenus) {
+            return;
+        }
+
         EventBus eventBus = OrangeX.getInstance().getEventBus();
         if (!eventBus.hasSubscriberForEvent(EventRender2D.class)) {
             return;
@@ -35,10 +56,18 @@ public final class Render2DManager {
 
         Render2D context = backend.createRender2D(fonts, platformContext);
         try {
-            eventBus.post(new EventRender2D(context));
+            eventBus.post(new EventRender2D(context, inWorld));
         } finally {
             context.flush();
         }
+    }
+
+    public boolean isRenderInMenus() {
+        return renderInMenus;
+    }
+
+    public void setRenderInMenus(boolean renderInMenus) {
+        this.renderInMenus = renderInMenus;
     }
 
     public String getBackendName() {

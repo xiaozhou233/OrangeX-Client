@@ -16,10 +16,14 @@ import java.lang.reflect.Modifier;
  * Fires {@link cn.xiaozhou233.orangex.event.impl.EventRender2D} once per frame.
  *
  * <ul>
- *   <li>1.8.9: tail of {@code GuiIngame#renderGameOverlay(float)}.</li>
+ *   <li>1.8.9: tail of {@code GuiIngame#renderGameOverlay(float)}. This method
+ *       is only called while a level is loaded, so the overlay is world-only
+ *       by construction.</li>
  *   <li>26.2: tail of {@code Gui#extractRenderState(DeltaTracker, boolean,
  *       boolean)}. The {@code Gui} instance is passed to the facade so the
- *       font backend can reach its {@code GuiRenderState}.</li>
+ *       font backend can reach its {@code GuiRenderState}; the second
+ *       argument ({@code shouldRenderLevel}) tells the manager whether a
+ *       level is loaded, because this method also runs on the title screen.</li>
  * </ul>
  */
 public final class Render2DHook extends ClassHook {
@@ -104,7 +108,7 @@ public final class Render2DHook extends ClassHook {
                         throw new IllegalStateException(
                                 "No (F)V HUD method found in " + ctClass.getName());
                     }
-                    method.insertAfter("Render2DEvents.fire(null);");
+                    method.insertAfter("Render2DEvents.fire(null, true);");
                     return;
                 } else {
                     MappingMethod target = resolver.mapMethod(
@@ -115,7 +119,7 @@ public final class Render2DHook extends ClassHook {
                     methodDescriptor = target.getTargetDescriptor();
                 }
                 CtMethod method = ctClass.getMethod(methodName, methodDescriptor);
-                method.insertAfter("Render2DEvents.fire(null);");
+                method.insertAfter("Render2DEvents.fire(null, true);");
                 break;
             }
             case V26_2: {
@@ -125,7 +129,10 @@ public final class Render2DHook extends ClassHook {
                         "(Lnet/minecraft/client/DeltaTracker;ZZ)V");
                 CtMethod method = ctClass.getMethod(
                         target.getTargetName(), target.getTargetDescriptor());
-                method.insertAfter("Render2DEvents.fire($0);");
+                // $0 is this, $1 is the DeltaTracker, $2 is shouldRenderLevel:
+                // false on the title screen, true while a level (including its
+                // pause/ClickGUI screens) exists.
+                method.insertAfter("Render2DEvents.fire($0, $2);");
                 break;
             }
             default:

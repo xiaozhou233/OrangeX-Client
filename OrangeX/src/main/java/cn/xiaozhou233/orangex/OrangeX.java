@@ -2,6 +2,7 @@ package cn.xiaozhou233.orangex;
 
 import cn.xiaozhou233.orangex.event.impl.EventTickPre;
 import cn.xiaozhou233.orangex.hook.HookManager;
+import cn.xiaozhou233.orangex.input.InputController;
 import cn.xiaozhou233.orangex.mapping.MappingManager;
 import cn.xiaozhou233.orangex.render.FontDebugOverlay;
 import cn.xiaozhou233.orangex.render.Render2DManager;
@@ -27,6 +28,8 @@ public class OrangeX {
     private RuntimeInfo runtimeInfo;
     @Getter
     private Render2DManager render2DManager;
+    @Getter
+    private Minecraft minecraft;
 
     public OrangeX() {
         System.out.println("OrangeX <init> start!");
@@ -41,15 +44,15 @@ public class OrangeX {
         MappingManager.init(runtimeInfo);
 
         Minecraft minecraft = MinecraftFactory.create(runtimeInfo, MappingManager.getResolver());
+        this.minecraft = minecraft;
         System.out.println(minecraft.getMinecraft());
 
         render2DManager = new Render2DManager(
                 runtimeInfo, MappingManager.getResolver(), minecraft.getMinecraft());
         System.out.println("[OrangeX] Font backend: " + render2DManager.getBackendName());
 
-        if (Boolean.getBoolean("orangex.debugFont")) {
-            eventBus.register(new FontDebugOverlay());
-        }
+        eventBus.register(new FontDebugOverlay());
+        eventBus.register(new InputController(minecraft));
 
         HookManager.getINSTANCE().applyAll();
     }

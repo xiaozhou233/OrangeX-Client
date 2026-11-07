@@ -12,14 +12,15 @@ import java.lang.reflect.Method;
  * Looking the class up through the system class loader always reaches the
  * registered copy.</p>
  */
-final class JuiceAgentBridge {
+public final class JuiceAgentBridge {
 
     private static final String API_CLASS = "cn.xiaozhou233.juiceagent.api.JuiceAgent";
 
     private static Method getClassBytesByName;
     private static Method retransformClassByName;
+    private static Method defineClass;
 
-    static byte[] getClassBytesByName(String className) {
+    public static byte[] getClassBytesByName(String className) {
         init();
 
         try {
@@ -30,7 +31,7 @@ final class JuiceAgentBridge {
         }
     }
 
-    static void retransformClassByName(String className, byte[] bytes) {
+    public static void retransformClassByName(String className, byte[] bytes) {
         init();
 
         try {
@@ -38,6 +39,23 @@ final class JuiceAgentBridge {
         } catch (Throwable t) {
             throw new IllegalStateException(
                     "JuiceAgent.retransformClassByName failed: " + className, t);
+        }
+    }
+
+    /**
+     * Defines a new class in {@code loader} through the agent.
+     *
+     * <p>{@code ClassLoader#defineClass} is protected and cannot be called
+     * through reflection on modern JDKs; the native agent invokes it through
+     * JNI instead.</p>
+     */
+    public static Class<?> defineClass(ClassLoader loader, byte[] bytes) {
+        init();
+
+        try {
+            return (Class<?>) defineClass.invoke(null, loader, bytes);
+        } catch (Throwable t) {
+            throw new IllegalStateException("JuiceAgent.defineClass failed", t);
         }
     }
 
@@ -51,6 +69,8 @@ final class JuiceAgentBridge {
             getClassBytesByName = api.getMethod("getClassBytesByName", String.class);
             retransformClassByName = api.getMethod(
                     "retransformClassByName", String.class, byte[].class, int.class);
+            defineClass = api.getMethod(
+                    "defineClass", ClassLoader.class, byte[].class);
         } catch (Throwable t) {
             throw new IllegalStateException("JuiceAgent API is not available", t);
         }

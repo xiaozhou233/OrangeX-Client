@@ -1,5 +1,6 @@
 package cn.xiaozhou233.orangex.wrapper.internal.v26_2;
 
+import cn.xiaozhou233.orangex.input.internal.VersionInput;
 import cn.xiaozhou233.orangex.mapping.MappingClass;
 import cn.xiaozhou233.orangex.mapping.MappingField;
 import cn.xiaozhou233.orangex.mapping.MappingResolver;
@@ -25,6 +26,7 @@ public final class V26_2Minecraft implements Minecraft {
     private final MappingClass mappingMinecraft;
 
     private Object instance;
+    private VersionInput input;
 
     public V26_2Minecraft(RuntimeInfo runtimeInfo,
                           MappingResolver mappingResolver) {
@@ -38,6 +40,79 @@ public final class V26_2Minecraft implements Minecraft {
             instance = resolveInstance();
         }
         return instance;
+    }
+
+    /**
+     * Loads the version-specific input implementation on first use. Keeping
+     * the 26.2 class behind a string keeps 1.8.9 runtimes clean.
+     */
+    private synchronized VersionInput input() {
+        if (input == null) {
+            try {
+                Class<?> bridge = Class.forName(
+                        "cn.xiaozhou233.orangex.input.v26_2.V26_2Input",
+                        true,
+                        V26_2Minecraft.class.getClassLoader());
+                input = (VersionInput) bridge.getConstructor(
+                                RuntimeInfo.class,
+                                Object.class)
+                        .newInstance(runtimeInfo, getMinecraft());
+            } catch (ReflectiveOperationException e) {
+                throw new IllegalStateException(
+                        "Cannot create the 26.2 input bridge", e);
+            }
+        }
+        return input;
+    }
+
+    @Override
+    public boolean isInWorld() {
+        return input().isInWorld();
+    }
+
+    @Override
+    public boolean isInputScreenOpen() {
+        return input().isInputScreenOpen();
+    }
+
+    @Override
+    public boolean isScreenOpen() {
+        return input().isScreenOpen();
+    }
+
+    @Override
+    public boolean isInputScreenInstance(Object screen) {
+        return input().isInputScreenInstance(screen);
+    }
+
+    @Override
+    public void openInputScreen() {
+        input().openInputScreen();
+    }
+
+    @Override
+    public void closeInputScreen() {
+        input().closeInputScreen();
+    }
+
+    @Override
+    public boolean isToggleKeyDown() {
+        return input().isToggleKeyDown();
+    }
+
+    @Override
+    public boolean isToggleEventDriven() {
+        return input().isToggleEventDriven();
+    }
+
+    @Override
+    public double getGuiMouseX() {
+        return input().getGuiMouseX();
+    }
+
+    @Override
+    public double getGuiMouseY() {
+        return input().getGuiMouseY();
     }
 
     private Object resolveInstance() {
