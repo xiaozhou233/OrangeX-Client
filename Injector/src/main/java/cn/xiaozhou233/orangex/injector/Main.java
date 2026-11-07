@@ -1,11 +1,17 @@
 package cn.xiaozhou233.orangex.injector;
 
 import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLaf;
+import com.formdev.flatlaf.util.UIScale;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
+import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
@@ -99,6 +105,38 @@ public class Main {
             UIManager.put("Button.arc", 12);
         } catch (Throwable throwable) {
             System.out.println("[WARN] FlatLaf is not available; using the default look and feel");
+            return;
+        }
+        applyWindowScale();
+    }
+
+    /**
+     * Large monitors are often driven at 100% OS scaling, which makes Swing
+     * UIs look tiny. Compute the scale the JRE already applies and add a zoom
+     * factor on top until the UI reaches a comfortable physical size.
+     */
+    private static void applyWindowScale() {
+        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+        if (screen.height < 1120) {
+            return;
+        }
+
+        float target = screen.height >= 1800 ? 2.0f : 1.5f;
+        GraphicsConfiguration configuration = GraphicsEnvironment
+                .getLocalGraphicsEnvironment()
+                .getDefaultScreenDevice()
+                .getDefaultConfiguration();
+
+        double effective = UIScale.getSystemScaleFactor(configuration)
+                * UIScale.getUserScaleFactor();
+        if (effective >= target) {
+            return;
+        }
+
+        float zoom = (float) (target / effective);
+        if (UIScale.setZoomFactor(zoom)) {
+            FlatLaf.updateUI();
+            System.out.println("[OrangeX] UI scale " + target + "x (zoom " + zoom + ")");
         }
     }
 }

@@ -2,6 +2,7 @@ package cn.xiaozhou233.orangex.injector;
 
 import cn.xiaozhou233.juiceagent.injector.Injector;
 import cn.xiaozhou233.juiceagent.injector.WindowInfo;
+import com.formdev.flatlaf.util.UIScale;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -52,7 +53,7 @@ public class InjectorWindow extends JFrame {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
         setContentPane(buildContent());
-        setSize(470, 340);
+        setSize(UIScale.scale(470), UIScale.scale(340));
         setLocationRelativeTo(null);
         getRootPane().setDefaultButton(injectButton);
 
@@ -74,7 +75,9 @@ public class InjectorWindow extends JFrame {
 
     private JPanel buildContent() {
         JPanel root = new JPanel(new GridBagLayout());
-        root.setBorder(new EmptyBorder(20, 26, 16, 26));
+        root.setBorder(new EmptyBorder(
+                UIScale.scale(20), UIScale.scale(26),
+                UIScale.scale(16), UIScale.scale(26)));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -86,40 +89,41 @@ public class InjectorWindow extends JFrame {
         JLabel title = new JLabel(
                 "<html><font color='#FF8A00'><b>OrangeX</b></font> Injector</html>",
                 SwingConstants.CENTER);
-        title.setFont(title.getFont().deriveFont(Font.BOLD, 26f));
+        title.setFont(title.getFont().deriveFont(Font.BOLD, UIScale.scale(26f)));
         gbc.gridy = row++;
-        gbc.insets = new Insets(0, 0, 20, 0);
+        gbc.insets = UIScale.scale(new Insets(0, 0, 20, 0));
         root.add(title, gbc);
 
-        processBox.setPreferredSize(new Dimension(200, 34));
-        JPanel processRow = new JPanel(new BorderLayout(8, 0));
+        processBox.setPreferredSize(new Dimension(UIScale.scale(200), UIScale.scale(34)));
+        JPanel processRow = new JPanel(new BorderLayout(UIScale.scale(8), 0));
         processRow.add(processBox, BorderLayout.CENTER);
         processRow.add(refreshButton, BorderLayout.EAST);
         gbc.gridy = row++;
-        gbc.insets = new Insets(0, 0, 10, 0);
+        gbc.insets = UIScale.scale(new Insets(0, 0, 10, 0));
         root.add(processRow, gbc);
 
         gbc.gridy = row++;
-        gbc.insets = new Insets(0, 0, 8, 0);
+        gbc.insets = UIScale.scale(new Insets(0, 0, 8, 0));
         root.add(customPidCheck, gbc);
 
-        pidField.setPreferredSize(new Dimension(0, 34));
+        pidField.setPreferredSize(new Dimension(0, UIScale.scale(34)));
         pidField.putClientProperty("JTextField.placeholderText", "Enter a process ID");
         pidField.setVisible(false);
         gbc.gridy = row++;
-        gbc.insets = new Insets(0, 0, 10, 0);
+        gbc.insets = UIScale.scale(new Insets(0, 0, 10, 0));
         root.add(pidField, gbc);
 
-        injectButton.setPreferredSize(new Dimension(0, 40));
-        injectButton.setFont(injectButton.getFont().deriveFont(Font.BOLD, 15f));
+        injectButton.setPreferredSize(new Dimension(0, UIScale.scale(40)));
+        injectButton.setFont(injectButton.getFont().deriveFont(
+                Font.BOLD, UIScale.scale(15f)));
         injectButton.setBackground(ACCENT);
         injectButton.setForeground(Color.WHITE);
         injectButton.putClientProperty("JButton.buttonType", "roundRect");
         gbc.gridy = row++;
-        gbc.insets = new Insets(10, 0, 12, 0);
+        gbc.insets = UIScale.scale(new Insets(10, 0, 12, 0));
         root.add(injectButton, gbc);
 
-        statusLabel.setFont(statusLabel.getFont().deriveFont(12f));
+        statusLabel.setFont(statusLabel.getFont().deriveFont(UIScale.scale(12f)));
         statusLabel.setForeground(MUTED);
         gbc.gridy = row++;
         gbc.insets = new Insets(0, 0, 0, 0);
