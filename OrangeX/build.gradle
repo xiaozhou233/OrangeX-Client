@@ -29,8 +29,8 @@ dependencies {
     // never loads these classes.
     compileOnly files('../libraries/lwjgl-2.9.4-nightly-20150209.jar')
 
-    compileOnly files("../libraries/Minecraft26.2.jar")
-    compileOnly files("../libraries/brigadier-1.3.10.jar")
+    compileOnly files("../libraries/minecraft/Minecraft26.2.jar")
+    compileOnly files("../libraries/minecraft/com/mojang/brigadier/1.3.10/brigadier-1.3.10.jar")
 
     // JuiceAgent is provided at runtime by the agent (see JuiceAgentBridge).
     // Do NOT bundle it: Fabric's KnotClassLoader would load a second copy of

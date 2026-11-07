@@ -1,6 +1,7 @@
 plugins {
     id 'base'
 }
+apply from: 'gradle/dependencies.gradle'
 
 def outputDir = layout.projectDirectory.dir('out/tmp')
 def distDir = layout.projectDirectory.dir('out')
@@ -45,6 +46,7 @@ tasks.register('injectionZip', Zip) {
 tasks.register('packageAll') {
     group = 'build'
     description = 'Builds Loader, OrangeX and Injector, then zips out/tmp into out/injection.zip'
+    dependsOn downloadDependencies
     dependsOn cleanOut
     dependsOn ':Loader:shadowJar', ':OrangeX:shadowJar', ':Injector:jar'
     dependsOn injectionZip
@@ -68,5 +70,11 @@ subprojects {
 
     tasks.matching { it.name == 'shadowJar' }.configureEach {
         mustRunAfter rootProject.tasks.named('cleanOut')
+    }
+}
+
+gradle.taskGraph.whenReady { taskGraph ->
+    if (taskGraph.hasTask(':build')) {
+        throw new GradleException('---> The build task is not supported. Please refer to the documentation. <---')
     }
 }
