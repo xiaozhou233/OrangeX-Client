@@ -61,7 +61,7 @@ subprojects {
             options.encoding = 'UTF-8'
             if (JavaVersion.current().isJava9Compatible()) {
                 // Fail fast if a post-Java-8 API is used.
-                options.release = 8
+                options.release = 25
             }
         }
     }

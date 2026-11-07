@@ -1,6 +1,0 @@
-plugins {
-    id 'java-library'
-}
-
-group = 'cn.xiaozhou233.orangex'
-version = 'unspecified'
