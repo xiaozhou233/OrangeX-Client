@@ -1,105 +1,104 @@
 package cn.xiaozhou233.orangex.injector;
 
-import cn.xiaozhou233.juiceagent.injector.Injector;
-import cn.xiaozhou233.juiceagent.injector.WindowInfo;
+import com.formdev.flatlaf.FlatDarkLaf;
 
-import java.io.*;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import java.awt.Color;
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Scanner;
 
 public class Main {
-    public static String orangexPath = new File(System.getProperty("user.home") + "/.orangex").getAbsolutePath();
-    private static int pid = -1;
+    public static final String orangexPath =
+            new File(System.getProperty("user.home"), ".orangex").getAbsolutePath();
+    public static final String agentPath =
+            new File(orangexPath, "libloader.dll").getAbsolutePath();
+    public static final String configDir = orangexPath;
 
-    public static void main(String[] args) throws Exception {
-        System.setOut(new PrintStream(
-                new FileOutputStream(FileDescriptor.out),
-                true,
-                StandardCharsets.UTF_8.name()
-        ));
-
-        System.setErr(new PrintStream(
-                new FileOutputStream(FileDescriptor.err),
-                true,
-                StandardCharsets.UTF_8.name()
-        ));
+    public static void main(String[] args) {
+        setupConsole();
 
         System.out.println("================");
         System.out.println("OrangeX Injector v1.0.0");
         System.out.println("OrangeX Path: " + orangexPath);
         System.out.println("================");
 
-        // Unzip injection
+        extractInjection();
+        if (!loadNativeLibrary()) {
+            return;
+        }
+
+        SwingUtilities.invokeLater(() -> {
+            installLookAndFeel();
+            InjectorWindow window = new InjectorWindow(agentPath, configDir);
+            window.setVisible(true);
+        });
+    }
+
+    private static void setupConsole() {
+        try {
+            System.setOut(new PrintStream(
+                    new FileOutputStream(FileDescriptor.out),
+                    true,
+                    StandardCharsets.UTF_8.name()
+            ));
+            System.setErr(new PrintStream(
+                    new FileOutputStream(FileDescriptor.err),
+                    true,
+                    StandardCharsets.UTF_8.name()
+            ));
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    private static void extractInjection() {
         File zipFile = new File("./injection.zip");
         if (!zipFile.exists()) {
             System.err.println("injection.zip not found!");
+            return;
         }
+
         try (InputStream zipStream = new FileInputStream(zipFile)) {
             FileUtils.unzip(zipStream, new File(orangexPath));
-            System.out.println("Done!");
-        } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Extracted injection.zip to " + orangexPath);
+        } catch (IOException exception) {
+            System.err.println("[ERROR] Failed to extract injection.zip: " + exception.getMessage());
+            exception.printStackTrace();
         }
+    }
 
-        // Load libinject native library
-        System.load(new File(orangexPath + "/libinject.dll").getAbsolutePath());
-        System.out.println("Loaded libinject.dll");
-
-        // Find Minecraft
-        ArrayList<Integer> pids = new ArrayList<>();
-        ArrayList<String> windowTitles = new ArrayList<>();
+    private static boolean loadNativeLibrary() {
         try {
-            String[] titles = {"Minecraft", "minecraft", "1.8.9", "Badlion", "Lunar"};
-            String[] ignoreTitles = {"Badlion Client", "Badlion Chat", "Home - Lunar Client"};
-            for (String title : titles) {
-                WindowInfo[] list = Injector.findWindowsByTitle(title);
-                if (list == null || list.length == 0) {
-                } else {
-                    for (WindowInfo w : list) {
-                        if (pids.contains(w.pid))
-                            continue;
-                        if (Arrays.stream(ignoreTitles).anyMatch(w.title::contains))
-                            continue;
-                        pids.add(w.pid);
-                        windowTitles.add(w.title);
-                    }
-                }
-            }
-        } catch (UnsatisfiedLinkError ule) {
-            throw new RuntimeException("Native method findWindowsByTitle not available", ule);
-        } catch (Exception ex) {
-            System.out.println("[ERROR] Error while calling native findWindowsByTitle: " + ex.getMessage());
-            ex.printStackTrace();
+            System.load(new File(orangexPath, "libinject.dll").getAbsolutePath());
+            System.out.println("Loaded libinject.dll");
+            return true;
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Failed to load libinject.dll:\n" + throwable,
+                    "OrangeX Injector",
+                    JOptionPane.ERROR_MESSAGE);
+            return false;
         }
+    }
 
-        // Print results
-        System.out.println("=======================");
-        for (int i = 0; i < pids.size(); i++) {
-            System.out.printf("[ %d ] %s (PID: %d)%n", i + 1, windowTitles.get(i), pids.get(i));
+    private static void installLookAndFeel() {
+        try {
+            FlatDarkLaf.setup();
+            UIManager.put("Component.accentColor", new Color(0xFF8A00));
+            UIManager.put("Component.arc", 10);
+            UIManager.put("Button.arc", 12);
+        } catch (Throwable throwable) {
+            System.out.println("[WARN] FlatLaf is not available; using the default look and feel");
         }
-        System.out.println("=======================");
-        if (pids.isEmpty()) {
-            System.err.println("[ERROR] No Minecraft process found!");
-        }
-
-        // Input the sequence number
-        try (Scanner scanner = new Scanner(System.in)) {
-            System.out.printf("[INPUT] Select (1-%d): ", pids.size());
-            int index = scanner.nextInt();
-            if (index < 1 || index > pids.size()) {
-                throw new RuntimeException("Invalid selection: " + index);
-            }
-            pid = pids.get(index - 1);
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new RuntimeException("Invalid input", e);
-        }
-
-        String agentPath = orangexPath + "/libloader.dll";
-        String configDir = orangexPath;
-        Injector.inject(pid, agentPath, configDir);
     }
 }

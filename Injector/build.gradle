@@ -12,6 +12,9 @@ repositories {
 dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    // Source: https://mvnrepository.com/artifact/com.formdev/flatlaf
+    implementation 'com.formdev:flatlaf:3.8'
 }
 
 test {
@@ -24,6 +27,12 @@ tasks.named('jar') {
     manifest {
         attributes 'Main-Class': 'cn.xiaozhou233.orangex.injector.Main'
     }
+    // Bundle runtime dependencies (FlatLaf) so injector.jar is self-contained.
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
 }
 
 tasks.withType(JavaCompile).configureEach {
