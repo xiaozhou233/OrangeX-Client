@@ -258,8 +258,9 @@ OrangeX.getInstance().getEventBus().register(new Object() {
 
 | 现象 | 原因 |
 | --- | --- |
-| `no such class: cn$xiaozhou233...` | 注入代码写了全限定名，撞上 1.8.8 的 `cn` 类。改成 `getInjectedClassNames` + 简单类名 |
-| `no such class: TickEvents` | `getInjectedClassNames()` 没声明该类，或 OrangeX.jar 没加入 `ClassPool` |
+| `no such class: cn$xiaozhou233...` | 注入代码写了 `cn.*` 全限定名，撞上 1.8.8 的 `cn` 类。统一改用 `orangexbridge.Hooks` |
+| `cannot find net.minecraft...: od found in ...` | Lunar / Genesis 等启动器的类资源仍是混淆名。确认 `AgentClassPath` 生效，并且日志里有 `javassist bridge OK` |
+| `[OrangeX] javassist bridge FAILED` | OrangeX.jar 没放进 `ClassPool`，或部署的 jar 是旧版本（缺少 `orangexbridge`） |
 | `CannotCompileException`，`getMethod` 抛 `NotFoundException` | 版本不对/方法名或描述符错误，检查 `MappingResolver` |
 | 日志有 `[OrangeX] javassist classpath: ...` 但无事件打印 | 注入成功但没触发：确认目标方法真的每帧调用（1.8.x `runTick()V`，26.2 `runTick(Z)V`） |
 | 事件 post 了但 `@Subscribe` 不执行 | 没注册 / 不是同一个 `EventBus` / 方法不是 `public` |
@@ -275,10 +276,23 @@ OrangeX/src/main/java/cn/xiaozhou233/orangex/
 │   ├── HookManager.java
 │   ├── ClassHook.java
 │   ├── ClassPoolUtils.java
+│   ├── AgentClassPath.java
+│   ├── SafeClassPath.java
 │   ├── JuiceAgentBridge.java
-│   └── impl/TickHook.java
+│   └── impl/
+│       ├── TickHook.java
+│       ├── Render2DHook.java
+│       ├── GuiInputHook.java
+│       └── KeyPressHook.java
 └── event/
     ├── Event.java
-    ├── facade/TickEvents.java
-    └── impl/EventTickPre.java, EventTickPost.java
+    ├── facade/
+    │   ├── TickEvents.java
+    │   ├── Render2DEvents.java
+    │   └── InputEvents.java
+    └── impl/EventTickPre.java, EventTickPost.java, EventRender2D.java
+
+OrangeX/src/main/java/orangexbridge/
+├── Hooks.java          注入代码统一入口
+└── Legacy.java         1.8.9 专用（LWJGL 2）
 ```
