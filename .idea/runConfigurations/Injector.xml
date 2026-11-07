@@ -2,6 +2,7 @@
   <configuration default="false" name="Injector" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="cn.xiaozhou233.orangex.injector.Main" />
     <module name="OrangeX-Client.Injector.main" />
+    <option name="VM_PARAMETERS" value="--enable-native-access=ALL-UNNAMED -Dfile.encoding=UTF-8" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/out" />
     <extension name="coverage">
       <pattern>

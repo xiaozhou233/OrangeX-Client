@@ -3,10 +3,8 @@ package cn.xiaozhou233.orangex.injector;
 import cn.xiaozhou233.juiceagent.injector.Injector;
 import cn.xiaozhou233.juiceagent.injector.WindowInfo;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -16,6 +14,18 @@ public class Main {
     private static int pid = -1;
 
     public static void main(String[] args) {
+        System.setOut(new PrintStream(
+                new FileOutputStream(FileDescriptor.out),
+                true,
+                StandardCharsets.UTF_8
+        ));
+
+        System.setErr(new PrintStream(
+                new FileOutputStream(FileDescriptor.err),
+                true,
+                StandardCharsets.UTF_8
+        ));
+
         System.out.println("================");
         System.out.println("OrangeX Injector v1.0.0");
         System.out.println("OrangeX Path: " + orangexPath);
