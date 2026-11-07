@@ -19,6 +19,7 @@ public class ModuleManager {
 
     public void init() {
         registerAll();
+        OrangeX.getInstance().getEventBus().register(this);
     }
 
     public void registerAll() {
@@ -45,5 +46,15 @@ public class ModuleManager {
 
     public List<Module> getAllModules() {
         return modules;
+    }
+
+    @Subscribe
+    public void onKey(EventKey event) {
+        for (Module module : modules) {
+            if (module.getKeybind().getValue() == event.getKey()) {
+                module.toggle();
+                System.out.println("[ModuleManager] Toggled module: " + module.getName());
+            }
+        }
     }
 }
