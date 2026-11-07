@@ -1,9 +1,12 @@
 package cn.xiaozhou233.orangex;
 
+import cn.xiaozhou233.orangex.event.impl.EventKey;
+import cn.xiaozhou233.orangex.event.impl.EventRender2D;
 import cn.xiaozhou233.orangex.event.impl.EventTickPre;
 import cn.xiaozhou233.orangex.hook.HookManager;
 import cn.xiaozhou233.orangex.input.InputController;
 import cn.xiaozhou233.orangex.mapping.MappingManager;
+import cn.xiaozhou233.orangex.modules.ModuleManager;
 import cn.xiaozhou233.orangex.render.FontDebugOverlay;
 import cn.xiaozhou233.orangex.render.Render2DManager;
 import cn.xiaozhou233.orangex.runtime.RuntimeDetector;
@@ -29,6 +32,8 @@ public class OrangeX {
     @Getter
     private Render2DManager render2DManager;
     @Getter
+    private ModuleManager moduleManager = new ModuleManager();
+    @Getter
     private Minecraft minecraft;
 
     public OrangeX() {
@@ -51,13 +56,21 @@ public class OrangeX {
                 runtimeInfo, MappingManager.getResolver(), minecraft.getMinecraft());
         System.out.println("[OrangeX] Font backend: " + render2DManager.getBackendName());
 
-        eventBus.register(new FontDebugOverlay());
+        //eventBus.register(new FontDebugOverlay());
         eventBus.register(new InputController(minecraft));
+        eventBus.register(this);
+
+        moduleManager.init();
 
         HookManager.getINSTANCE().applyAll();
     }
 
     public void stop() {
         System.out.println("OrangeX stop!");
+    }
+
+    @Subscribe
+    public void onKey(EventKey event) {
+        System.out.println("KEY: " + event.getKey());
     }
 }
