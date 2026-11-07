@@ -54,6 +54,10 @@ public final class Render2DManager {
             return;
         }
 
+        // Pin atlases used by this frame and release long-idle ones (e.g. the
+        // previous GUI scale's faces) before they are needed again.
+        fonts.beginFrame();
+
         Render2D context = backend.createRender2D(fonts, platformContext);
         try {
             eventBus.post(new EventRender2D(context, inWorld));

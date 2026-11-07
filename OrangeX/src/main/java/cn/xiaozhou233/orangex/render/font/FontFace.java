@@ -2,25 +2,34 @@ package cn.xiaozhou233.orangex.render.font;
 
 import cn.xiaozhou233.orangex.render.internal.FontTexture;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- * A baked atlas plus its GPU texture and the scale needed to draw it at the
- * requested logical size.
+ * A font face bound to a shared {@link FontAtlasEntry} and a logical size.
+ *
+ * <p>The atlas is shared between sizes; {@link #getDrawScale()} converts atlas
+ * pixels back to GUI pixels. Each face owns a small width cache because widths
+ * also depend on the CJK fallback face that the primary face resolved.</p>
  */
 public final class FontFace {
 
+    private static final int MAX_CACHED_WIDTHS = 1024;
+
     private final FontFamily family;
-    private final FontAtlas atlas;
-    private final FontTexture texture;
+    private final FontAtlasEntry entry;
     private final float logicalSize;
     private final float drawScale;
+    private final Map<String, Double> widthCache = new HashMap<String, Double>();
+    private long lastUsedNanos;
 
-    public FontFace(FontFamily family, FontAtlas atlas, FontTexture texture,
-                    float logicalSize, float drawScale) {
+    FontFace(FontFamily family, FontAtlasEntry entry,
+             float logicalSize, float drawScale, long lastUsedNanos) {
         this.family = family;
-        this.atlas = atlas;
-        this.texture = texture;
+        this.entry = entry;
         this.logicalSize = logicalSize;
         this.drawScale = drawScale;
+        this.lastUsedNanos = lastUsedNanos;
     }
 
     public FontFamily getFamily() {
@@ -28,11 +37,11 @@ public final class FontFace {
     }
 
     public FontAtlas getAtlas() {
-        return atlas;
+        return entry.atlas;
     }
 
     public FontTexture getTexture() {
-        return texture;
+        return entry.texture;
     }
 
     public float getLogicalSize() {
@@ -44,18 +53,45 @@ public final class FontFace {
     }
 
     public Glyph getGlyph(int codePoint) {
-        return atlas.getGlyph(codePoint);
+        return entry.atlas.getGlyph(codePoint);
     }
 
     public Glyph getFallbackGlyph() {
-        return atlas.getFallbackGlyph();
+        return entry.atlas.getFallbackGlyph();
     }
 
     public float getAscent() {
-        return atlas.getAscent();
+        return entry.atlas.getAscent();
     }
 
     public float getLineHeight() {
-        return atlas.getLineHeight();
+        return entry.atlas.getLineHeight();
+    }
+
+    FontAtlasEntry getEntry() {
+        return entry;
+    }
+
+    long getLastUsedNanos() {
+        return lastUsedNanos;
+    }
+
+    void touch(long now) {
+        lastUsedNanos = now;
+    }
+
+    /**
+     * Shared across frames and renderers: {@code getStringWidth} is normally
+     * called every frame for static text.
+     */
+    Double getCachedWidth(String text) {
+        return widthCache.get(text);
+    }
+
+    void cacheWidth(String text, double width) {
+        if (widthCache.size() >= MAX_CACHED_WIDTHS) {
+            widthCache.clear();
+        }
+        widthCache.put(text, width);
     }
 }

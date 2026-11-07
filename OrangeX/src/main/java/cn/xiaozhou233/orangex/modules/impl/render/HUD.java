@@ -5,6 +5,7 @@ import cn.xiaozhou233.orangex.OrangeX;
 import cn.xiaozhou233.orangex.event.impl.EventRender2D;
 import cn.xiaozhou233.orangex.modules.Module;
 import cn.xiaozhou233.orangex.modules.ModuleCategory;
+import cn.xiaozhou233.orangex.render.api.FontRenderer;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.awt.Color;
@@ -42,6 +43,7 @@ public class HUD extends Module {
 
     private void renderLogo(EventRender2D event, long currentTime) {
         String title = "OrangeX";
+        FontRenderer font = event.getRender2D().getFont(LOGO_FONT_SIZE);
 
         int x = LOGO_START_X;
         int y = LOGO_START_Y;
@@ -49,31 +51,21 @@ public class HUD extends Module {
         for (int i = 0; i < title.length(); i++) {
             String character = String.valueOf(title.charAt(i));
 
-            event.getRender2D()
-                    .getFont(LOGO_FONT_SIZE)
-                    .drawString(
-                            character,
-                            x,
-                            y,
-                            getRainbowColor(currentTime, i)
-                    );
+            font.drawString(character, x, y, getRainbowColor(currentTime, i));
 
-            x += (int) event.getRender2D()
-                    .getFont(LOGO_FONT_SIZE)
-                    .getStringWidth(character);
+            x += (int) font.getStringWidth(character);
         }
     }
 
     private void renderModuleList(EventRender2D event, long currentTime) {
+        FontRenderer font = event.getRender2D().getFont(MODULE_FONT_SIZE);
         List<Module> modules = OrangeX.getInstance()
                 .getModuleManager()
                 .getAllModules()
                 .stream()
                 .filter(Module::isEnabled)
                 .sorted(Comparator.comparingDouble(
-                        module -> -event.getRender2D()
-                                .getFont(MODULE_FONT_SIZE)
-                                .getStringWidth(module.getName())
+                        module -> -font.getStringWidth(module.getName())
                 ))
                 .collect(Collectors.toList());
 
@@ -84,26 +76,12 @@ public class HUD extends Module {
             Module module = modules.get(i);
             String name = module.getName();
 
-            int textWidth = (int) event.getRender2D()
-                    .getFont(MODULE_FONT_SIZE)
-                    .getStringWidth(name);
-
+            int textWidth = (int) font.getStringWidth(name);
             int x = screenWidth - textWidth - MODULE_MARGIN;
 
-            event.getRender2D()
-                    .getFont(MODULE_FONT_SIZE)
-                    .drawStringWithShadow(
-                            name,
-                            x,
-                            y,
-                            getRainbowColor(currentTime, i)
-                    );
+            font.drawStringWithShadow(name, x, y, getRainbowColor(currentTime, i));
 
-            y += (int) (
-                    event.getRender2D()
-                            .getFont(MODULE_FONT_SIZE)
-                            .getStringHeight() + MODULE_SPACING
-            );
+            y += (int) (font.getStringHeight() + MODULE_SPACING);
         }
     }
 

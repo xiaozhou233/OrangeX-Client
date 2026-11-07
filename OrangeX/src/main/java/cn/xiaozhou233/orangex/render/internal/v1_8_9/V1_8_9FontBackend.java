@@ -56,27 +56,32 @@ public final class V1_8_9FontBackend implements FontBackend {
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D,
                 GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
 
+        // Two bytes per texel instead of four. GL_ALPHA would be even smaller
+        // but samples RGB as 0, which GL_MODULATE turns into black text;
+        // LUMINANCE_ALPHA keeps RGB = coverage and therefore behaves exactly
+        // like the RGBA upload.
         ByteBuffer buffer = BufferUtils.createByteBuffer(
-                atlas.getWidth() * atlas.getHeight() * 4);
+                atlas.getWidth() * atlas.getHeight() * 2);
         byte[] coverage = atlas.getPixels();
         for (int i = 0; i < coverage.length; i++) {
-            // RGBA is the most compatible fixed-function format: white RGB
-            // keeps the vertex colour, alpha carries the glyph coverage.
-            buffer.put((byte) 0xFF);
-            buffer.put((byte) 0xFF);
-            buffer.put((byte) 0xFF);
+            buffer.put(coverage[i]);
             buffer.put(coverage[i]);
         }
         buffer.flip();
 
-        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA,
+        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_LUMINANCE_ALPHA,
                 atlas.getWidth(), atlas.getHeight(), 0,
-                GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+                GL11.GL_LUMINANCE_ALPHA, GL11.GL_UNSIGNED_BYTE, buffer);
 
         GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, previousAlignment);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, previousTexture);
         GL13.glActiveTexture(previousActiveTexture);
         return new V1_8_9FontTexture(textureId, atlas.getWidth(), atlas.getHeight());
+    }
+
+    @Override
+    public int getBytesPerTexel() {
+        return 2;
     }
 
     @Override

@@ -30,16 +30,8 @@ public final class V26_2FontBackend implements FontBackend {
         int height = atlas.getHeight();
         byte[] coverage = atlas.getPixels();
 
-        byte[] rgba = new byte[coverage.length * 4];
-        for (int i = 0, j = 0; i < coverage.length; i++, j += 4) {
-            rgba[j] = (byte) 0xFF;
-            rgba[j + 1] = (byte) 0xFF;
-            rgba[j + 2] = (byte) 0xFF;
-            rgba[j + 3] = coverage[i];
-        }
-
         V26_2GpuTexture texture = V26_2TextureHelper.create(
-                loader, width, height, rgba);
+                loader, width, height, coverage);
         return new V26_2FontTexture(texture.texture, texture.textureView,
                 texture.sampler, width, height);
     }

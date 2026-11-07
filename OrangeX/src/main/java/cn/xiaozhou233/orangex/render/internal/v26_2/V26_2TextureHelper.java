@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 final class V26_2TextureHelper {
 
     static V26_2GpuTexture create(ClassLoader loader, int width, int height,
-                                  byte[] rgba) {
+                                  byte[] coverage) {
         try {
             Class<?> nativeImageClass = Class.forName(
                     "com.mojang.blaze3d.platform.NativeImage", false, loader);
@@ -19,9 +19,16 @@ final class V26_2TextureHelper {
                     .getDeclaredConstructor(int.class, int.class, boolean.class);
             Object image = nativeImageConstructor.newInstance(width, height, false);
 
+            // Expand straight into the NativeImage buffer: avoids a second
+            // full-size RGBA array on top of the atlas and the image.
             ByteBuffer buffer = (ByteBuffer) nativeImageClass
                     .getMethod("getPixelBytes").invoke(image);
-            buffer.put(rgba);
+            for (byte alpha : coverage) {
+                buffer.put((byte) 0xFF);
+                buffer.put((byte) 0xFF);
+                buffer.put((byte) 0xFF);
+                buffer.put(alpha);
+            }
 
             Class<?> dynamicTextureClass = Class.forName(
                     "net.minecraft.client.renderer.texture.DynamicTexture", false, loader);

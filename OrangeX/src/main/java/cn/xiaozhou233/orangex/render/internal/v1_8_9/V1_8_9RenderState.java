@@ -20,6 +20,7 @@ final class V1_8_9RenderState {
     private final IntBuffer scissorBuffer = BufferUtils.createIntBuffer(16);
 
     private boolean active;
+    private boolean premultipliedBlend;
     private boolean previousBlend;
     private boolean previousTexture2D;
     private boolean previousAlphaTest;
@@ -32,6 +33,8 @@ final class V1_8_9RenderState {
     private int previousTextureEnvMode;
     private int previousActiveTexture;
     private int previousShadeModel;
+    private int previousBlendSrc;
+    private int previousBlendDst;
     private float previousLineWidth;
     private int previousScissorX;
     private int previousScissorY;
@@ -55,6 +58,8 @@ final class V1_8_9RenderState {
         previousTextureEnvMode = GL11.glGetTexEnvi(
                 GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE);
         previousShadeModel = GL11.glGetInteger(GL11.GL_SHADE_MODEL);
+        previousBlendSrc = GL11.glGetInteger(GL11.GL_BLEND_SRC);
+        previousBlendDst = GL11.glGetInteger(GL11.GL_BLEND_DST);
         previousLineWidth = GL11.glGetFloat(GL11.GL_LINE_WIDTH);
         previousActiveTexture = GL11.glGetInteger(GL13.GL_ACTIVE_TEXTURE);
 
@@ -73,6 +78,7 @@ final class V1_8_9RenderState {
 
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        premultipliedBlend = false;
         GL11.glDisable(GL11.GL_TEXTURE_2D);
         GL11.glDisable(GL11.GL_ALPHA_TEST);
         GL11.glDisable(GL11.GL_DEPTH_TEST);
@@ -103,6 +109,7 @@ final class V1_8_9RenderState {
         setEnabled(GL11.GL_SCISSOR_TEST, previousScissorTest);
         GL11.glScissor(previousScissorX, previousScissorY,
                 previousScissorWidth, previousScissorHeight);
+        GL11.glBlendFunc(previousBlendSrc, previousBlendDst);
         GL11.glTexEnvi(GL11.GL_TEXTURE_ENV,
                 GL11.GL_TEXTURE_ENV_MODE, previousTextureEnvMode);
         GL11.glShadeModel(previousShadeModel);
@@ -119,12 +126,47 @@ final class V1_8_9RenderState {
     }
 
     void setColor(int argb) {
+        useStandardBlend();
         GL11.glColor4f(
                 ((argb >> 16) & 0xFF) / 255.0f,
                 ((argb >> 8) & 0xFF) / 255.0f,
                 (argb & 0xFF) / 255.0f,
                 ((argb >>> 24) & 0xFF) / 255.0f
         );
+    }
+
+    /**
+     * Colours for {@code LUMINANCE_ALPHA} glyph atlases.
+     *
+     * <p>That atlas format stores the coverage in both luminance and alpha, so
+     * {@code GL_MODULATE} produces {@code Cf * coverage} twice. Premultiplying
+     * the vertex colour and blending with {@code (ONE, ONE_MINUS_SRC_ALPHA)}
+     * keeps the result identical to the old RGBA upload while halving the
+     * texture size.</p>
+     */
+    void setGlyphColor(int argb) {
+        usePremultipliedBlend();
+        float alpha = ((argb >>> 24) & 0xFF) / 255.0f;
+        GL11.glColor4f(
+                ((argb >> 16) & 0xFF) / 255.0f * alpha,
+                ((argb >> 8) & 0xFF) / 255.0f * alpha,
+                (argb & 0xFF) / 255.0f * alpha,
+                alpha
+        );
+    }
+
+    private void useStandardBlend() {
+        if (premultipliedBlend) {
+            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            premultipliedBlend = false;
+        }
+    }
+
+    private void usePremultipliedBlend() {
+        if (!premultipliedBlend) {
+            GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            premultipliedBlend = true;
+        }
     }
 
     private static void setEnabled(int capability, boolean enabled) {

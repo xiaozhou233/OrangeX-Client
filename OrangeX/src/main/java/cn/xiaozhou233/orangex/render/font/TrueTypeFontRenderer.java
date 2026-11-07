@@ -3,9 +3,6 @@ package cn.xiaozhou233.orangex.render.font;
 import cn.xiaozhou233.orangex.render.api.FontRenderer;
 import cn.xiaozhou233.orangex.render.internal.GlyphDrawer;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Draws UTF-16 text with a primary face and an optional CJK fallback face.
  *
@@ -28,7 +25,6 @@ public final class TrueTypeFontRenderer implements FontRenderer {
     private final boolean bold;
     private final double guiScale;
 
-    private final Map<String, Double> widthCache = new HashMap<String, Double>();
     private FontFace fallback;
 
     public TrueTypeFontRenderer(FontManager manager, FontFace primary,
@@ -53,13 +49,13 @@ public final class TrueTypeFontRenderer implements FontRenderer {
 
     @Override
     public void drawCenteredString(String text, double centerX, double y, int argb) {
-        drawString(text, centerX - getUncachedWidth(text) / 2.0, y, argb);
+        drawString(text, centerX - getStringWidth(text) / 2.0, y, argb);
     }
 
     @Override
     public void drawCenteredStringWithShadow(String text, double centerX,
                                              double y, int argb) {
-        drawStringWithShadow(text, centerX - getUncachedWidth(text) / 2.0, y, argb);
+        drawStringWithShadow(text, centerX - getStringWidth(text) / 2.0, y, argb);
     }
 
     @Override
@@ -67,15 +63,12 @@ public final class TrueTypeFontRenderer implements FontRenderer {
         if (text == null || text.isEmpty()) {
             return 0.0;
         }
-        Double cached = widthCache.get(text);
+        Double cached = primary.getCachedWidth(text);
         if (cached != null) {
             return cached;
         }
         double width = getUncachedWidth(text);
-        if (widthCache.size() > 4096) {
-            widthCache.clear();
-        }
-        widthCache.put(text, width);
+        primary.cacheWidth(text, width);
         return width;
     }
 

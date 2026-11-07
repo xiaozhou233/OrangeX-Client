@@ -31,7 +31,7 @@ final class V1_8_9GlyphDrawer implements GlyphDrawer {
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
             boundTexture = textureId;
         }
-        state.setColor(argb);
+        state.setGlyphColor(argb);
 
         double left = penX + glyph.getX0() * scale;
         double right = penX + glyph.getX1() * scale;
