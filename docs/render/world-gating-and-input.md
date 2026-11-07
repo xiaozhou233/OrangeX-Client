@@ -192,7 +192,7 @@ GuiScreen#keyTyped(char typedChar, int keyCode)                    // ESC 默认
 
 #### 26.2
 
-`Screen` 是抽象类，实际实现是 `V26_2InputScreen`（输入状态记录在 `ClientInput`）：
+`Screen` 是抽象类，实际实现是 `V26_3InputScreen`（输入状态记录在 `ClientInput`）：
 
 ```java
 public final class V26_2InputScreen extends Screen {
@@ -244,7 +244,7 @@ public final class V26_2InputScreen extends Screen {
 
 ESC 不需要自己处理：`Screen#keyPressed` 默认会调用 `onClose()`，进而 `gui.setScreen(null)`，`ClientInput` 在下一个 tick 检测到界面关闭后自动重置状态。
 
-打开 / 关闭（`V26_2Input` 内部）：
+打开 / 关闭（`V26_3Input` 内部）：
 
 ```java
 minecraft.gui.setScreen(new V26_2InputScreen()); // releaseMouse + releaseAll + init
