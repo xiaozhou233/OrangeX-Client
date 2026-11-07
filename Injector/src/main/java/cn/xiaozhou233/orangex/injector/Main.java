@@ -13,17 +13,17 @@ public class Main {
     public static String orangexPath = new File(System.getProperty("user.home") + "/.orangex").getAbsolutePath();
     private static int pid = -1;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         System.setOut(new PrintStream(
                 new FileOutputStream(FileDescriptor.out),
                 true,
-                StandardCharsets.UTF_8
+                StandardCharsets.UTF_8.name()
         ));
 
         System.setErr(new PrintStream(
                 new FileOutputStream(FileDescriptor.err),
                 true,
-                StandardCharsets.UTF_8
+                StandardCharsets.UTF_8.name()
         ));
 
         System.out.println("================");

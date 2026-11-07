@@ -37,9 +37,42 @@ dependencies {
     // the API whose native methods are not registered.
 }
 
+// The 26.2 input classes import game classes that are records / class-file
+// version 69, so they cannot be compiled with --release 8. Keep them in a
+// separate source set compiled by JDK 25, but still emit Java 8 bytecode so a
+// 1.8.9 JVM can load the rest of the jar.
+sourceSets {
+    main {
+        java {
+            exclude 'cn/xiaozhou233/orangex/input/v26_2/**'
+        }
+    }
+    v26_2 {
+        java {
+            srcDir 'src/main/java'
+            include 'cn/xiaozhou233/orangex/input/v26_2/**'
+        }
+        compileClasspath += sourceSets.main.output
+        compileClasspath += configurations.compileClasspath
+    }
+}
+
+tasks.named('compileV26_2Java', JavaCompile).configure {
+    javaCompiler = javaToolchains.compilerFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+    // No --release: the JDK 25 platform classpath is needed to resolve records
+    // from Minecraft26.2.jar, while -source/-target 8 keeps the output loadable
+    // by Java 8.
+    options.release = null
+    options.encoding = 'UTF-8'
+}
+
 tasks.named('shadowJar') {
     destinationDirectory = rootProject.layout.projectDirectory.dir('out/tmp')
     archiveFileName = "${project.name}.jar"
+    dependsOn tasks.named('v26_2Classes')
+    from sourceSets.v26_2.output
 }
 
 shadowJar {
