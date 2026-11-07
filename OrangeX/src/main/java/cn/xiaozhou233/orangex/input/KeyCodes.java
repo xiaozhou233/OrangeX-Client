@@ -16,6 +16,9 @@ public final class KeyCodes {
     /** LWJGL 2 {@code Keyboard.KEY_M}. */
     public static final int M = 50;
 
+    /** LWJGL 2 {@code Keyboard.KEY_RSHIFT}. */
+    public static final int RSHIFT = 54;
+
     /**
      * Translates a GLFW key code (26.x) to the 1.8.9 LWJGL 2 key code used by
      * {@code EventKey}.

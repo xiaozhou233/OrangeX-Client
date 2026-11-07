@@ -55,16 +55,16 @@ public final class InputEvents {
     }
 
     /**
-     * Called from {@code GuiScreen#keyTyped(char, int)}. Returns {@code true}
-     * only for the toggle key, so other keys (ESC, etc.) still reach vanilla
-     * screen handling.
+     * Called from {@code GuiScreen#keyTyped(char, int)}. The event is posted to
+     * the EventBus; returning {@code false} keeps vanilla key handling (ESC,
+     * etc.) intact.
      */
     public static boolean onKeyTyped(Object screen, int keyCode) {
         if (!isOurs(screen)) {
             return false;
         }
         KeyEvents.fire(keyCode);
-        return keyCode == KeyCodes.M;
+        return false;
     }
 
     public static void onDrawScreen(Object screen, int mouseX, int mouseY) {

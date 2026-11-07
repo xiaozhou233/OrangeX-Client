@@ -2,6 +2,7 @@ package cn.xiaozhou233.orangex.modules;
 
 import cn.xiaozhou233.orangex.OrangeX;
 import cn.xiaozhou233.orangex.event.impl.EventKey;
+import cn.xiaozhou233.orangex.modules.impl.render.ClickGUI;
 import cn.xiaozhou233.orangex.modules.impl.render.HUD;
 import org.greenrobot.eventbus.Subscribe;
 
@@ -24,6 +25,7 @@ public class ModuleManager {
 
     public void registerAll() {
         register(new HUD());
+        register(new ClickGUI());
     }
 
     public void register(Module module) {

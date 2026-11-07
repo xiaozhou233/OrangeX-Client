@@ -15,11 +15,6 @@ import cn.xiaozhou233.orangex.wrapper.api.Minecraft;
  */
 public final class ClientInput {
 
-    /**
-     * GUI toggle key name. The canonical key code is {@link KeyCodes#M}.
-     */
-    public static final String TOGGLE_KEY_NAME = "M";
-
     private static volatile boolean open;
     private static volatile double mouseX;
     private static volatile double mouseY;
@@ -80,23 +75,6 @@ public final class ClientInput {
 
     public static void requestClose() {
         pendingClose = true;
-    }
-
-    /**
-     * Handles a key event posted on the EventBus. Only the canonical toggle
-     * key (M) changes the GUI state; all other keys are ignored here but stay
-     * available to other subscribers.
-     */
-    public static void onKey(Minecraft minecraft, int key) {
-        if (minecraft == null || key != KeyCodes.M) {
-            return;
-        }
-
-        if (minecraft.isInputScreenOpen()) {
-            requestClose();
-        } else if (minecraft.isInWorld() && !minecraft.isScreenOpen()) {
-            requestOpen();
-        }
     }
 
     public static void onMouseMove(double x, double y) {

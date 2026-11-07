@@ -5,7 +5,7 @@
 1. 为什么 1.8.9 的字体 / GUI 只在进入世界后绘制，而 26.2 在主界面也会绘制，以及 OrangeX 现在如何统一。
 2. 客户端 GUI 打开时，如何让鼠标在 GUI 上移动，而不是继续控制游戏视角。
 
-> 状态：第 1 部分和第 2 部分的空 GUI / 鼠标输入已落地。M 键打开或关闭输入界面。
+> 状态：第 1 部分和第 2 部分的空 GUI / 鼠标输入已落地。RSHIFT（右 Shift）打开或关闭输入界面。
 
 ---
 
@@ -280,7 +280,7 @@ Minecraft262Stubs/
 OrangeX/src/main/java/cn/xiaozhou233/orangex/
 ├── input/
 │   ├── ClientInput.java                 跨版本输入状态：开/关、鼠标坐标、按键状态
-│   ├── InputController.java             订阅 EventKey 并驱动 ClientInput
+│   ├── InputController.java             在 tick 前后驱动 ClientInput
 │   ├── KeyCodes.java                    统一的按键编号（1.8.9 LWJGL 2）+ GLFW 转换
 │   ├── internal/
 │   │   ├── VersionInput.java            版本输入接口
@@ -292,6 +292,7 @@ OrangeX/src/main/java/cn/xiaozhou233/orangex/
 │   ├── facade/InputEvents.java          输入门面（1.8.9 注入代码）
 │   ├── facade/KeyEvents.java            按键事件统一投递到 EventBus
 │   └── impl/EventKey.java               按键事件（统一使用 1.8.9 key code）
+├── modules/impl/render/ClickGUI.java    ClickGUI 模块，默认 keybind = RSHIFT
 └── hook/impl/
     ├── GuiInputHook.java                1.8.9 GuiScreen 输入 / 按键 Hook
     └── KeyPressHook.java                1.8.9 KeyBinding#onTick / 26.2 KeyboardHandler#keyPress 按键 Hook
@@ -299,16 +300,20 @@ OrangeX/src/main/java/cn/xiaozhou233/orangex/
 
 行为：
 
-- M 键在**世界内**打开空 GUI；再次按下关闭。
+- RSHIFT 是 `ClickGUI` 模块的默认 keybind。
+- `ModuleManager` 收到 RSHIFT 的 `EventKey` 后 toggle `ClickGUI`：
+  - 启用：`ClickGUI.onEnable` → `ClientInput.requestOpen()`
+  - 禁用：`ClickGUI.onDisable` → `ClientInput.requestClose()`
+  - 如果界面被 ESC 等原版逻辑关闭，`ClickGUI.onTick` 会在下一 tick 自动禁用模块，保证状态同步。
 - 所有 `EventKey#getKey()` 都使用 1.8.9 / LWJGL 2 键码，26.2 的 GLFW 键码在投递前通过 `KeyCodes.fromGlfw` 转换。
 - 按键统一走 EventBus：
-  - 1.8.9 打开：`KeyBinding#onTick(int)` → `InputEvents.onKeyPressed` → `KeyEvents.fire` → `EventBus.post(EventKey)` → `InputController.onKey` → `ClientInput.requestOpen()`
+  - 1.8.9 打开：`KeyBinding#onTick(int)` → `InputEvents.onKeyPressed` → `KeyEvents.fire` → `EventBus.post(EventKey)` → `ModuleManager.onKey` → `ClickGUI.toggle()` → `ClientInput.requestOpen()`
   - 1.8.9 关闭：`GuiScreen#keyTyped(char, int)` → `InputEvents.onKeyTyped` → 同一条 EventBus 链路 → `requestClose()`
   - 26.2：`KeyboardHandler#keyPress(long, int, KeyEvent)` 全局 Hook → `InputEvents.onGlfwKeyPressed` → 键码转换 → 同一条 EventBus 链路。行走、无界面时也能收到按键，不再依赖 tick 轮询。
-  - 其他功能可以直接 `@Subscribe` `EventKey` 读取按键，不需要再改注入代码。
+  - 其他模块可以直接 `@Subscribe` `EventKey` 读取按键，不需要再改注入代码。
   - 打开 / 关闭都只在 tick 末尾（`EventTickPost` → `ClientInput.applyPending`）真正执行。
-  - 原因：如果在键盘循环里直接打开 Screen，同一个 M 事件会立刻被 `currentScreen.handleKeyboardInput()` 再处理一次，导致刚打开就关闭。
-  - 自动重复事件：1.8.9 通过 `Keyboard.isRepeatEvent()` 过滤，26.2 只处理 GLFW action == 1（press），按住 M 不会反复开关。
+  - 原因：如果在键盘循环里直接打开 Screen，同一个 RSHIFT 事件会立刻被 `currentScreen.handleKeyboardInput()` 再处理一次，导致刚打开就关闭。
+  - 自动重复事件：1.8.9 通过 `Keyboard.isRepeatEvent()` 过滤，26.2 只处理 GLFW action == 1（press），按住 RSHIFT 不会反复开关。
 - 打开时：
   - 1.8.9：运行时生成 `GuiScreen` 具体子类，再 `Minecraft#displayGuiScreen(...)`；`doesGuiPauseGame()` 对自己的空壳返回 `false`。
   - 26.2：`Gui#setScreen(new V26_2InputScreen())`，`isPauseScreen()` 返回 `false`。
@@ -377,8 +382,8 @@ int y = scaledHeight - Mouse.getY() * scaledHeight / mc.displayHeight - 1;
 | 1.8.9 注入报 `no such class: cn$...` | 注入代码写了全限定 `cn.*`，应使用简单类名 + `getInjectedClassNames()` |
 | 空 GUI 打开后玩家还能动 | 1.8.9 / 26.2 都必须真正打开 Screen；只 ungrab 不够 |
 | 1.8.9 空 GUI 导致单人暂停 | 已 Hook `GuiScreen#doesGuiPauseGame`，对自己的空壳返回 false |
-| 1.8.9 短按 M 没反应 | 已改为 `KeyBinding#onTick` 事件路径；可用 `-Dorangex.debugInput=true` 查看按键日志 |
-| 聊天 / 背包界面里按 M 被劫持 | 打开前检查 `isScreenOpen()`，任何原版 Screen 存在时都不响应 |
+| 1.8.9 短按 RSHIFT 没反应 | 已改为 `KeyBinding#onTick` 事件路径；可用 `-Dorangex.debugInput=true` 查看按键日志 |
+| 聊天 / 背包界面里按 RSHIFT 被劫持 | 打开前检查 `isScreenOpen()`，任何原版 Screen 存在时都不响应 |
 
 ---
 

@@ -34,7 +34,7 @@ public final class FontDebugOverlay {
                         + "  mouse " + (int) ClientInput.getMouseX()
                         + ", " + (int) ClientInput.getMouseY(),
                 8, 68, 0xFF55FF55);
-        body.drawString("M: toggle input screen", 8, 82, 0xFF888888);
+        body.drawString("RSHIFT: ClickGUI", 8, 82, 0xFF888888);
 
         // Large high-contrast marker: if this is invisible too, the problem is
         // GL state/coordinates rather than the glyph atlas.
