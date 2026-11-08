@@ -1,6 +1,7 @@
 package cn.xiaozhou233.orangex.wrapper.internal;
 
 import cn.xiaozhou233.orangex.wrapper.api.Minecraft;
+import cn.xiaozhou233.orangex.wrapper.api.WorldView;
 
 /**
  * Creates the wrappers for one Minecraft version.
@@ -18,4 +19,9 @@ public interface WrapperProvider {
      * Creates the wrapper for {@code net.minecraft.client.Minecraft}.
      */
     Minecraft createMinecraft(WrapperContext context);
+
+    /**
+     * Creates the world/camera view backed by the given client instance.
+     */
+    WorldView createWorld(WrapperContext context, Minecraft minecraft);
 }

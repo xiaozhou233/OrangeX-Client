@@ -13,6 +13,7 @@ import cn.xiaozhou233.orangex.runtime.RuntimeDetector;
 import cn.xiaozhou233.orangex.runtime.RuntimeInfo;
 import cn.xiaozhou233.orangex.wrapper.MinecraftFactory;
 import cn.xiaozhou233.orangex.wrapper.api.Minecraft;
+import cn.xiaozhou233.orangex.wrapper.api.WorldView;
 import lombok.Getter;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -35,6 +36,8 @@ public class OrangeX {
     private ModuleManager moduleManager = new ModuleManager();
     @Getter
     private Minecraft minecraft;
+    @Getter
+    private WorldView worldView;
 
     public OrangeX() {
         System.out.println("OrangeX <init> start!");
@@ -51,6 +54,17 @@ public class OrangeX {
         Minecraft minecraft = MinecraftFactory.create(runtimeInfo, MappingManager.getResolver());
         this.minecraft = minecraft;
         System.out.println(minecraft.getMinecraft());
+
+        try {
+            this.worldView = MinecraftFactory.createWorld(
+                    runtimeInfo, MappingManager.getResolver(), minecraft);
+        } catch (Throwable throwable) {
+            // The client must keep running even when a version cannot expose
+            // world data; world-dependent modules simply stay inactive.
+            System.err.println("[OrangeX] World wrapper unavailable: "
+                    + throwable.getMessage());
+            throwable.printStackTrace();
+        }
 
         render2DManager = new Render2DManager(
                 runtimeInfo, MappingManager.getResolver(), minecraft.getMinecraft());

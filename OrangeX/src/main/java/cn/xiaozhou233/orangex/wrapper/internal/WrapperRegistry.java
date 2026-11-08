@@ -2,6 +2,7 @@ package cn.xiaozhou233.orangex.wrapper.internal;
 
 import cn.xiaozhou233.orangex.runtime.version.MinecraftVersion;
 import cn.xiaozhou233.orangex.wrapper.api.Minecraft;
+import cn.xiaozhou233.orangex.wrapper.api.WorldView;
 import cn.xiaozhou233.orangex.wrapper.internal.v1_8_9.V1_8_9WrapperProvider;
 import cn.xiaozhou233.orangex.wrapper.internal.v26_2.V26_2WrapperProvider;
 
@@ -45,6 +46,14 @@ public final class WrapperRegistry {
     }
 
     public static Minecraft createMinecraft(WrapperContext context) {
+        return provider(context).createMinecraft(context);
+    }
+
+    public static WorldView createWorld(WrapperContext context, Minecraft minecraft) {
+        return provider(context).createWorld(context, minecraft);
+    }
+
+    private static WrapperProvider provider(WrapperContext context) {
         MinecraftVersion version = context.getRuntimeInfo().getMinecraftVersion();
         WrapperProvider provider = PROVIDERS.get(version);
 
@@ -53,7 +62,7 @@ public final class WrapperRegistry {
                     "Unsupported Minecraft version: " + version);
         }
 
-        return provider.createMinecraft(context);
+        return provider;
     }
 
     private WrapperRegistry() {
