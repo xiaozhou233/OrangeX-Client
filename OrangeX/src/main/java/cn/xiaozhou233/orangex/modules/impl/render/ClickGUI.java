@@ -6,6 +6,7 @@ import cn.xiaozhou233.orangex.input.ClientInput;
 import cn.xiaozhou233.orangex.input.KeyCodes;
 import cn.xiaozhou233.orangex.modules.Module;
 import cn.xiaozhou233.orangex.modules.ModuleCategory;
+import cn.xiaozhou233.orangex.ui.clickgui.ClickGuiRender;
 import org.greenrobot.eventbus.Subscribe;
 
 /**
@@ -33,6 +34,7 @@ public class ClickGUI extends Module {
             return;
         }
         justEnabled = true;
+        ClickGuiRender.reset();
         // Defer opening to EventTickPost: opening inside the keyboard callback
         // would let the same RSHIFT event reach the new screen and close it.
         ClientInput.requestOpen();
@@ -41,6 +43,7 @@ public class ClickGUI extends Module {
     @Override
     protected void onDisable() {
         justEnabled = false;
+        ClickGuiRender.reset();
         ClientInput.requestClose();
         super.onDisable();
     }
@@ -65,8 +68,6 @@ public class ClickGUI extends Module {
             return;
         }
 
-        // TODO: draw the ClickGUI here.
-        // Cursor: ClientInput.getMouseX() / getMouseY()
-        // Buttons: ClientInput.isLeftDown() / isRightDown() / isMiddleDown()
+        ClickGuiRender.render(event);
     }
 }
