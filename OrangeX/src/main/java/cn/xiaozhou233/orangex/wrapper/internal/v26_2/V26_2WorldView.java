@@ -2,6 +2,7 @@ package cn.xiaozhou233.orangex.wrapper.internal.v26_2;
 
 import cn.xiaozhou233.orangex.wrapper.api.Minecraft;
 import cn.xiaozhou233.orangex.wrapper.api.WorldView;
+import cn.xiaozhou233.orangex.wrapper.common.EntityKind;
 import cn.xiaozhou233.orangex.wrapper.common.EntityTarget;
 import cn.xiaozhou233.orangex.wrapper.common.Vec3;
 import cn.xiaozhou233.orangex.wrapper.common.WorldSnapshot;
@@ -25,6 +26,28 @@ public final class V26_2WorldView implements WorldView {
 
     private static final float DEFAULT_FOV = 70.0F;
 
+    private static final String ENTITY_PLAYER =
+            "net.minecraft.world.entity.player.Player";
+    private static final String ENTITY_MONSTER =
+            "net.minecraft.world.entity.monster.Enemy";
+    private static final String ENTITY_ANIMAL =
+            "net.minecraft.world.entity.animal.Animal";
+    private static final String ENTITY_WATER_ANIMAL =
+            "net.minecraft.world.entity.animal.fish.WaterAnimal";
+    private static final String ENTITY_AMBIENT =
+            "net.minecraft.world.entity.ambient.AmbientCreature";
+    private static final String ENTITY_GOLEM =
+            "net.minecraft.world.entity.animal.golem.AbstractGolem";
+    private static final String ENTITY_VILLAGER =
+            "net.minecraft.world.entity.npc.villager.AbstractVillager";
+
+    private static final String[] PLAYER_CLASSES = {ENTITY_PLAYER};
+    private static final String[] MONSTER_CLASSES = {ENTITY_MONSTER};
+    private static final String[] ANIMAL_CLASSES = {
+            ENTITY_ANIMAL, ENTITY_WATER_ANIMAL, ENTITY_AMBIENT, ENTITY_GOLEM
+    };
+    private static final String[] VILLAGER_CLASSES = {ENTITY_VILLAGER};
+
     private final Object minecraft;
 
     private final Field levelField;
@@ -38,6 +61,12 @@ public final class V26_2WorldView implements WorldView {
     private Method cameraXRotMethod;
     private Method cameraYRotMethod;
     private Method cameraFovMethod;
+
+    private boolean entitySourceResolved;
+    private Method entitiesForRenderingMethod;
+    private Method getEntitiesMethod;
+    private Method getAllMethod;
+    private Method playersMethod;
 
     private final Map<Class<?>, EntityAccess> accessCache =
             new HashMap<Class<?>, EntityAccess>();
@@ -114,44 +143,28 @@ public final class V26_2WorldView implements WorldView {
         return camera;
     }
 
+    /**
+     * Captures every entity the level exposes for rendering. No gameplay
+     * filtering happens here: feature code (for example the ESP module)
+     * decides which kinds it wants to show.
+     */
     private List<EntityTarget> collectTargets(Object level,
                                               Object localPlayer,
                                               Vec3 cameraPosition,
                                               float partialTicks) {
         List<EntityTarget> targets = new ArrayList<EntityTarget>();
 
-        Method playersMethod = ReflectionSupport.findMethod(
-                level.getClass(), "players", null);
-        if (playersMethod == null) {
+        Iterable<?> entities = entities(level);
+        if (entities == null) {
             return targets;
         }
 
-        Object value = ReflectionSupport.invoke(playersMethod, level);
-        if (!(value instanceof Iterable)) {
-            return targets;
-        }
-
-        for (Object entity : (Iterable<?>) value) {
-            if (entity == null || entity == localPlayer) {
+        for (Object entity : entities) {
+            if (entity == null) {
                 continue;
             }
 
             EntityAccess access = accessFor(entity.getClass());
-
-            if (!invokeBoolean(access.isAlive, entity)) {
-                continue;
-            }
-            if (invokeBoolean(access.isInvisible, entity)) {
-                continue;
-            }
-            if (access.isSpectator != null && invokeBoolean(access.isSpectator, entity)) {
-                continue;
-            }
-
-            float health = invokeFloat(access.getHealth, entity);
-            if (health <= 0.0F) {
-                continue;
-            }
 
             Vec3 position = readVec3(ReflectionSupport.invoke(
                     access.getPosition, entity, Float.valueOf(partialTicks)));
@@ -159,17 +172,110 @@ public final class V26_2WorldView implements WorldView {
                 continue;
             }
 
+            boolean local = entity == localPlayer;
+
             targets.add(new EntityTarget(
                     invokeString(access.getName, entity),
                     position,
                     invokeFloat(access.getBbWidth, entity),
                     invokeFloat(access.getBbHeight, entity),
-                    health,
-                    invokeFloat(access.getMaxHealth, entity),
-                    distance(cameraPosition, position)));
+                    access.getHealth == null ? 0.0F : invokeFloat(access.getHealth, entity),
+                    access.getMaxHealth == null ? 0.0F : invokeFloat(access.getMaxHealth, entity),
+                    distance(cameraPosition, position),
+                    classify(entity.getClass()),
+                    local,
+                    invokeBoolean(access.isInvisible, entity)));
         }
 
         return targets;
+    }
+
+    /**
+     * Resolves the all-entity source once. Modern clients expose
+     * {@code Level#entitiesForRendering()}; older/newer builds may instead
+     * expose {@code Level#getEntities()#getAll()}. {@code players()} stays as
+     * a last-resort fallback so the overlay keeps working if the level API
+     * changes again.
+     */
+    private Iterable<?> entities(Object level) {
+        if (!entitySourceResolved) {
+            entitySourceResolved = true;
+            entitiesForRenderingMethod = ReflectionSupport.findMethod(
+                    level.getClass(), "entitiesForRendering", null);
+            if (entitiesForRenderingMethod == null) {
+                getEntitiesMethod = ReflectionSupport.findMethod(
+                        level.getClass(), "getEntities", null);
+            }
+            if (entitiesForRenderingMethod == null && getEntitiesMethod == null) {
+                playersMethod = ReflectionSupport.findMethod(
+                        level.getClass(), "players", null);
+            }
+        }
+
+        if (entitiesForRenderingMethod != null) {
+            Object value = ReflectionSupport.invoke(entitiesForRenderingMethod, level);
+            return value instanceof Iterable ? (Iterable<?>) value : null;
+        }
+
+        if (getEntitiesMethod != null) {
+            Object getter = ReflectionSupport.invoke(getEntitiesMethod, level);
+            if (getter == null) {
+                return null;
+            }
+            if (getAllMethod == null) {
+                getAllMethod = ReflectionSupport.findMethod(
+                        getter.getClass(), "getAll", null);
+            }
+            if (getAllMethod != null) {
+                Object value = ReflectionSupport.invoke(getAllMethod, getter);
+                return value instanceof Iterable ? (Iterable<?>) value : null;
+            }
+            return null;
+        }
+
+        if (playersMethod != null) {
+            Object value = ReflectionSupport.invoke(playersMethod, level);
+            return value instanceof Iterable ? (Iterable<?>) value : null;
+        }
+
+        return null;
+    }
+
+    private static EntityKind classify(Class<?> entityClass) {
+        if (matches(entityClass, PLAYER_CLASSES)) {
+            return EntityKind.PLAYER;
+        }
+        if (matches(entityClass, VILLAGER_CLASSES)) {
+            return EntityKind.VILLAGER;
+        }
+        if (matches(entityClass, MONSTER_CLASSES)) {
+            return EntityKind.MONSTER;
+        }
+        if (matches(entityClass, ANIMAL_CLASSES)) {
+            return EntityKind.ANIMAL;
+        }
+        return EntityKind.OTHER;
+    }
+
+    private static boolean matches(Class<?> type, String[] classNames) {
+        if (type == null) {
+            return false;
+        }
+
+        String name = type.getName();
+        for (String className : classNames) {
+            if (name.equals(className)) {
+                return true;
+            }
+        }
+
+        for (Class<?> implemented : type.getInterfaces()) {
+            if (matches(implemented, classNames)) {
+                return true;
+            }
+        }
+
+        return matches(type.getSuperclass(), classNames);
     }
 
     private float partialTicks() {
@@ -269,9 +375,7 @@ public final class V26_2WorldView implements WorldView {
         private final Method getMaxHealth;
         private final Method getBbWidth;
         private final Method getBbHeight;
-        private final Method isAlive;
         private final Method isInvisible;
-        private final Method isSpectator;
 
         private EntityAccess(Class<?> entityClass) {
             this.getPosition = ReflectionSupport.requireMethod(
@@ -279,20 +383,18 @@ public final class V26_2WorldView implements WorldView {
                     float.class);
             this.getName = ReflectionSupport.requireMethod(
                     entityClass, "getName", null, entityClass.getName());
-            this.getHealth = ReflectionSupport.requireMethod(
-                    entityClass, "getHealth", float.class, entityClass.getName());
-            this.getMaxHealth = ReflectionSupport.requireMethod(
-                    entityClass, "getMaxHealth", float.class, entityClass.getName());
+            // Health only exists on LivingEntity, so non-living entities
+            // (items, arrows, ...) leave these null.
+            this.getHealth = ReflectionSupport.findMethod(
+                    entityClass, "getHealth", float.class);
+            this.getMaxHealth = ReflectionSupport.findMethod(
+                    entityClass, "getMaxHealth", float.class);
             this.getBbWidth = ReflectionSupport.requireMethod(
                     entityClass, "getBbWidth", float.class, entityClass.getName());
             this.getBbHeight = ReflectionSupport.requireMethod(
                     entityClass, "getBbHeight", float.class, entityClass.getName());
-            this.isAlive = ReflectionSupport.requireMethod(
-                    entityClass, "isAlive", boolean.class, entityClass.getName());
             this.isInvisible = ReflectionSupport.requireMethod(
                     entityClass, "isInvisible", boolean.class, entityClass.getName());
-            this.isSpectator = ReflectionSupport.findMethod(
-                    entityClass, "isSpectator", boolean.class);
         }
     }
 }

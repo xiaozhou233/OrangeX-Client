@@ -6,6 +6,7 @@ import cn.xiaozhou233.orangex.mapping.MappingMethod;
 import cn.xiaozhou233.orangex.mapping.MappingResolver;
 import cn.xiaozhou233.orangex.wrapper.api.Minecraft;
 import cn.xiaozhou233.orangex.wrapper.api.WorldView;
+import cn.xiaozhou233.orangex.wrapper.common.EntityKind;
 import cn.xiaozhou233.orangex.wrapper.common.EntityTarget;
 import cn.xiaozhou233.orangex.wrapper.common.Vec3;
 import cn.xiaozhou233.orangex.wrapper.common.WorldSnapshot;
@@ -36,6 +37,12 @@ public final class V1_8_9WorldView implements WorldView {
     private static final String ENTITY = "net/minecraft/entity/Entity";
     private static final String ENTITY_LIVING = "net/minecraft/entity/EntityLivingBase";
     private static final String ENTITY_PLAYER = "net/minecraft/entity/player/EntityPlayer";
+    private static final String ENTITY_MONSTER = "net/minecraft/entity/monster/IMob";
+    private static final String ENTITY_ANIMAL = "net/minecraft/entity/passive/EntityAnimal";
+    private static final String ENTITY_AMBIENT = "net/minecraft/entity/passive/EntityAmbientCreature";
+    private static final String ENTITY_WATER = "net/minecraft/entity/passive/EntityWaterMob";
+    private static final String ENTITY_GOLEM = "net/minecraft/entity/monster/EntityGolem";
+    private static final String ENTITY_VILLAGER = "net/minecraft/entity/passive/EntityVillager";
     private static final String ENTITY_RENDERER = "net/minecraft/client/renderer/EntityRenderer";
 
     private static final float DEFAULT_FOV = 70.0F;
@@ -53,15 +60,20 @@ public final class V1_8_9WorldView implements WorldView {
     private final Field entityRendererField;
 
     private final String partialTicksName;
-    private final String playerEntitiesName;
+    private final String loadedEntitiesName;
     private final String thirdPersonViewName;
     private final String fovSettingName;
     private final String fovModifierMethodName;
     private final String thirdPersonDistanceName;
     private final String thirdPersonDistanceTempName;
 
+    private final String[] playerClassNames;
+    private final String[] monsterClassNames;
+    private final String[] animalClassNames;
+    private final String[] villagerClassNames;
+
     private Field partialTicksField;
-    private Field playerEntitiesField;
+    private Field loadedEntitiesField;
     private Field thirdPersonViewField;
     private Field fovSettingField;
     private Field thirdPersonDistanceField;
@@ -86,7 +98,7 @@ public final class V1_8_9WorldView implements WorldView {
         this.entityRendererField = resolveField(minecraftMapping, "entityRenderer", minecraftClass);
 
         this.partialTicksName = fieldName(TIMER, "renderPartialTicks");
-        this.playerEntitiesName = fieldName(WORLD, "playerEntities");
+        this.loadedEntitiesName = fieldName(WORLD, "loadedEntityList");
         this.thirdPersonViewName = fieldName(GAME_SETTINGS, "thirdPersonView");
         this.fovSettingName = fieldName(GAME_SETTINGS, "fovSetting");
         this.fovModifierMethodName = methodName(
@@ -95,6 +107,12 @@ public final class V1_8_9WorldView implements WorldView {
                 ENTITY_RENDERER, "thirdPersonDistance");
         this.thirdPersonDistanceTempName = optionalFieldName(
                 ENTITY_RENDERER, "thirdPersonDistanceTemp");
+
+        this.playerClassNames = classNames(ENTITY_PLAYER);
+        this.monsterClassNames = classNames(ENTITY_MONSTER);
+        this.animalClassNames = classNames(
+                ENTITY_ANIMAL, ENTITY_AMBIENT, ENTITY_WATER, ENTITY_GOLEM);
+        this.villagerClassNames = classNames(ENTITY_VILLAGER);
     }
 
     @Override
@@ -156,6 +174,11 @@ public final class V1_8_9WorldView implements WorldView {
                 cameraYaw, cameraPitch, fov, targets);
     }
 
+    /**
+     * Captures every entity in the loaded entity list. No gameplay filtering
+     * happens here: feature code (for example the ESP module) decides which
+     * kinds it wants to show.
+     */
     private List<EntityTarget> collectTargets(Object world,
                                               Object localPlayer,
                                               double cameraX,
@@ -164,7 +187,7 @@ public final class V1_8_9WorldView implements WorldView {
                                               float partialTicks) {
         List<EntityTarget> targets = new ArrayList<EntityTarget>();
 
-        Field entitiesField = playerEntitiesField(world.getClass());
+        Field entitiesField = loadedEntitiesField(world.getClass());
         if (entitiesField == null) {
             return targets;
         }
@@ -175,26 +198,11 @@ public final class V1_8_9WorldView implements WorldView {
         }
 
         for (Object entity : (List<?>) value) {
-            if (entity == null || entity == localPlayer) {
+            if (entity == null) {
                 continue;
             }
 
             EntityAccess access = accessFor(entity.getClass());
-
-            if (access.isAlive != null && !invokeBoolean(access.isAlive, entity)) {
-                continue;
-            }
-            if (access.isInvisible != null && invokeBoolean(access.isInvisible, entity)) {
-                continue;
-            }
-            if (access.isSpectator != null && invokeBoolean(access.isSpectator, entity)) {
-                continue;
-            }
-
-            float health = invokeFloat(access.getHealth, entity);
-            if (health <= 0.0F) {
-                continue;
-            }
 
             double x = interpolate(access.posX, access.lastTickPosX, entity, partialTicks);
             double y = interpolate(access.posY, access.lastTickPosY, entity, partialTicks);
@@ -206,18 +214,73 @@ public final class V1_8_9WorldView implements WorldView {
                     : ReflectionSupport.getFloat(access.height, entity);
 
             double distance = distance(cameraX, cameraY, cameraZ, x, y, z);
+            boolean local = entity == localPlayer;
 
             targets.add(new EntityTarget(
                     String.valueOf(ReflectionSupport.invoke(access.getName, entity)),
                     new Vec3(x, y, z),
                     width,
                     height,
-                    health,
-                    invokeFloat(access.getMaxHealth, entity),
-                    distance));
+                    access.getHealth == null ? 0.0F : invokeFloat(access.getHealth, entity),
+                    access.getMaxHealth == null ? 0.0F : invokeFloat(access.getMaxHealth, entity),
+                    distance,
+                    classify(entity.getClass()),
+                    local,
+                    invokeBoolean(access.isInvisible, entity)));
         }
 
         return targets;
+    }
+
+    private EntityKind classify(Class<?> entityClass) {
+        if (matches(entityClass, playerClassNames)) {
+            return EntityKind.PLAYER;
+        }
+        if (matches(entityClass, villagerClassNames)) {
+            return EntityKind.VILLAGER;
+        }
+        if (matches(entityClass, monsterClassNames)) {
+            return EntityKind.MONSTER;
+        }
+        if (matches(entityClass, animalClassNames)) {
+            return EntityKind.ANIMAL;
+        }
+        return EntityKind.OTHER;
+    }
+
+    /**
+     * Checks the runtime class hierarchy (including interfaces) against a set
+     * of mapped class names. This avoids loading optional entity classes that
+     * may not exist on every runtime.
+     */
+    private static boolean matches(Class<?> type, String[] classNames) {
+        if (type == null) {
+            return false;
+        }
+
+        String name = type.getName();
+        for (String className : classNames) {
+            if (name.equals(className)) {
+                return true;
+            }
+        }
+
+        for (Class<?> implemented : type.getInterfaces()) {
+            if (matches(implemented, classNames)) {
+                return true;
+            }
+        }
+
+        return matches(type.getSuperclass(), classNames);
+    }
+
+    private String[] classNames(String... sourceNames) {
+        String[] names = new String[sourceNames.length];
+        for (int index = 0; index < sourceNames.length; index++) {
+            names[index] = resolver.mapClass(sourceNames[index])
+                    .getTargetName().replace('/', '.');
+        }
+        return names;
     }
 
     private float partialTicks() {
@@ -320,12 +383,12 @@ public final class V1_8_9WorldView implements WorldView {
                 || thirdPersonDistanceTempField != null;
     }
 
-    private Field playerEntitiesField(Class<?> worldClass) {
-        if (playerEntitiesField == null) {
-            playerEntitiesField = ReflectionSupport.findField(
-                    worldClass, playerEntitiesName);
+    private Field loadedEntitiesField(Class<?> worldClass) {
+        if (loadedEntitiesField == null) {
+            loadedEntitiesField = ReflectionSupport.findField(
+                    worldClass, loadedEntitiesName);
         }
-        return playerEntitiesField;
+        return loadedEntitiesField;
     }
 
     private EntityAccess accessFor(Class<?> entityClass) {
@@ -431,14 +494,11 @@ public final class V1_8_9WorldView implements WorldView {
         private final Method getName;
         private final Method getHealth;
         private final Method getMaxHealth;
-        private final Method isAlive;
         private final Method isInvisible;
-        private final Method isSpectator;
 
         private EntityAccess(Class<?> entityClass) {
             MappingClass entity = resolver.mapClass(ENTITY);
             MappingClass living = resolver.mapClass(ENTITY_LIVING);
-            MappingClass player = resolver.mapClass(ENTITY_PLAYER);
 
             this.posX = mappedField(entity, "posX", entityClass);
             this.posY = mappedField(entity, "posY", entityClass);
@@ -455,17 +515,13 @@ public final class V1_8_9WorldView implements WorldView {
 
             this.eyeHeight = mappedMethod(entity, "getEyeHeight", "()F",
                     float.class, entityClass);
-            this.isAlive = mappedMethod(entity, "isEntityAlive", "()Z",
-                    boolean.class, entityClass);
-            this.isInvisible = mappedMethod(entity, "isInvisible", "()Z",
-                    boolean.class, entityClass);
-            this.getHealth = mappedMethod(living, "getHealth", "()F",
-                    float.class, entityClass);
-            this.getMaxHealth = mappedMethod(living, "getMaxHealth", "()F",
-                    float.class, entityClass);
-            this.getName = mappedMethod(player, "getName", "()Ljava/lang/String;",
+            this.getName = mappedMethod(entity, "getName", "()Ljava/lang/String;",
                     String.class, entityClass);
-            this.isSpectator = optionalMappedMethod(player, "isSpectator", "()Z",
+            this.getHealth = optionalMappedMethod(living, "getHealth", "()F",
+                    float.class, entityClass);
+            this.getMaxHealth = optionalMappedMethod(living, "getMaxHealth", "()F",
+                    float.class, entityClass);
+            this.isInvisible = mappedMethod(entity, "isInvisible", "()Z",
                     boolean.class, entityClass);
         }
 

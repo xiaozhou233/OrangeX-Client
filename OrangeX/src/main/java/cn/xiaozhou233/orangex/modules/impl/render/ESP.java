@@ -20,13 +20,14 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * 2D ESP: projects players to the screen and draws a box, name, distance and
+ * 2D ESP: projects entities to the screen and draws a box, name, distance and
  * health bar around each one.
  *
  * <p>All drawing happens in GUI pixel space through {@link Render2D}, so it
  * works with both the 1.8.9 and the modern font backends. World data comes
  * from the cross-version {@link WorldView} wrapper, never from game classes
- * directly.</p>
+ * directly. The wrapper reports every entity; the target-type filters below
+ * decide which kinds are drawn.</p>
  */
 public class ESP extends Module {
 
@@ -44,6 +45,14 @@ public class ESP extends Module {
     private static final int ORANGE = 0xFFFF8A00;
     private static final int FILL_ALPHA = 32;
     private static final int HEALTH_BACKGROUND = 0x80000000;
+
+    private final BooleanValue players = addBoolean("Players", true);
+    private final BooleanValue localPlayer = addBoolean("Local Player", false);
+    private final BooleanValue monsters = addBoolean("Monsters", false);
+    private final BooleanValue animals = addBoolean("Animals", false);
+    private final BooleanValue villagers = addBoolean("Villagers", false);
+    private final BooleanValue others = addBoolean("Others", false);
+    private final BooleanValue invisible = addBoolean("Invisible", false);
 
     private final BooleanValue box = addBoolean("Box", true);
     private final BooleanValue fill = addBoolean("Fill", true);
@@ -92,8 +101,44 @@ public class ESP extends Module {
         List<EntityTarget> targets = snapshot.getTargets();
         for (int index = 0; index < targets.size(); index++) {
             EntityTarget target = targets.get(index);
+            if (!isTargetEnabled(target)) {
+                continue;
+            }
             renderTarget(graphics, font, fontHeight, snapshot, target, index,
                     screenWidth, screenHeight);
+        }
+    }
+
+    /**
+     * Target filters live here rather than in the world wrapper so the same
+     * snapshot can feed future features (tracers, nametags, ...) without each
+     * of them re-implementing the rules.
+     */
+    private boolean isTargetEnabled(EntityTarget target) {
+        // Invisible entities are their own category: they are drawn only when
+        // "Invisible" is enabled, no matter which kind filters are on. Turn
+        // every kind filter off and keep only this one on for an invisible-only
+        // ESP.
+        if (target.isLocalPlayer()) {
+            return localPlayer.isEnabled()
+                    && (!target.isInvisible() || invisible.isEnabled());
+        }
+        if (target.isInvisible()) {
+            return invisible.isEnabled();
+        }
+
+        switch (target.getKind()) {
+            case PLAYER:
+                return players.isEnabled();
+            case MONSTER:
+                return monsters.isEnabled();
+            case ANIMAL:
+                return animals.isEnabled();
+            case VILLAGER:
+                return villagers.isEnabled();
+            case OTHER:
+            default:
+                return others.isEnabled();
         }
     }
 

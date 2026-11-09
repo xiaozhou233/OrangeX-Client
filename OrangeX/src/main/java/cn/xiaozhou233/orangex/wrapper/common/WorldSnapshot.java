@@ -5,11 +5,11 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * One frame of world data: camera state plus the visible player list.
+ * One frame of world data: camera state plus the entity list.
  *
  * <p>Snapshots are immutable and are produced on the render thread, so the
  * partial tick is read only once and every position in this object belongs to
- * the same frame.</p>
+ * the same frame. Entries are not filtered by gameplay rules.</p>
  */
 public final class WorldSnapshot {
 

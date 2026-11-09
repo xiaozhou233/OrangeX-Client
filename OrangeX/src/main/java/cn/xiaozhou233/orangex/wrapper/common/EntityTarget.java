@@ -1,8 +1,8 @@
 package cn.xiaozhou233.orangex.wrapper.common;
 
 /**
- * Version-independent snapshot of one player entity that feature code can
- * render (for example an ESP target).
+ * Version-independent snapshot of one entity that feature code can render
+ * (for example an ESP target).
  */
 public final class EntityTarget {
 
@@ -13,6 +13,9 @@ public final class EntityTarget {
     private final float health;
     private final float maxHealth;
     private final double distance;
+    private final EntityKind kind;
+    private final boolean localPlayer;
+    private final boolean invisible;
 
     public EntityTarget(String name,
                         Vec3 position,
@@ -20,7 +23,10 @@ public final class EntityTarget {
                         double height,
                         float health,
                         float maxHealth,
-                        double distance) {
+                        double distance,
+                        EntityKind kind,
+                        boolean localPlayer,
+                        boolean invisible) {
         this.name = name;
         this.position = position;
         this.width = width;
@@ -28,6 +34,9 @@ public final class EntityTarget {
         this.health = health;
         this.maxHealth = maxHealth;
         this.distance = distance;
+        this.kind = kind;
+        this.localPlayer = localPlayer;
+        this.invisible = invisible;
     }
 
     public String getName() {
@@ -64,9 +73,31 @@ public final class EntityTarget {
         return distance;
     }
 
+    public EntityKind getKind() {
+        return kind;
+    }
+
+    /**
+     * {@code true} when this target is the entity the camera belongs to.
+     */
+    public boolean isLocalPlayer() {
+        return localPlayer;
+    }
+
+    /**
+     * {@code true} when the game reports the entity as invisible (invisibility
+     * potion, spectator, invisible armor stands, ...).
+     */
+    public boolean isInvisible() {
+        return invisible;
+    }
+
     @Override
     public String toString() {
-        return "EntityTarget{name='" + name + "', position=" + position
+        return "EntityTarget{name='" + name + "', kind=" + kind
+                + ", localPlayer=" + localPlayer
+                + ", invisible=" + invisible
+                + ", position=" + position
                 + ", health=" + health + "/" + maxHealth
                 + ", distance=" + distance + "}";
     }
