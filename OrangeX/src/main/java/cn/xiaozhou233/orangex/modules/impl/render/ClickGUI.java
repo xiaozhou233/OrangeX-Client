@@ -1,5 +1,6 @@
 package cn.xiaozhou233.orangex.modules.impl.render;
 
+import cn.xiaozhou233.orangex.OrangeX;
 import cn.xiaozhou233.orangex.event.impl.EventRender2D;
 import cn.xiaozhou233.orangex.event.impl.EventTickPre;
 import cn.xiaozhou233.orangex.input.ClientInput;
@@ -45,6 +46,9 @@ public class ClickGUI extends Module {
         justEnabled = false;
         ClickGuiRender.reset();
         ClientInput.requestClose();
+        if (OrangeX.getInstance().getConfigManager() != null) {
+            OrangeX.getInstance().getConfigManager().saveIfDirty();
+        }
         super.onDisable();
     }
 

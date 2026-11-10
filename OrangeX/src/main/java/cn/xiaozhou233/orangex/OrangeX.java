@@ -1,5 +1,6 @@
 package cn.xiaozhou233.orangex;
 
+import cn.xiaozhou233.orangex.config.ConfigManager;
 import cn.xiaozhou233.orangex.event.impl.EventKey;
 import cn.xiaozhou233.orangex.event.impl.EventRender2D;
 import cn.xiaozhou233.orangex.event.impl.EventTickPre;
@@ -18,7 +19,11 @@ import lombok.Getter;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.io.File;
+
 public class OrangeX {
+    public static String OrangeXPath = new File(System.getProperty("user.home")+"/.orangex").getAbsolutePath();
+
     @Getter
     private static final OrangeX instance = new OrangeX();
     @Getter
@@ -34,6 +39,9 @@ public class OrangeX {
     private Render2DManager render2DManager;
     @Getter
     private ModuleManager moduleManager = new ModuleManager();
+    @Getter
+    private ConfigManager configManager;
+
     @Getter
     private Minecraft minecraft;
     @Getter
@@ -75,6 +83,9 @@ public class OrangeX {
         eventBus.register(this);
 
         moduleManager.init();
+
+        configManager = new ConfigManager(new File(OrangeXPath, "configs/"), moduleManager);
+        configManager.init();
 
         HookManager.getINSTANCE().applyAll();
     }

@@ -17,6 +17,8 @@ import java.util.function.Supplier;
  */
 public abstract class Value<T> {
 
+    private static volatile Runnable globalChangeHook;
+
     private final String name;
     private final T defaultValue;
 
@@ -47,9 +49,24 @@ public abstract class Value<T> {
             return;
         }
         this.value = newValue;
-        if (changeListener != null) {
-            changeListener.accept(newValue);
+        try {
+            if (changeListener != null) {
+                changeListener.accept(newValue);
+            }
+        } finally {
+            Runnable hook = globalChangeHook;
+            if (hook != null) {
+                hook.run();
+            }
         }
+    }
+
+    /**
+     * Registers a process-wide callback invoked whenever any value changes.
+     * Used by the config manager to track unsaved changes.
+     */
+    public static void setGlobalChangeHook(Runnable hook) {
+        globalChangeHook = hook;
     }
 
     public T getDefaultValue() {

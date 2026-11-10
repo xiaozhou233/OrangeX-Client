@@ -1,6 +1,7 @@
 package cn.xiaozhou233.orangex.modules;
 
 import cn.xiaozhou233.orangex.OrangeX;
+import cn.xiaozhou233.orangex.config.ConfigManager;
 import cn.xiaozhou233.orangex.input.KeyCodes;
 import cn.xiaozhou233.orangex.value.BooleanValue;
 import cn.xiaozhou233.orangex.value.KeybindValue;
@@ -62,6 +63,14 @@ public abstract class Module {
 
     protected ModeValue addMode(String name, String defaultMode, String... modes) {
         return addValue(new ModeValue(name, defaultMode, modes));
+    }
+
+    /**
+     * Stable key used for persistence. Keeping the class name instead of the
+     * display name means renamed modules keep their stored settings.
+     */
+    public String getConfigKey() {
+        return getClass().getName();
     }
 
     public Value<?> getValue(String name) {
@@ -126,6 +135,7 @@ public abstract class Module {
         if (this.enabled == setEnabled) return;
 
         this.enabled = setEnabled;
+        markConfigDirty();
 
         if (this.enabled) {
             if (OrangeX.getInstance().getEventBus().isRegistered(this))
@@ -142,6 +152,13 @@ public abstract class Module {
 
     public void toggle() {
         setEnabled(!this.enabled);
+    }
+
+    private void markConfigDirty() {
+        ConfigManager configManager = OrangeX.getInstance().getConfigManager();
+        if (configManager != null) {
+            configManager.markDirty();
+        }
     }
 
 }
