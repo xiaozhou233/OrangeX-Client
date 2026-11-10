@@ -1,6 +1,7 @@
 package cn.xiaozhou233.orangex.wrapper.internal;
 
 import cn.xiaozhou233.orangex.wrapper.api.Minecraft;
+import cn.xiaozhou233.orangex.wrapper.api.Player;
 import cn.xiaozhou233.orangex.wrapper.api.WorldView;
 
 /**
@@ -24,4 +25,9 @@ public interface WrapperProvider {
      * Creates the world/camera view backed by the given client instance.
      */
     WorldView createWorld(WrapperContext context, Minecraft minecraft);
+
+    /**
+     * Creates the local-player view backed by the given client instance.
+     */
+    Player createPlayer(WrapperContext context, Minecraft minecraft);
 }

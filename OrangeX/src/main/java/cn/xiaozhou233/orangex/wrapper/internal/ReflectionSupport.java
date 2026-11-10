@@ -120,6 +120,15 @@ public final class ReflectionSupport {
         }
     }
 
+    public static void setInt(Field field, Object target, int value) {
+        try {
+            field.setInt(target, value);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException(
+                    "Cannot write field '" + field.getName() + "'", e);
+        }
+    }
+
     public static boolean getBoolean(Field field, Object target) {
         try {
             return field.getBoolean(target);

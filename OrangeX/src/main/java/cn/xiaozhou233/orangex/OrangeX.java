@@ -14,6 +14,7 @@ import cn.xiaozhou233.orangex.runtime.RuntimeDetector;
 import cn.xiaozhou233.orangex.runtime.RuntimeInfo;
 import cn.xiaozhou233.orangex.wrapper.MinecraftFactory;
 import cn.xiaozhou233.orangex.wrapper.api.Minecraft;
+import cn.xiaozhou233.orangex.wrapper.api.Player;
 import cn.xiaozhou233.orangex.wrapper.api.WorldView;
 import lombok.Getter;
 import org.greenrobot.eventbus.EventBus;
@@ -46,6 +47,8 @@ public class OrangeX {
     private Minecraft minecraft;
     @Getter
     private WorldView worldView;
+    @Getter
+    private Player player;
 
     public OrangeX() {
         System.out.println("OrangeX <init> start!");
@@ -70,6 +73,16 @@ public class OrangeX {
             // The client must keep running even when a version cannot expose
             // world data; world-dependent modules simply stay inactive.
             System.err.println("[OrangeX] World wrapper unavailable: "
+                    + throwable.getMessage());
+            throwable.printStackTrace();
+        }
+
+        try {
+            this.player = MinecraftFactory.createPlayer(
+                    runtimeInfo, MappingManager.getResolver(), minecraft);
+        } catch (Throwable throwable) {
+            // Player-dependent modules stay inactive when this fails.
+            System.err.println("[OrangeX] Player wrapper unavailable: "
                     + throwable.getMessage());
             throwable.printStackTrace();
         }

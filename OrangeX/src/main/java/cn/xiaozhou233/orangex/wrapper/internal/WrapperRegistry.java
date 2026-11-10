@@ -2,6 +2,7 @@ package cn.xiaozhou233.orangex.wrapper.internal;
 
 import cn.xiaozhou233.orangex.runtime.version.MinecraftVersion;
 import cn.xiaozhou233.orangex.wrapper.api.Minecraft;
+import cn.xiaozhou233.orangex.wrapper.api.Player;
 import cn.xiaozhou233.orangex.wrapper.api.WorldView;
 import cn.xiaozhou233.orangex.wrapper.internal.v1_8_9.V1_8_9WrapperProvider;
 import cn.xiaozhou233.orangex.wrapper.internal.v26_2.V26_2WrapperProvider;
@@ -51,6 +52,10 @@ public final class WrapperRegistry {
 
     public static WorldView createWorld(WrapperContext context, Minecraft minecraft) {
         return provider(context).createWorld(context, minecraft);
+    }
+
+    public static Player createPlayer(WrapperContext context, Minecraft minecraft) {
+        return provider(context).createPlayer(context, minecraft);
     }
 
     private static WrapperProvider provider(WrapperContext context) {

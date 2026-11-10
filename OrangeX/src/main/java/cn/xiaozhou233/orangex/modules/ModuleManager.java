@@ -2,6 +2,7 @@ package cn.xiaozhou233.orangex.modules;
 
 import cn.xiaozhou233.orangex.OrangeX;
 import cn.xiaozhou233.orangex.event.impl.EventKey;
+import cn.xiaozhou233.orangex.modules.impl.movement.NoJumpDelay;
 import cn.xiaozhou233.orangex.modules.impl.render.ClickGUI;
 import cn.xiaozhou233.orangex.modules.impl.render.ESP;
 import cn.xiaozhou233.orangex.modules.impl.render.HUD;
@@ -28,6 +29,7 @@ public class ModuleManager {
         register(new HUD());
         register(new ClickGUI());
         register(new ESP());
+        register(new NoJumpDelay());
     }
 
     public void register(Module module) {
