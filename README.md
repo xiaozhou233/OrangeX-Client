@@ -116,6 +116,8 @@ java -jar injector.jar
 
 ## 开发指南 | Development
 
+完整开发文档见 [docs/README.md](docs/README.md)：模块开发、跨版本 Wrapper、反射与映射、Hook 和渲染。
+
 ### 开发环境 | Requirements
 
 | 环境    | 要求                                      |

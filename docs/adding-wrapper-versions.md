@@ -19,7 +19,9 @@ wrapper/
 ├── MinecraftFactory.java              # 唯一公开入口
 ├── package-info.java
 ├── api/
-│   └── Minecraft.java                 # 跨版本契约，只依赖 JDK
+│   ├── Minecraft.java                 # 跨版本契约，只依赖 JDK
+│   ├── Player.java
+│   └── WorldView.java
 ├── common/
 │   └── Vec3.java                      # 与版本无关的值对象
 └── internal/
@@ -28,7 +30,9 @@ wrapper/
     ├── WrapperRegistry.java           # 版本 -> Provider 注册表
     └── v1_8_9/
         ├── V1_8_9WrapperProvider.java
-        └── V1_8_9Minecraft.java
+        ├── V1_8_9Minecraft.java
+        ├── V1_8_9WorldView.java
+        └── V1_8_9Player.java
 ```
 
 各层职责：
@@ -234,42 +238,71 @@ static {
 MCP 开发环境使用 `MappingClass.identity(...)`：没有显式注册的成员会按
 同名返回，因此 `theMinecraft` 这类 named 字段可以直接使用。
 
-## 4. 添加新的 Wrapper 类型
+## 4. 添加新的 Wrapper 能力
 
 当需要暴露 Player、World、Chat 等能力时，不要往 `Minecraft` 接口里堆方法，
-按能力单独建接口。
+按能力单独建接口。完整实战（`Player` + `NoJumpDelay`）见
+[adding-wrapper-capabilities.md](adding-wrapper-capabilities.md)。
 
 以 `Player` 为例：
 
 ```java
 // api/Player.java
 public interface Player {
-    double getHealth();
-    void setHealth(double health);
+    void clearJumpDelay();
 }
 ```
 
-然后扩展 Provider：
+`WrapperProvider` 为每种能力增加一个工厂方法。依赖 `Minecraft` 实例的能力
+要把实例一起传进来：
 
 ```java
 public interface WrapperProvider {
 
     Minecraft createMinecraft(WrapperContext context);
 
-    Player createPlayer(WrapperContext context);
+    WorldView createWorld(WrapperContext context, Minecraft minecraft);
+
+    Player createPlayer(WrapperContext context, Minecraft minecraft);
 }
 ```
 
 每个版本的 Provider 实现自己的 `createPlayer`；不支持的版本抛
-`UnsupportedOperationException`。
-
-最后在 `WrapperRegistry` 增加对应分发方法，并在 `MinecraftFactory` 暴露：
+`UnsupportedOperationException`：
 
 ```java
+@Override
+public Player createPlayer(WrapperContext context, Minecraft minecraft) {
+    return new V1_8_9Player(context.getMappingResolver(), minecraft);
+}
+```
+
+然后在 `WrapperRegistry` 增加分发方法，并在 `MinecraftFactory` 暴露：
+
+```java
+// WrapperRegistry
+public static Player createPlayer(WrapperContext context, Minecraft minecraft) {
+    return provider(context).createPlayer(context, minecraft);
+}
+
+// MinecraftFactory
 public static Player createPlayer(RuntimeInfo runtimeInfo,
-                                  MappingResolver mappingResolver) {
+                                  MappingResolver mappingResolver,
+                                  Minecraft minecraft) {
     return WrapperRegistry.createPlayer(
-            new WrapperContext(runtimeInfo, mappingResolver));
+            new WrapperContext(runtimeInfo, mappingResolver), minecraft);
+}
+```
+
+最后在 `OrangeX.start()` 里创建并保存（失败只记录日志）：
+
+```java
+try {
+    this.player = MinecraftFactory.createPlayer(
+            runtimeInfo, MappingManager.getResolver(), minecraft);
+} catch (Throwable throwable) {
+    System.err.println("[OrangeX] Player wrapper unavailable: "
+            + throwable.getMessage());
 }
 ```
 
@@ -277,7 +310,8 @@ public static Player createPlayer(RuntimeInfo runtimeInfo,
 
 - 业务代码只依赖 `api`。
 - 新版本只需要实现同一个 Provider 接口。
-- 新能力只需要加一个 API + 一个分发方法。
+- 新能力只需要加一个 API、一个 Provider 方法和一个分发方法。
+- 具体字段反射写在 `internal.vX_Y_Z` 中，模块看不到 Minecraft 类名。
 
 ## 5. 构建与验证
 
@@ -319,10 +353,15 @@ ave@71e820ad
 ## 7. Checklist
 
 - [ ] `MinecraftVersion` 已有该版本，且版本检测能正确输出。
-- [ ] `wrapper/internal/vX_Y_Z` 下有 `VX_Y_ZWrappedProvider` 和 `VX_Y_ZMinecraft`。
-- [ ] `WrapperRegistry` 已注册该 Provider。
+- [ ] `wrapper/internal/vX_Y_Z` 下有 `VX_Y_ZWrapperProvider`、`VX_Y_ZMinecraft`，
+      以及该版本支持的其它能力实现（`WorldView`、`Player`……）。
+- [ ] Provider 实现了 `createMinecraft`、`createWorld`、`createPlayer`；
+      暂不支持的能力显式抛 `UnsupportedOperationException`。
+- [ ] `WrapperRegistry` 已注册该 Provider，并为每种能力增加分发方法。
 - [ ] `MappingManager` 已支持该版本 + 加载器组合。
 - [ ] SRG 资源已放到 `src/main/resources/mappings/...`。
 - [ ] 实现类中没有静态单例查询，依赖全部来自 `WrapperContext`。
 - [ ] `api` / `common` 中没有任何 Minecraft 或映射名称。
 - [ ] `./gradlew :OrangeX:shadowJar` 通过，并在真实客户端中打印出实例。
+
+新增能力而不是新增版本时，见 [adding-wrapper-capabilities.md](adding-wrapper-capabilities.md)。
