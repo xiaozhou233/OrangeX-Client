@@ -36,7 +36,7 @@ public final class Render2DManager {
     }
 
     public void fire(Object platformContext) {
-        fire(platformContext, true);
+        fire(platformContext, true, Float.NaN);
     }
 
     /**
@@ -45,6 +45,15 @@ public final class Render2DManager {
      *                event is dropped unless {@link #isRenderInMenus()} is on.
      */
     public void fire(Object platformContext, boolean inWorld) {
+        fire(platformContext, inWorld, Float.NaN);
+    }
+
+    /**
+     * @param partialTicks the partial tick the game rendered this frame with,
+     *                     or {@link Float#NaN} when the caller has none.
+     */
+    public void fire(Object platformContext, boolean inWorld,
+                     float partialTicks) {
         if (!inWorld && !renderInMenus) {
             return;
         }
@@ -60,7 +69,7 @@ public final class Render2DManager {
 
         Render2D context = backend.createRender2D(fonts, platformContext);
         try {
-            eventBus.post(new EventRender2D(context, inWorld));
+            eventBus.post(new EventRender2D(context, inWorld, partialTicks));
         } finally {
             context.flush();
         }

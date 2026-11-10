@@ -79,7 +79,7 @@ public class ESP extends Module {
 
         WorldSnapshot snapshot;
         try {
-            snapshot = world.snapshot();
+            snapshot = world.snapshot(event.getPartialTicks());
         } catch (Throwable throwable) {
             // A broken wrapper must not kill the whole HUD frame.
             System.err.println("[ESP] Failed to read world snapshot: "

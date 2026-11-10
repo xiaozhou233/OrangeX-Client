@@ -15,10 +15,16 @@ public class EventRender2D {
 
     private final Render2D render2D;
     private final boolean inWorld;
+    private final float partialTicks;
 
     public EventRender2D(Render2D render2D, boolean inWorld) {
+        this(render2D, inWorld, Float.NaN);
+    }
+
+    public EventRender2D(Render2D render2D, boolean inWorld, float partialTicks) {
         this.render2D = render2D;
         this.inWorld = inWorld;
+        this.partialTicks = partialTicks;
     }
 
     public Render2D getRender2D() {
@@ -30,5 +36,17 @@ public class EventRender2D {
      */
     public boolean isInWorld() {
         return inWorld;
+    }
+
+    /**
+     * The partial tick the game used for this frame's world render, i.e. the
+     * interpolation factor between the previous and the current tick.
+     *
+     * <p>Feature code must use this value instead of reading a timer of its own
+     * so projected world positions line up with the rendered world. It is
+     * {@link Float#NaN} when the hook could not supply one.</p>
+     */
+    public float getPartialTicks() {
+        return partialTicks;
     }
 }

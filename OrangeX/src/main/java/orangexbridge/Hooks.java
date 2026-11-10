@@ -30,6 +30,15 @@ public final class Hooks {
         Render2DEvents.fire(context, inWorld);
     }
 
+    /**
+     * 1.8.9 entry point: the HUD method receives the frame's partial tick, so
+     * injected code passes it straight through as {@code $1}.
+     */
+    public static void render2d(Object context, boolean inWorld,
+                                float partialTicks) {
+        Render2DEvents.fire(context, inWorld, partialTicks);
+    }
+
     public static void render2d(Object context) {
         Render2DEvents.fire(context);
     }

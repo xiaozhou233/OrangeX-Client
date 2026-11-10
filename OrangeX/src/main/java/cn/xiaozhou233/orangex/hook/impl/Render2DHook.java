@@ -101,7 +101,8 @@ public final class Render2DHook extends ClassHook {
                         throw new IllegalStateException(
                                 "No (F)V HUD method found in " + ctClass.getName());
                     }
-                    method.insertAfter("orangexbridge.Hooks.render2d(null, true);");
+                    method.insertAfter(
+                            "orangexbridge.Hooks.render2d(null, true, $1);");
                     return;
                 } else {
                     MappingMethod target = resolver.mapMethod(
@@ -112,7 +113,10 @@ public final class Render2DHook extends ClassHook {
                     methodDescriptor = target.getTargetDescriptor();
                 }
                 CtMethod method = ctClass.getMethod(methodName, methodDescriptor);
-                method.insertAfter("orangexbridge.Hooks.render2d(null, true);");
+                // $1 is the frame's partial tick: pass it through so features
+                // interpolate world positions exactly like the world render.
+                method.insertAfter(
+                        "orangexbridge.Hooks.render2d(null, true, $1);");
                 break;
             }
             case V26_2: {

@@ -16,7 +16,21 @@ public interface WorldView {
     /**
      * Captures the camera and entity list for the current frame.
      *
+     * @param partialTicks the partial tick the game rendered this frame with,
+     *                     taken from {@code EventRender2D}. This is the only
+     *                     value that keeps projections aligned with the
+     *                     rendered world; {@link Float#NaN} lets the
+     *                     implementation resolve one itself.
      * @return {@code null} while no level is loaded (title screen, loading).
      */
-    WorldSnapshot snapshot();
+    WorldSnapshot snapshot(float partialTicks);
+
+    /**
+     * @return whether a caller-supplied frame partial tick can be used. NaN and
+     *         out-of-range values are rejected so a misbehaving hook never
+     *         freezes entity interpolation.
+     */
+    static boolean isUsablePartialTick(float partialTicks) {
+        return partialTicks >= 0.0F && partialTicks <= 1.0F;
+    }
 }

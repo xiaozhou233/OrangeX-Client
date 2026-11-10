@@ -86,7 +86,7 @@ public final class V26_2WorldView implements WorldView {
     }
 
     @Override
-    public WorldSnapshot snapshot() {
+    public WorldSnapshot snapshot(float partialTicks) {
         Object level = ReflectionSupport.get(levelField, minecraft);
         Object localPlayer = ReflectionSupport.get(playerField, minecraft);
         Object gameRenderer = ReflectionSupport.get(gameRendererField, minecraft);
@@ -95,10 +95,15 @@ public final class V26_2WorldView implements WorldView {
             return null;
         }
 
-        float partialTicks = partialTicks();
         Object camera = camera(gameRenderer);
         if (camera == null) {
             return null;
+        }
+
+        // The 26.2 hook extracts the GUI from the game's delta tracker, so it
+        // supplies no partial tick and the tracker is the authoritative value.
+        if (!WorldView.isUsablePartialTick(partialTicks)) {
+            partialTicks = partialTicks();
         }
 
         Vec3 cameraPosition = readVec3(

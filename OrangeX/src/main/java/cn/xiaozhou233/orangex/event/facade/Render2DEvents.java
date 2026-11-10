@@ -17,10 +17,19 @@ public final class Render2DEvents {
      *                screen too, so the hook must pass this through.
      */
     public static void fire(Object platformContext, boolean inWorld) {
+        fire(platformContext, inWorld, Float.NaN);
+    }
+
+    /**
+     * @param partialTicks the partial tick the game rendered this frame with.
+     *                     {@link Float#NaN} when the hook cannot supply it.
+     */
+    public static void fire(Object platformContext, boolean inWorld,
+                            float partialTicks) {
         try {
             Render2DManager manager = OrangeX.getInstance().getRender2DManager();
             if (manager != null) {
-                manager.fire(platformContext, inWorld);
+                manager.fire(platformContext, inWorld, partialTicks);
             }
         } catch (Throwable throwable) {
             if (!failureLogged) {

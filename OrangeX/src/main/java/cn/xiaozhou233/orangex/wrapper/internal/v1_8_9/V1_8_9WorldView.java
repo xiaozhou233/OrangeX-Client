@@ -73,6 +73,7 @@ public final class V1_8_9WorldView implements WorldView {
     private final String[] villagerClassNames;
 
     private Field partialTicksField;
+    private boolean partialTicksWarningLogged;
     private Field loadedEntitiesField;
     private Field thirdPersonViewField;
     private Field fovSettingField;
@@ -116,7 +117,7 @@ public final class V1_8_9WorldView implements WorldView {
     }
 
     @Override
-    public WorldSnapshot snapshot() {
+    public WorldSnapshot snapshot(float partialTicks) {
         Object world = ReflectionSupport.get(worldField, minecraft);
         Object viewEntity = ReflectionSupport.get(viewEntityField, minecraft);
         Object localPlayer = ReflectionSupport.get(playerField, minecraft);
@@ -125,18 +126,23 @@ public final class V1_8_9WorldView implements WorldView {
             return null;
         }
 
-        float partialTicks = partialTicks();
+        // The render hook hands us the exact value the frame was rendered
+        // with. Only fall back to the timer when the caller has none, because a
+        // partial tick of 0 (or a stale one) makes every interpolated position
+        // advance in 20 Hz steps while the world renders smoothly.
+        float frameTicks = WorldView.isUsablePartialTick(partialTicks)
+                ? partialTicks : partialTicks();
         EntityAccess view = accessFor(viewEntity.getClass());
 
-        double eyeX = interpolate(view.posX, view.lastTickPosX, viewEntity, partialTicks);
-        double eyeY = interpolate(view.posY, view.lastTickPosY, viewEntity, partialTicks)
+        double eyeX = interpolate(view.posX, view.lastTickPosX, viewEntity, frameTicks);
+        double eyeY = interpolate(view.posY, view.lastTickPosY, viewEntity, frameTicks)
                 + invokeFloat(view.eyeHeight, viewEntity);
-        double eyeZ = interpolate(view.posZ, view.lastTickPosZ, viewEntity, partialTicks);
+        double eyeZ = interpolate(view.posZ, view.lastTickPosZ, viewEntity, frameTicks);
 
         float yaw = interpolateAngle(view.rotationYaw, view.prevRotationYaw,
-                viewEntity, partialTicks);
+                viewEntity, frameTicks);
         float pitch = interpolateAngle(view.rotationPitch, view.prevRotationPitch,
-                viewEntity, partialTicks);
+                viewEntity, frameTicks);
 
         int thirdPerson = thirdPersonView();
         float cameraYaw = yaw;
@@ -152,7 +158,7 @@ public final class V1_8_9WorldView implements WorldView {
         // Third person moves the camera back by the configured distance;
         // first person sits 0.1 blocks behind the eye (EntityRenderer).
         double cameraOffset = thirdPerson > 0
-                ? thirdPersonDistance(partialTicks)
+                ? thirdPersonDistance(frameTicks)
                 : FIRST_PERSON_OFFSET;
 
         double yawRadians = Math.toRadians(cameraYaw);
@@ -166,9 +172,9 @@ public final class V1_8_9WorldView implements WorldView {
         double cameraY = eyeY - forwardY * cameraOffset;
         double cameraZ = eyeZ - forwardZ * cameraOffset;
 
-        float fov = fieldOfView(partialTicks);
+        float fov = fieldOfView(frameTicks);
         List<EntityTarget> targets = collectTargets(
-                world, localPlayer, cameraX, cameraY, cameraZ, partialTicks);
+                world, localPlayer, cameraX, cameraY, cameraZ, frameTicks);
 
         return new WorldSnapshot(new Vec3(cameraX, cameraY, cameraZ),
                 cameraYaw, cameraPitch, fov, targets);
@@ -292,6 +298,12 @@ public final class V1_8_9WorldView implements WorldView {
         if (partialTicksField == null) {
             partialTicksField = ReflectionSupport.findField(
                     timer.getClass(), partialTicksName);
+            if (partialTicksField == null && !partialTicksWarningLogged) {
+                partialTicksWarningLogged = true;
+                System.err.println("[OrangeX] Cannot read "
+                        + partialTicksName + " from " + timer.getClass().getName()
+                        + ": world positions will not interpolate");
+            }
         }
 
         return partialTicksField == null
