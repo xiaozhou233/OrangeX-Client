@@ -67,6 +67,16 @@ public final class GuiInputHook extends ClassHook {
         // The empty screen is an overlay: it must not pause singleplayer.
         injectAfter(ctClass, "doesGuiPauseGame", "()Z",
                 "if (orangexbridge.Hooks.isOurScreen($0)) { $_ = false; }");
+
+        // Wheel scrolling for the ClickGUI. Injecting after vanilla keeps its
+        // mouse-button dispatch intact; the wheel event is still readable.
+        try {
+            injectAfter(ctClass, "handleMouseInput", "()V",
+                    "orangexbridge.Legacy.forwardScroll($0);");
+        } catch (Throwable ignored) {
+            // Scrolling is optional: never let it disable the input hooks
+            // above on a runtime where this method cannot be resolved.
+        }
     }
 
     private void injectBefore(CtClass ctClass, String name,

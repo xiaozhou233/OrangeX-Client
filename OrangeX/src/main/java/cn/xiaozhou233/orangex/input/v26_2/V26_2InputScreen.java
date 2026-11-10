@@ -63,7 +63,7 @@ public final class V26_2InputScreen extends Screen {
     @Override
     public boolean mouseScrolled(double x, double y,
                                  double scrollX, double scrollY) {
-        ClientInput.onMouseMove(x, y);
+        ClientInput.onMouseScroll(x, y, scrollY);
         return true;
     }
 }

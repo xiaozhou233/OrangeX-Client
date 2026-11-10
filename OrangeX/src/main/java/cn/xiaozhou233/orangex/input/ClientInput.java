@@ -21,6 +21,7 @@ public final class ClientInput {
     private static volatile boolean leftDown;
     private static volatile boolean rightDown;
     private static volatile boolean middleDown;
+    private static double scrollAmount;
 
     private static boolean started;
     private static boolean pendingOpen;
@@ -111,6 +112,29 @@ public final class ClientInput {
         }
     }
 
+    /**
+     * Queues a wheel notch for the next frame. Positive is one notch up.
+     */
+    public static synchronized void onMouseScroll(double amount) {
+        if (amount != 0.0) {
+            scrollAmount += amount;
+        }
+    }
+
+    public static void onMouseScroll(double x, double y, double amount) {
+        onMouseMove(x, y);
+        onMouseScroll(amount);
+    }
+
+    /**
+     * @return the wheel amount accumulated since the previous call.
+     */
+    public static synchronized double consumeScroll() {
+        double amount = scrollAmount;
+        scrollAmount = 0.0;
+        return amount;
+    }
+
     public static void reset() {
         if (open) {
             System.out.println("[OrangeX] Input screen closed");
@@ -119,6 +143,7 @@ public final class ClientInput {
         leftDown = false;
         rightDown = false;
         middleDown = false;
+        scrollAmount = 0.0;
     }
 
     public static boolean isOpen() {

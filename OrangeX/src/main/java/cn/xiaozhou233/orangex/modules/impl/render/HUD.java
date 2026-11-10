@@ -18,7 +18,7 @@ public class HUD extends Module {
     private static final float RAINBOW_CYCLE = 6000f;
 
     private static final int LOGO_FONT_SIZE = 22;
-    private static final int MODULE_FONT_SIZE = 14;
+    private static final int MODULE_FONT_SIZE = 10;
 
     private static final int LOGO_START_X = 5;
     private static final int LOGO_START_Y = 5;

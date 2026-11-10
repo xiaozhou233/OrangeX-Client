@@ -1,5 +1,6 @@
 package cn.xiaozhou233.orangex.input.internal.v1_8_9;
 
+import cn.xiaozhou233.orangex.event.facade.InputEvents;
 import cn.xiaozhou233.orangex.hook.ClassPoolUtils;
 import cn.xiaozhou233.orangex.hook.HookManager;
 import cn.xiaozhou233.orangex.hook.JuiceAgentBridge;
@@ -272,11 +273,27 @@ public final class V1_8_9Input implements VersionInput {
     }
 
     /**
-     * Used by injected {@code GuiScreen}/{@code KeyBinding} code to ignore
-     * LWJGL auto-repeat events.
+     * Used by injected {@code GuiScreen} code to ignore LWJGL auto-repeat
+     * events.
      */
     public static boolean isRepeatEvent() {
         return Keyboard.isRepeatEvent();
+    }
+
+    /**
+     * Called after {@code GuiScreen#handleMouseInput} ran. The wheel event is
+     * still readable at this point and must not consume the vanilla mouse
+     * button dispatch.
+     */
+    public static void forwardScroll(Object screen) {
+        if (!InputEvents.isOurInputScreen(screen)) {
+            return;
+        }
+
+        int wheel = Mouse.getEventDWheel();
+        if (wheel != 0) {
+            ClientInput.onMouseScroll(wheel > 0 ? 1.0 : -1.0);
+        }
     }
 
     @Override

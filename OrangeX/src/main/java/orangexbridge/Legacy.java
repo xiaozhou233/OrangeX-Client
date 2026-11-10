@@ -14,6 +14,10 @@ public final class Legacy {
         return V1_8_9Input.isRepeatEvent();
     }
 
+    public static void forwardScroll(Object screen) {
+        V1_8_9Input.forwardScroll(screen);
+    }
+
     private Legacy() {
     }
 }
