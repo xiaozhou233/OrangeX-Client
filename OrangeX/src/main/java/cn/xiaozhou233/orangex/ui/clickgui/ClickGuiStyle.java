@@ -50,6 +50,7 @@ public final class ClickGuiStyle {
     public static final int COLOR_SIDEBAR_BORDER = 0xFF24242C;
     public static final int COLOR_SWITCH_OFF = 0xFF34343F;
     public static final int COLOR_KNOB_OFF = 0xFF9A9AA8;
+    public static final int COLOR_SCROLLBAR = 0x40FFFFFF;
 
     private ClickGuiStyle() {
     }
@@ -79,6 +80,28 @@ public final class ClickGuiStyle {
 
     public static double centeredY(FontRenderer font, float top, float height) {
         return top + (height - font.getStringHeight()) / 2.0;
+    }
+
+    /**
+     * Draws a thin scrollbar for a scrollable list. Nothing is drawn while the
+     * content fits, so short lists look unchanged.
+     */
+    public static void drawScrollbar(Render2D graphics, double x, double top,
+                                     double viewHeight, double contentHeight,
+                                     double scroll) {
+        if (contentHeight <= viewHeight + 0.5) {
+            return;
+        }
+
+        double thumbHeight = Math.max(18.0,
+                viewHeight * (viewHeight / contentHeight));
+        double maxScroll = contentHeight - viewHeight;
+        double progress = maxScroll <= 0.0 ? 0.0
+                : clamp((float) (scroll / maxScroll), 0.0f, 1.0f);
+        double thumbY = top + (viewHeight - thumbHeight) * progress;
+
+        graphics.fillRoundedRect(x, thumbY, 2.0, thumbHeight, 1.0,
+                COLOR_SCROLLBAR);
     }
 
     public static boolean isInside(double mouseX, double mouseY,

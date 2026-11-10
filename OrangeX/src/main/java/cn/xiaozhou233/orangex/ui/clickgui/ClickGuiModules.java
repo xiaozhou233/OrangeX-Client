@@ -28,6 +28,19 @@ public final class ClickGuiModules {
         return settings;
     }
 
+    /**
+     * Allocation-free variant of {@link #settingsOf(Module)} for rows that only
+     * need to know whether a settings page can be opened.
+     */
+    public static boolean hasSettings(Module module) {
+        for (Value<?> value : module.getVisibleValues()) {
+            if (!(value instanceof KeybindValue)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static String displayName(ModuleCategory category) {
         String name = category.name();
         return name.substring(0, 1) + name.substring(1).toLowerCase(Locale.ROOT);

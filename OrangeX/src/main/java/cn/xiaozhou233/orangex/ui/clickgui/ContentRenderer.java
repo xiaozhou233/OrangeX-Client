@@ -11,8 +11,9 @@ import java.util.List;
 /**
  * Draws the module list for the selected category.
  *
- * <p>Module settings are not drawn inline; right-clicking a module opens the
- * separate {@link SettingsWindow}.</p>
+ * <p>Right-clicking a module opens its settings page in this same content area
+ * (see {@link SettingsSection}). The list scrolls with the wheel and shows a
+ * scrollbar when it does not fit.</p>
  */
 public final class ContentRenderer {
 
@@ -20,13 +21,13 @@ public final class ContentRenderer {
     }
 
     public static void draw(Render2D graphics, ClickGuiLayout layout,
-                            List<Module> modules, ModuleCategory category,
+                            ContentList rows, ModuleCategory category,
                             ClickGuiAnimator animator, float delta,
                             double mouseX, double mouseY) {
-        float x = layout.x();
         float y = layout.y();
         float contentX = layout.contentX();
         float contentWidth = layout.contentWidth();
+        List<Module> modules = rows.modules();
 
         FontRenderer title = ClickGuiStyle.font(graphics, 13.0f, true);
         title.drawString(ClickGuiModules.displayName(category), contentX,
@@ -57,22 +58,30 @@ public final class ContentRenderer {
                     contentX + (contentWidth - empty.getStringWidth(text)) / 2.0,
                     listTop + 14, ClickGuiStyle.COLOR_TEXT_MUTED);
         } else {
-            float rowY = listTop;
+            for (int i = 0; i < modules.size(); i++) {
+                Module module = modules.get(i);
+                float rowY = rows.rowTop(i);
 
-            for (Module module : modules) {
-                boolean hovered = ClickGuiStyle.isInside(mouseX, mouseY,
-                        contentX, rowY, contentWidth,
-                        ClickGuiStyle.MODULE_HEIGHT);
+                if (rowY > listBottom
+                        || rowY + ClickGuiStyle.MODULE_HEIGHT < listTop) {
+                    continue;
+                }
+
+                boolean hovered = mouseY >= listTop && mouseY <= listBottom
+                        && ClickGuiStyle.isInside(mouseX, mouseY, contentX,
+                                rowY, contentWidth, ClickGuiStyle.MODULE_HEIGHT);
                 float hover = animator.hover(module, hovered, delta);
 
-                drawModuleRow(graphics, layout, module, rowY, hover,
-                        animator, delta);
-
-                rowY += ClickGuiStyle.MODULE_HEIGHT + ClickGuiStyle.MODULE_GAP;
+                drawModuleRow(graphics, layout, module, rowY, hover, animator,
+                        delta);
             }
         }
 
         graphics.disableScissor();
+
+        ClickGuiStyle.drawScrollbar(graphics, contentX + contentWidth - 3,
+                listTop, listBottom - listTop, rows.contentHeight(),
+                rows.scroll());
     }
 
     private static void drawModuleRow(Render2D graphics, ClickGuiLayout layout,

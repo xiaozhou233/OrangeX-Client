@@ -8,10 +8,9 @@ import cn.xiaozhou233.orangex.modules.ModuleCategory;
 import cn.xiaozhou233.orangex.modules.ModuleManager;
 import cn.xiaozhou233.orangex.render.api.Render2D;
 import cn.xiaozhou233.orangex.ui.clickgui.component.Component;
-import cn.xiaozhou233.orangex.value.BooleanValue;
-import cn.xiaozhou233.orangex.value.ModeValue;
 import cn.xiaozhou233.orangex.value.Value;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -19,8 +18,9 @@ import java.util.List;
  *
  * <p>A single rounded window with a category sidebar on the left and the
  * selected category's modules on the right. Left-clicking a module toggles it;
- * right-clicking a module opens its settings in the separate
- * {@link SettingsWindow}. The window itself can be dragged by its header.</p>
+ * right-clicking a module swaps the content area to its settings page, which is
+ * left with the back button next to the module name. The window itself can be
+ * dragged by its header.</p>
  *
  * <p>All coordinates are Minecraft GUI pixels. Input is polled from
  * {@link ClientInput} because the empty input screen does not forward
@@ -31,13 +31,20 @@ public final class MainPanel extends Component {
 
     private static final ModuleCategory[] CATEGORIES = ModuleCategory.values();
 
+    /** Pixels scrolled per wheel notch. */
+    private static final float SCROLL_STEP = 24.0f;
+
     private final ModuleManager moduleManager =
             OrangeX.getInstance().getModuleManager();
 
     private final ClickGuiAnimator animator = new ClickGuiAnimator();
-    private final SettingsWindow settingsWindow = new SettingsWindow();
 
     private ModuleCategory selectedCategory = ModuleCategory.RENDER;
+
+    /** Module whose settings page replaces the list, or {@code null}. */
+    private Module settingsModule;
+
+    private float scrollOffset;
 
     private boolean hasPosition;
     private boolean dragging;
@@ -56,6 +63,8 @@ public final class MainPanel extends Component {
         updateBounds(graphics);
 
         ClickGuiLayout layout = layout();
+        applyScroll(layout);
+
         float delta = updateDelta();
         double mouseX = ClientInput.getMouseX();
         double mouseY = ClientInput.getMouseY();
@@ -68,23 +77,18 @@ public final class MainPanel extends Component {
         PanelChrome.drawHeader(graphics, layout);
         SidebarRenderer.draw(graphics, layout, selectedCategory,
                 moduleManager.getAllModules(), animator, delta, mouseX, mouseY);
-        ContentRenderer.draw(graphics, layout,
-                modulesOf(selectedCategory), selectedCategory,
-                animator, delta, mouseX, mouseY);
 
-        settingsWindow.render(graphics, delta, mouseX, mouseY);
+        if (settingsModule == null) {
+            ContentRenderer.draw(graphics, layout, contentList(layout),
+                    selectedCategory, animator, delta, mouseX, mouseY);
+        } else {
+            SettingsSection.draw(graphics, layout, settingsModule,
+                    settingsOf(), scrollOffset, animator, delta, mouseX, mouseY);
+        }
     }
 
     @Override
     public void mouseClicked(float mouseX, float mouseY, int button) {
-        if (settingsWindow.isOpen()) {
-            if (settingsWindow.mouseClicked(mouseX, mouseY, button)) {
-                return;
-            }
-            settingsWindow.close();
-            return;
-        }
-
         if (!ClickGuiStyle.isInside(mouseX, mouseY, x, y, width, height)) {
             return;
         }
@@ -102,7 +106,15 @@ public final class MainPanel extends Component {
         ClickGuiLayout layout = layout();
         ModuleCategory category = categoryAt(layout, mouseX, mouseY);
         if (category != null) {
-            selectedCategory = category;
+            if (category != selectedCategory) {
+                selectedCategory = category;
+            }
+            closeSettings();
+            return;
+        }
+
+        if (settingsModule != null) {
+            handleSettingsClick(layout, mouseX, mouseY, button);
             return;
         }
 
@@ -111,11 +123,6 @@ public final class MainPanel extends Component {
 
     @Override
     public void mouseDragged(float mouseX, float mouseY, int button) {
-        if (settingsWindow.isOpen()) {
-            settingsWindow.mouseDragged(mouseX, mouseY, button);
-            return;
-        }
-
         if (!dragging || button != 0) {
             return;
         }
@@ -135,7 +142,6 @@ public final class MainPanel extends Component {
 
     @Override
     public void mouseReleased(float mouseX, float mouseY, int button) {
-        settingsWindow.mouseReleased(mouseX, mouseY, button);
         if (button == 0) {
             dragging = false;
         }
@@ -143,7 +149,7 @@ public final class MainPanel extends Component {
 
     public void resetInteraction() {
         dragging = false;
-        settingsWindow.close();
+        closeSettings();
     }
 
     /* ------------------------------------------------------------------ */
@@ -155,28 +161,48 @@ public final class MainPanel extends Component {
         if (mouseY < layout.listTop() || mouseY > layout.listBottom()) {
             return false;
         }
-
-        float contentX = layout.contentX();
-        float contentWidth = layout.contentWidth();
-        float moduleHeight = ClickGuiStyle.MODULE_HEIGHT;
-        float rowY = layout.listTop();
-
-        for (Module module : modulesOf(selectedCategory)) {
-            if (ClickGuiStyle.isInside(mouseX, mouseY, contentX, rowY,
-                    contentWidth, moduleHeight)) {
-                if (button == 0) {
-                    module.toggle();
-                } else if (button == 1
-                        && !ClickGuiModules.settingsOf(module).isEmpty()) {
-                    settingsWindow.open(module, layout);
-                }
-                return true;
-            }
-
-            rowY += moduleHeight + ClickGuiStyle.MODULE_GAP;
+        if (mouseX < layout.contentX()
+                || mouseX > layout.contentX() + layout.contentWidth()) {
+            return false;
         }
 
+        ContentList rows = contentList(layout);
+        int moduleIndex = rows.moduleIndexAt(mouseY);
+        if (moduleIndex < 0) {
+            return false;
+        }
+
+        Module module = rows.modules().get(moduleIndex);
+        if (button == 0) {
+            module.toggle();
+        } else if (button == 1 && ClickGuiModules.hasSettings(module)) {
+            settingsModule = module;
+            scrollOffset = 0.0f;
+        }
+        return true;
+    }
+
+    private boolean handleSettingsClick(ClickGuiLayout layout, float mouseX,
+                                        float mouseY, int button) {
+        if (button == 0 && SettingsSection.isBackButton(layout, mouseX,
+                mouseY)) {
+            closeSettings();
+            return true;
+        }
+
+        List<Value<?>> settings = settingsOf();
+        int index = SettingsSection.rowIndexAt(layout, settings, scrollOffset,
+                mouseY);
+        if (index >= 0) {
+            SettingsSection.click(settings, index, button);
+            return true;
+        }
         return false;
+    }
+
+    private void closeSettings() {
+        settingsModule = null;
+        scrollOffset = 0.0f;
     }
 
     private ModuleCategory categoryAt(ClickGuiLayout layout, float mouseX,
@@ -203,6 +229,39 @@ public final class MainPanel extends Component {
     private ClickGuiLayout layout() {
         return new ClickGuiLayout(x, y, width, height, categoryRowHeight,
                 screenWidth, screenHeight);
+    }
+
+    private ContentList contentList(ClickGuiLayout layout) {
+        return new ContentList(layout, modulesOf(selectedCategory),
+                scrollOffset);
+    }
+
+    private List<Value<?>> settingsOf() {
+        return settingsModule == null
+                ? Collections.<Value<?>>emptyList()
+                : ClickGuiModules.settingsOf(settingsModule);
+    }
+
+    /**
+     * Applies this frame's wheel input to whichever list is visible and keeps
+     * its offset inside the content.
+     */
+    private void applyScroll(ClickGuiLayout layout) {
+        double wheel = ClientInput.consumeScroll();
+        float step = (float) -wheel * SCROLL_STEP;
+
+        if (settingsModule != null) {
+            scrollOffset = ClickGuiStyle.clamp(scrollOffset + step, 0.0f,
+                    SettingsSection.maxScroll(layout, settingsOf()));
+            return;
+        }
+
+        ContentList rows = contentList(layout);
+        if (wheel != 0.0) {
+            rows.scrollBy(step);
+        }
+        rows.clampScroll();
+        scrollOffset = rows.scroll();
     }
 
     private void updateBounds(Render2D graphics) {
